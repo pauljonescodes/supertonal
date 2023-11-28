@@ -8,14 +8,17 @@
 
 namespace BinaryData
 {
-    extern const char*   cabinet_wav;
-    const int            cabinet_wavSize = 127642;
+    extern const char*   cory_bread_and_butter_normalized_wav;
+    const int            cory_bread_and_butter_normalized_wavSize = 127642;
 
-    extern const char*   normalized_wav;
-    const int            normalized_wavSize = 127642;
+    extern const char*   Guitar_Plate_aif;
+    const int            Guitar_Plate_aifSize = 644226;
+
+    extern const char*   VTM60_low_pregain70_low50_mid50_high50_presence50_wav;
+    const int            VTM60_low_pregain70_low50_mid50_high50_presence50_wavSize = 2798;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 2;
+    const int namedResourceListSize = 3;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

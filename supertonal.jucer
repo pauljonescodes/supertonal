@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="gKYDzO" name="supertonal" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="gKYDzO" name="Supertonal" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              version="0.0.0" companyName="cory" companyCopyright="2112" pluginFormats="buildAAX">
-  <MAINGROUP id="Pdzbsi" name="supertonal">
-    <GROUP id="{B780589E-F1CE-4592-E518-D781ABD1CC3E}" name="Samples">
-      <FILE id="fzJgxg" name="cabinet.wav" compile="0" resource="1" file="Samples/cabinet.wav"/>
-      <FILE id="hDlnXe" name="normalized.wav" compile="0" resource="1" file="Samples/normalized.wav"/>
+              version="0.1.3" companyName="Supertonal Company" companyCopyright="2112"
+              pluginFormats="buildAAX,buildVST3" pluginAAXCategory="8192">
+  <MAINGROUP id="Pdzbsi" name="Supertonal">
+    <GROUP id="{2ED2996E-C3B4-16E6-D794-2D6A2D1A240A}" name="Assets">
+      <FILE id="NiXqDL" name="cory_bread_and_butter_normalized.wav" compile="0"
+            resource="1" file="Assets/cory_bread_and_butter_normalized.wav"/>
+      <FILE id="WCefh3" name="Guitar Plate.aif" compile="0" resource="1"
+            file="Assets/Guitar Plate.aif"/>
+      <FILE id="cjKIfL" name="VTM60_low_pregain70_low50_mid50_high50_presence50.wav"
+            compile="0" resource="1" file="Assets/VTM60_low_pregain70_low50_mid50_high50_presence50.wav"/>
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
-      <GROUP id="{06D1DEEE-BB7C-D180-995E-E44977EBC81C}" name="Components">
-        <FILE id="aVo0hE" name="MainComponent.cpp" compile="1" resource="0"
-              file="Source/Components/MainComponent.cpp"/>
-        <FILE id="duUwdk" name="MainComponent.h" compile="0" resource="0" file="Source/Components/MainComponent.h"/>
-      </GROUP>
+      <FILE id="Gaac0b" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
       <FILE id="cVoqrs" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="zmo3pu" name="PluginProcessor.h" compile="0" resource="0"
@@ -62,10 +63,11 @@
         <MODULEPATH id="juce_dsp" path="../../modules"/>
       </MODULEPATHS>
     </VS2022>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="Builds/MacOSX" hardenedRuntime="1" iosDevelopmentTeamID="24TXZ384X3"
+               buildNumber="77">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="supertonal"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="supertonal"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Supertonal2"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../modules"/>

@@ -14,7 +14,7 @@
  #define JucePlugin_Build_VST              0
 #endif
 #ifndef  JucePlugin_Build_VST3
- #define JucePlugin_Build_VST3             0
+ #define JucePlugin_Build_VST3             1
 #endif
 #ifndef  JucePlugin_Build_AU
  #define JucePlugin_Build_AU               0
@@ -41,16 +41,16 @@
  #define JucePlugin_Enable_ARA             0
 #endif
 #ifndef  JucePlugin_Name
- #define JucePlugin_Name                   "supertonal"
+ #define JucePlugin_Name                   "Supertonal"
 #endif
 #ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "supertonal"
+ #define JucePlugin_Desc                   "Supertonal"
 #endif
 #ifndef  JucePlugin_Manufacturer
- #define JucePlugin_Manufacturer           "cory"
+ #define JucePlugin_Manufacturer           "Supertonal Company"
 #endif
 #ifndef  JucePlugin_ManufacturerWebsite
- #define JucePlugin_ManufacturerWebsite    "www.cory.com"
+ #define JucePlugin_ManufacturerWebsite    "www.SupertonalCompany.com"
 #endif
 #ifndef  JucePlugin_ManufacturerEmail
  #define JucePlugin_ManufacturerEmail      ""
@@ -77,13 +77,13 @@
  #define JucePlugin_EditorRequiresKeyboardFocus  0
 #endif
 #ifndef  JucePlugin_Version
- #define JucePlugin_Version                0.0.0
+ #define JucePlugin_Version                0.1.3
 #endif
 #ifndef  JucePlugin_VersionCode
- #define JucePlugin_VersionCode            0x0
+ #define JucePlugin_VersionCode            0x103
 #endif
 #ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "0.0.0"
+ #define JucePlugin_VersionString          "0.1.3"
 #endif
 #ifndef  JucePlugin_VSTUniqueID
  #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
@@ -101,19 +101,19 @@
  #define JucePlugin_AUSubType              JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_AUExportPrefix
- #define JucePlugin_AUExportPrefix         supertonalAU
+ #define JucePlugin_AUExportPrefix         SupertonalAU
 #endif
 #ifndef  JucePlugin_AUExportPrefixQuoted
- #define JucePlugin_AUExportPrefixQuoted   "supertonalAU"
+ #define JucePlugin_AUExportPrefixQuoted   "SupertonalAU"
 #endif
 #ifndef  JucePlugin_AUManufacturerCode
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.cory.supertonal
+ #define JucePlugin_CFBundleIdentifier     com.SupertonalCompany.Supertonal
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.cory.supertonal
+ #define JucePlugin_AAXIdentifier          com.SupertonalCompany.Supertonal
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
@@ -122,7 +122,7 @@
  #define JucePlugin_AAXProductId           JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_AAXCategory
- #define JucePlugin_AAXCategory            0
+ #define JucePlugin_AAXCategory            8192
 #endif
 #ifndef  JucePlugin_AAXDisableBypass
  #define JucePlugin_AAXDisableBypass       0
@@ -137,7 +137,7 @@
  #define JucePlugin_IAASubType             JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_IAAName
- #define JucePlugin_IAAName                "cory: supertonal"
+ #define JucePlugin_IAAName                "Supertonal Company: Supertonal"
 #endif
 #ifndef  JucePlugin_VSTNumMidiInputs
  #define JucePlugin_VSTNumMidiInputs       16
@@ -152,10 +152,10 @@
  #define JucePlugin_ARATransformationFlags  0
 #endif
 #ifndef  JucePlugin_ARAFactoryID
- #define JucePlugin_ARAFactoryID           "com.cory.supertonal.factory"
+ #define JucePlugin_ARAFactoryID           "com.SupertonalCompany.Supertonal.factory"
 #endif
 #ifndef  JucePlugin_ARADocumentArchiveID
- #define JucePlugin_ARADocumentArchiveID   "com.cory.supertonal.aradocumentarchive.0.0.0"
+ #define JucePlugin_ARADocumentArchiveID   "com.SupertonalCompany.Supertonal.aradocumentarchive.0.1.3"
 #endif
 #ifndef  JucePlugin_ARACompatibleArchiveIDs
  #define JucePlugin_ARACompatibleArchiveIDs  ""

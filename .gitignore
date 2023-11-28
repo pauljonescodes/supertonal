@@ -364,3 +364,6 @@ FodyWeavers.xsd
 /Source/SampledMidiNote.h
 /Source/SampledMidiNote.cpp
 /Builds/
+
+wrap-sign-cmds.md
+**/*.DS_Store
