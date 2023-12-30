@@ -364,4 +364,10 @@ FodyWeavers.xsd
 /Source/SampledMidiNote.h
 /Source/SampledMidiNote.cpp
 /Builds/
+<<<<<<< HEAD
 /JuceLibraryCode/
+=======
+
+wrap-sign-cmds.md
+**/*.DS_Store
+>>>>>>> 58bf7c6cb8305d3a799227dd9bda6b101f6ea016
