@@ -36,10 +36,9 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::ampGainId,
 },
 {
-	apvts::ampLowShelfOnId,
-	apvts::ampLowShelfFrequencyId,
-	apvts::ampLowShelfQId,
-	apvts::ampLowShelfGainId,
+	apvts::ampHighPassOnId,
+	apvts::ampHighPassFrequencyId,
+	apvts::ampHighPassQId,
 },
 {
 	apvts::ampMidPeakOnId,

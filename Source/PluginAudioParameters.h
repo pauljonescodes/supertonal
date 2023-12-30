@@ -15,6 +15,7 @@
 namespace apvts
 {
 	static const std::string identifier = "supertonal-apvts";
+	static constexpr int version = 2;
 
 	// Define each ID as a static const with camel case and "Id" suffix
 	
@@ -30,7 +31,8 @@ namespace apvts
 
 	static const std::string overdriveTanhShaperOnId = "od_tanh-shaper_on";
 	static const std::string overdriveClipShaperOnId = "od_clip-shaper_on";
-	static const std::string ampLowShelfOnId = "amp_low-shelf_on";
+
+	static const std::string ampHighPassOnId = "amp_high-pass_on";
 	static const std::string ampMidPeakOnId = "amp_mid-peak_on";
 	static const std::string ampHighShelfOnId = "amp_high-shelf_on";
 
@@ -39,9 +41,8 @@ namespace apvts
 	static const std::string ampCompRatioId = "amp_comp_ratio";
 	static const std::string ampCompReleaseId = "amp_comp_release";
 	
-	static const std::string ampLowShelfFrequencyId = "amp_low-shelf_frequency";
-	static const std::string ampLowShelfQId = "amp_low-shelf_q";
-	static const std::string ampLowShelfGainId = "amp_low-shelf_gain";
+	static const std::string ampHighPassFrequencyId = "amp_high-pass_frequency";
+	static const std::string ampHighPassQId = "amp_high-pass_q";
 	
 	static const std::string ampMidPeakFrequencyId = "amp_mid-peak_frequency";
 	static const std::string ampMidPeakQId = "amp_mid-peak_q";
@@ -63,10 +64,9 @@ namespace apvts
 		ampCompAttackId,
 		ampCompRatioId,
 		ampCompReleaseId,
-		ampLowShelfOnId,
-		ampLowShelfFrequencyId,
-		ampLowShelfQId,
-		ampLowShelfGainId,
+		ampHighPassOnId,
+		ampHighPassFrequencyId,
+		ampHighPassQId,
 		ampMidPeakOnId,
 		ampMidPeakFrequencyId,
 		ampMidPeakQId,
@@ -146,7 +146,7 @@ namespace apvts
 
 	// EQ
 
-	static const std::string lowShelfEqualizationId = "low-shelf";
+	static const std::string highPassEqualizationId = "high-pass";
 	static const std::string midPeakEqualizationId = "mid-peak";
 	static const std::string highShelfEqualizationId = "high-shelf";
 
@@ -157,7 +157,7 @@ namespace apvts
 	static const std::map<std::string, float> equalizationTypeIdToDefaultFrequencyMap = {
 	{highShelfEqualizationId,highShelfFrequencyDefaultValue},
 	{midPeakEqualizationId,midPeakFrequencyDefaultValue},
-	{lowShelfEqualizationId,lowShelfFrequencyDefaultValue}
+	{highPassEqualizationId,lowShelfFrequencyDefaultValue}
 	};
 
 	static const std::string qualityId = "q";

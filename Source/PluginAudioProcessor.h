@@ -61,7 +61,7 @@ private:
     std::unique_ptr<juce::dsp::Gain<float>> mOverdriveGainPtr;
     std::unique_ptr<juce::dsp::Convolution> mAmpImpulseResponseConvolutionPtr;
     std::unique_ptr<juce::dsp::Compressor<float>> mAmpCompressorPtr;
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpLowShelfFilterPtr;
+    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpHighPassFilterPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpMidPeakFilterPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpHighShelfFilterPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mAmpGainPtr;

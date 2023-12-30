@@ -28,7 +28,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mQueue(std::make_unique<juce::dsp::ConvolutionMessageQueue>()),
 	mAmpImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 2048 }, *mQueue.get())),
 	mAmpCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
-	mAmpLowShelfFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
+	mAmpHighPassFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 	mAmpMidPeakFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 	mAmpHighShelfFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 	mAmpGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
@@ -69,7 +69,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			if (parts[1] == apvts::onId)
 			{
 				layout.add(std::make_unique<juce::AudioParameterBool>(
-					juce::ParameterID{ parameterId, 1 },
+					juce::ParameterID{ parameterId, apvts::version },
 					parameterId,
 					true
 					));
@@ -77,7 +77,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			else if (parts[1] == apvts::gainId)
 			{
 				layout.add(std::make_unique<juce::AudioParameterFloat>(
-					juce::ParameterID{ parameterId, 1 },
+					juce::ParameterID{ parameterId, apvts::version },
 					parameterId,
 					apvts::gainNormalizableRange,
 					apvts::gainDefaultValue
@@ -86,7 +86,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			else if (parts[1] == apvts::biasId)
 			{
 				layout.add(std::make_unique<juce::AudioParameterFloat>(
-					juce::ParameterID{ parameterId, 1 },
+					juce::ParameterID{ parameterId, apvts::version },
 					parameterId,
 					apvts::biasNormalizableRange,
 					apvts::biasDefaultValue
@@ -102,7 +102,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			if (parts[2] == apvts::onId)
 			{
 				layout.add(std::make_unique<juce::AudioParameterBool>(
-					juce::ParameterID{ parameterId, 1 },
+					juce::ParameterID{ parameterId, apvts::version },
 					parameterId,
 					true
 					));
@@ -112,7 +112,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				if (parts[2] == apvts::thresholdId)
 				{
 					layout.add(std::make_unique<juce::AudioParameterFloat>(
-						juce::ParameterID{ parameterId, 1 },
+						juce::ParameterID{ parameterId, apvts::version },
 						parameterId,
 						apvts::thresholdNormalizableRange,
 						apvts::thresholdDefaultValue
@@ -121,7 +121,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				else if (parts[2] == apvts::attackId)
 				{
 					layout.add(std::make_unique<juce::AudioParameterFloat>(
-						juce::ParameterID{ parameterId, 1 },
+						juce::ParameterID{ parameterId, apvts::version },
 						parameterId,
 						apvts::attackNormalizableRange,
 						apvts::attackDefaultValue
@@ -130,7 +130,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				else if (parts[2] == apvts::ratioId)
 				{
 					layout.add(std::make_unique<juce::AudioParameterFloat>(
-						juce::ParameterID{ parameterId, 1 },
+						juce::ParameterID{ parameterId, apvts::version },
 						parameterId,
 						apvts::ratioNormalizableRange,
 						apvts::ratioDefaultValue
@@ -139,7 +139,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				else if (parts[2] == apvts::releaseId)
 				{
 					layout.add(std::make_unique<juce::AudioParameterFloat>(
-						juce::ParameterID{ parameterId, 1 },
+						juce::ParameterID{ parameterId, apvts::version },
 						parameterId,
 						apvts::releaseNormalizableRange,
 						apvts::releaseDefaultValue
@@ -150,14 +150,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 					assert(false);
 				}
 			}
-			else if (parts[1] == apvts::lowShelfEqualizationId ||
+			else if (parts[1] == apvts::highPassEqualizationId ||
 				parts[1] == apvts::midPeakEqualizationId ||
 				parts[1] == apvts::highShelfEqualizationId)
 			{
 				if (parts[2] == apvts::qualityId)
 				{
 					layout.add(std::make_unique<juce::AudioParameterFloat>(
-						juce::ParameterID{ parameterId, 1 },
+						juce::ParameterID{ parameterId, apvts::version },
 						parameterId,
 						apvts::qualityNormalizableRange,
 						apvts::qualityDefaultValue
@@ -166,7 +166,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				else if (parts[2] == apvts::frequencyId)
 				{
 					layout.add(std::make_unique<juce::AudioParameterFloat>(
-						juce::ParameterID{ parameterId, 1 },
+						juce::ParameterID{ parameterId, apvts::version },
 						parameterId,
 						apvts::frequencyNormalizableRange,
 						apvts::equalizationTypeIdToDefaultFrequencyMap.at(parts[1])
@@ -175,7 +175,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				else if (parts[2] == apvts::gainId)
 				{
 					layout.add(std::make_unique<juce::AudioParameterFloat>(
-						juce::ParameterID{ parameterId, 1 },
+						juce::ParameterID{ parameterId, apvts::version },
 						parameterId,
 						apvts::eqGainNormalizableRange,
 						apvts::eqGainDefaultValue
@@ -237,8 +237,8 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mAmpCompressorPtr->prepare(spec);
 	mAmpGainPtr->prepare(spec);
 
-	mAmpLowShelfFilterPtr->prepare(spec);
-	*mAmpLowShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
+	mAmpHighPassFilterPtr->prepare(spec);
+	*mAmpHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
 		sampleRate,
 		apvts::lowShelfFrequencyDefaultValue,
 		apvts::qualityDefaultValue,
@@ -279,7 +279,7 @@ void PluginAudioProcessor::reset()
 	mOverdriveGainPtr->reset();
 	mAmpImpulseResponseConvolutionPtr->reset();
 	mAmpCompressorPtr->reset();
-	mAmpLowShelfFilterPtr->reset();
+	mAmpHighPassFilterPtr->reset();
 	mAmpMidPeakFilterPtr->reset();
 	mAmpHighShelfFilterPtr->reset();
 	mAmpGainPtr->reset();
@@ -324,7 +324,7 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	if (mAmpLowShelfFilterOn)
 	{
-		mAmpLowShelfFilterPtr->process(context);
+		mAmpHighPassFilterPtr->process(context);
 	}
 
 	if (mAmpMidPeakFilterOn)
@@ -414,7 +414,7 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 			{
 				mOverdriveSoftClipWaveShaperOn = newValue;
 			}
-			else if (parameterId == apvts::ampLowShelfOnId)
+			else if (parameterId == apvts::ampHighPassOnId)
 			{
 				mAmpLowShelfFilterOn = newValue;
 			}
@@ -453,35 +453,24 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 				assert(false);
 			}
 		}
-		else if (parts[1] == apvts::lowShelfEqualizationId)
+		else if (parts[1] == apvts::highPassEqualizationId)
 		{
-			const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::ampLowShelfFrequencyId).getValue();
-			const float gain = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::ampLowShelfGainId).getValue();
-			const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::ampLowShelfQId).getValue();
+			const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::ampHighPassFrequencyId).getValue();
+			const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::ampHighPassQId).getValue();
 
 			if (parts[2] == apvts::frequencyId)
 			{
-				*mAmpLowShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
+				*mAmpHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
 					sampleRate,
 					std::max(newValue, apvts::frequencyMinimumValue),
-					std::max(quality, apvts::qualityMinimumValue),
-					juce::Decibels::decibelsToGain(gain));
+					std::max(quality, apvts::qualityMinimumValue));
 			}
 			else if (parts[2] == apvts::qualityId)
 			{
-				*mAmpLowShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
+				*mAmpHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
 					sampleRate,
 					std::max(frequency, apvts::frequencyMinimumValue),
-					std::max(newValue, apvts::qualityMinimumValue),
-					juce::Decibels::decibelsToGain(gain));
-			}
-			else if (parts[2] == apvts::gainId)
-			{
-				*mAmpLowShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
-					sampleRate,
-					std::max(frequency, apvts::frequencyMinimumValue),
-					std::max(quality, apvts::qualityMinimumValue),
-					juce::Decibels::decibelsToGain(newValue));
+					std::max(newValue, apvts::qualityMinimumValue));
 			}
 			else
 			{
