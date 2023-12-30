@@ -107,7 +107,7 @@ namespace apvts
 	static const std::string gainId = "gain";
 
 	static constexpr float gainMinimumValue = -64.0f;
-	static constexpr float gainMaximumValue = 12.0f;
+	static constexpr float gainMaximumValue = 64.0f;
 	static constexpr float gainIntervalValue = 0.01f;
 	static constexpr float gainDefaultValue = 0.0f;
 	static const juce::NormalisableRange<float> gainNormalizableRange = juce::NormalisableRange<float>(gainMinimumValue, gainMaximumValue, gainIntervalValue);

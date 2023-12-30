@@ -26,7 +26,7 @@ private:
     std::unique_ptr <juce::Viewport> mViewportPtr;
     std::unique_ptr <juce::Component> mContainerPtr;
 
-    juce::OwnedArray<juce::OwnedArray<juce::Component>> mComponents;
+    juce::OwnedArray<juce::OwnedArray<juce::Component>> mComponentRows;
 
     juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> mButtonAttachments;    
     juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;

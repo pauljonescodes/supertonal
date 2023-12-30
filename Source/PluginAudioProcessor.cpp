@@ -322,20 +322,20 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	mAmpCompressorPtr->process(context);
 
-	/*if (mAmpLowShelfFilterOn)
+	if (mAmpLowShelfFilterOn)
 	{
 		mAmpLowShelfFilterPtr->process(context);
-	}*/
+	}
 
 	if (mAmpMidPeakFilterOn)
 	{
 		mAmpMidPeakFilterPtr->process(context);
 	}
 
-	/*if (mAmpHighShelfFilterOn)
+	if (mAmpHighShelfFilterOn)
 	{
 		mAmpHighShelfFilterPtr->process(context);
-	}*/
+	}
 
 	mAmpGainPtr->process(context);
 
