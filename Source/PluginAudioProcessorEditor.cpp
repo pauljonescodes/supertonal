@@ -3,12 +3,12 @@
 #include "PluginUtils.h"
 
 PluginAudioProcessorEditor::PluginAudioProcessorEditor(
-	PluginAudioProcessor& p, 
+	PluginAudioProcessor& p,
 	juce::AudioProcessorValueTreeState& apvts,
 	PluginPresetManager& presetManager)
-	: 
-	AudioProcessorEditor(&p), 
-	mProcessorRef(p), 
+	:
+	AudioProcessorEditor(&p),
+	mProcessorRef(p),
 	mAudioProcessorValueTreeState(apvts)
 {
 	mViewportPtr = std::make_unique<juce::Viewport>();
@@ -20,38 +20,89 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	mPresetComponentPtr = std::make_unique<PluginPresetComponent>(presetManager);
 	mContainerPtr->addAndMakeVisible(mPresetComponentPtr.get());
 
-	for (const auto& parameterId : apvts::ids)
+	static const std::vector<std::vector<std::string>> apvtsIdRows = {
+{
+	apvts::inputGainId,
+	apvts::overdriveTanhShaperOnId,
+	apvts::overdriveClipShaperOnId,
+	apvts::overdriveBiasId,
+	apvts::overdriveGainId,
+	},
+{
+	apvts::ampCompThresholdId,
+	apvts::ampCompAttackId,
+	apvts::ampCompRatioId,
+	apvts::ampCompReleaseId,
+	apvts::ampGainId,
+},
+{
+	apvts::ampLowShelfOnId,
+	apvts::ampLowShelfFrequencyId,
+	apvts::ampLowShelfQId,
+	apvts::ampLowShelfGainId,
+},
+{
+	apvts::ampMidPeakOnId,
+	apvts::ampMidPeakFrequencyId,
+	apvts::ampMidPeakQId,
+	apvts::ampMidPeakGainId,
+},
+{
+	apvts::ampHighShelfOnId,
+	apvts::ampHighShelfFrequencyId,
+	apvts::ampHighShelfQId,
+	apvts::ampHighShelfGainId,
+},
+{
+	apvts::ampImpulseResponseConvolutionOnId,
+	apvts::cabImpulseResponseConvolutionOnId,
+	apvts::outputGainId
+}
+	};
+
+	for (int row = 0; row < apvtsIdRows.size(); ++row)
 	{
-		if (PluginUtils::isToggleId(parameterId))
-		{
-			const auto& button = new juce::ToggleButton(PluginUtils::toTitleCase(parameterId));
-			mComponents.add(button);
-			mButtonAttachments.add(new juce::AudioProcessorValueTreeState::ButtonAttachment(
-				mAudioProcessorValueTreeState,
-				parameterId,
-				*button
-			));
-			mContainerPtr->addAndMakeVisible(button);
-		}
-		else
-		{
-			const auto& slider = new juce::Slider(juce::Slider::Rotary, juce::Slider::TextBoxBelow);
-			slider->setTitle(PluginUtils::toTitleCase(parameterId));
+		const auto& colIds = apvtsIdRows[row];
 
-			const auto& label = new juce::Label(parameterId, PluginUtils::toTitleCase(parameterId));
-			label->attachToComponent(slider, false);
+		for (const auto& parameterId : colIds)
+		{
+			if (mComponentRows.size() < row + 1)
+			{
+				mComponentRows.add(new juce::OwnedArray<juce::Component>());
+			}
 
-			mComponents.add(slider);
-			mSliderAttachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(
-				mAudioProcessorValueTreeState,
-				parameterId,
-				*slider
-			));
-			mContainerPtr->addAndMakeVisible(slider);
+			if (PluginUtils::isToggleId(parameterId))
+			{
+				auto* button = new juce::ToggleButton(PluginUtils::toTitleCase(parameterId));
+				mComponentRows[row]->add(button);
+				mButtonAttachments.add(new juce::AudioProcessorValueTreeState::ButtonAttachment(
+					mAudioProcessorValueTreeState,
+					parameterId,
+					*button
+				));
+				mContainerPtr->addAndMakeVisible(button);
+			}
+			else
+			{
+				auto* slider = new juce::Slider(juce::Slider::Rotary, juce::Slider::TextBoxBelow);
+				slider->setTitle(PluginUtils::toTitleCase(parameterId));
+
+				auto* label = new juce::Label(parameterId, PluginUtils::toTitleCase(parameterId));
+				label->attachToComponent(slider, false);
+
+				mComponentRows[row]->add(slider);
+				mSliderAttachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(
+					mAudioProcessorValueTreeState,
+					parameterId,
+					*slider
+				));
+				mContainerPtr->addAndMakeVisible(slider);
+			}
 		}
+		
 	}
 
-	setSize(600, 600);
+	setSize(750, 750);
 	setResizable(true, true);
 }
 
@@ -59,7 +110,7 @@ PluginAudioProcessorEditor::~PluginAudioProcessorEditor()
 {
 	mSliderAttachments.clear();
 	mButtonAttachments.clear();
-	mComponents.clear();
+	mComponentRows.clear();
 	mViewportPtr.reset();
 	mContainerPtr.reset();
 	mPresetComponentPtr.reset();
@@ -82,20 +133,28 @@ void PluginAudioProcessorEditor::resized()
 
 	mPresetComponentPtr->setBounds(presetControls);
 
-	int numRows = std::max(1, localBounds.getHeight() / 200);
-	int numCols = std::max(1, localBounds.getWidth() / 200);
-	
-	int buttonWidth = localBounds.getWidth() / numCols;
-	int buttonHeight = localBounds.getHeight() / numRows;
+	int numRows = mComponentRows.size();
+	int numCols = 0; 
 
-	int totalRowsNeeded = (mComponents.size() + numCols - 1) / numCols;
-	int totalHeight = ((buttonHeight + 50) * totalRowsNeeded);
+	for (int i = 0; i < mComponentRows.size(); ++i) {
+		int currentSize = mComponentRows[i]->size();
+
+		if (currentSize > numCols) {
+			numCols = currentSize;
+		}
+	}
+
+	int buttonWidth = localBounds.getWidth() / numCols;
+	int buttonHeight = buttonWidth;
+
+	int totalHeight = ((buttonHeight + 12.5) * numRows);
 	mContainerPtr->setBounds(0, 0, mViewportPtr->getWidth(), totalHeight);
 
-	for (int i = 0; i < mComponents.size(); ++i)
+	for (int row = 0; row < mComponentRows.size(); ++row)
 	{
-		int row = i / numCols;
-		int col = i % numCols;
-		mComponents[i]->setBounds(col * buttonWidth, row * buttonHeight + 100, buttonWidth, buttonHeight - 50);
+		for (int col = 0; col < mComponentRows[row]->size(); ++col)
+		{
+			(*mComponentRows[row])[col]->setBounds(col * buttonWidth, row * buttonHeight + 100, buttonWidth, buttonHeight - 50);
+		}
 	}
 }
