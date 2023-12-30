@@ -33,9 +33,9 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mAmpHighShelfFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 	mAmpGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
 	mCabinetImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 2048 }, *mQueue.get())),
-	mOutputGainPtr(std::make_unique<juce::dsp::Gain<float>>())
+	mOutputGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
+	mPresetManagerPtr(std::make_unique<PluginPresetManager>(*mAudioProcessorValueTreeStatePtr.get()))
 {
-	mPresetManagerPtr = std::make_unique<PluginPresetManager>(*mAudioProcessorValueTreeStatePtr.get());
 	mAudioFormatManagerPtr->registerBasicFormats();
 
 	mInputGainPtr->setGainDecibels(apvts::gainDefaultValue);
