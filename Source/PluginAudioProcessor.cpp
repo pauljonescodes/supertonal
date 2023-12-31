@@ -238,25 +238,10 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mAmpGainPtr->prepare(spec);
 
 	mAmpHighPassFilterPtr->prepare(spec);
-	*mAmpHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
-		sampleRate,
-		apvts::lowShelfFrequencyDefaultValue,
-		apvts::qualityDefaultValue,
-		apvts::eqGainDefaultValue);
 
 	mAmpMidPeakFilterPtr->prepare(spec);
-	*mAmpMidPeakFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-		sampleRate,
-		apvts::midPeakFrequencyDefaultValue,
-		apvts::qualityDefaultValue,
-		apvts::eqGainDefaultValue);
 
 	mAmpHighShelfFilterPtr->prepare(spec);
-	*mAmpHighShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
-		sampleRate,
-		apvts::highShelfFrequencyDefaultValue,
-		apvts::qualityDefaultValue,
-		apvts::eqGainDefaultValue);
 
 	mCabinetImpulseResponseConvolutionPtr->prepare(spec);
 	mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
@@ -268,6 +253,14 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 		juce::dsp::Convolution::Normalise::yes);
 
 	mOutputGainPtr->prepare(spec);
+
+	for (const auto& parameterId : apvts::ids)
+	{
+		auto sampleRate = getSampleRate();
+		auto newValue = mAudioProcessorValueTreeStatePtr->getParameterAsValue(parameterId).getValue();
+
+		parameterChanged(parameterId, newValue);
+	}
 }
 
 void PluginAudioProcessor::reset()
