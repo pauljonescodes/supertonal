@@ -42,31 +42,53 @@ public:
 
 private:
     std::unique_ptr<juce::AudioProcessorValueTreeState> mAudioProcessorValueTreeStatePtr;
-    std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
     std::unique_ptr<PluginPresetManager> mPresetManagerPtr;
-    
-    bool mOverdriveTanhWaveShaperOn = true;
-    bool mOverdriveSoftClipWaveShaperOn = true;
-    bool mAmpImpulseResponseConvolutionOn = true;
-    bool mAmpLowShelfFilterOn = true;
-    bool mAmpMidPeakFilterOn = true;
-    bool mAmpHighShelfFilterOn = true;
-    bool mCabImpulseResponseConvolutionOn = true;
+    std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
 
-    std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mQueue;
-    std::unique_ptr<juce::dsp::Gain<float>> mInputGainPtr;
-    std::unique_ptr<juce::dsp::WaveShaper<float>> mOverdriveTanhWaveShaperPtr;
-    std::unique_ptr<juce::dsp::WaveShaper<float>> mOverdriveSoftClipWaveShaperPtr;
-    std::unique_ptr<juce::dsp::Bias<float>> mOverdriveBiasPtr;
-    std::unique_ptr<juce::dsp::Gain<float>> mOverdriveGainPtr;
-    std::unique_ptr<juce::dsp::Convolution> mAmpImpulseResponseConvolutionPtr;
+    std::unique_ptr<juce::AudioBuffer<float>> mStage1Buffer;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage1InputGainPtr;
+    std::unique_ptr<juce::dsp::WaveShaper<float>> mStage1WaveShaperPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage1OutputGainPtr;
+    std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage1DryWetMixerPtr;
+
+    std::unique_ptr<juce::AudioBuffer<float>> mStage2Buffer;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage2InputGainPtr;
+    std::unique_ptr<juce::dsp::WaveShaper<float>> mStage2WaveShaperPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage2OutputGainPtr;
+    std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage2DryWetMixerPtr;
+
+    std::unique_ptr<juce::AudioBuffer<float>> mStage3Buffer;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage3InputGainPtr;
+    std::unique_ptr<juce::dsp::WaveShaper<float>> mStage3WaveShaperPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage3OutputGainPtr;
+    std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage3DryWetMixerPtr;
+
+    std::unique_ptr<juce::dsp::Bias<float>> mBiasPtr;
+    
     std::unique_ptr<juce::dsp::Compressor<float>> mAmpCompressorPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mAmpCompressorGainPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpHighPassFilterPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpMidPeakFilterPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpHighShelfFilterPtr;
-    std::unique_ptr<juce::dsp::Gain<float>> mAmpGainPtr;
+    
+    std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;
     std::unique_ptr<juce::dsp::Convolution> mCabinetImpulseResponseConvolutionPtr;
+
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
+
+    bool mStage1On = false;
+    bool mStage1Series = false;
+    
+    bool mStage2On = false;
+    bool mStage2Series = false;
+    
+    bool mStage3On = false;
+    bool mStage3Series = false;
+    
+    bool mAmpHighPassFilterOn = false;
+    bool mAmpMidPeakFilterOn = false;
+    bool mAmpHighShelfFilterOn = false;
+    bool mCabImpulseResponseConvolutionOn = true;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessor)
 };

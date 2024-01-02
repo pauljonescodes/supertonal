@@ -22,18 +22,35 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 
 	static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
-	apvts::inputGainId,
-	apvts::overdriveTanhShaperOnId,
-	apvts::overdriveClipShaperOnId,
-	apvts::overdriveBiasId,
-	apvts::overdriveGainId,
-	},
+	apvts::stage1OnId,
+	apvts::stage1InputGainId,
+	apvts::stage1WaveShaperId,
+	apvts::stage1OutputGainId,
+	apvts::stage1DryWetId,
+	apvts::stage1ModeId,
+},
+{
+	apvts::stage2OnId,
+	apvts::stage2InputGainId,
+	apvts::stage2WaveShaperId,
+	apvts::stage2OutputGainId,
+	apvts::stage2DryWetId,
+	apvts::stage2ModeId,
+},
+{
+	apvts::stage3OnId,
+	apvts::stage3InputGainId,
+	apvts::stage3WaveShaperId,
+	apvts::stage3OutputGainId,
+	apvts::stage3DryWetId,
+	apvts::stage3ModeId,
+},
 {
 	apvts::ampCompThresholdId,
 	apvts::ampCompAttackId,
 	apvts::ampCompRatioId,
 	apvts::ampCompReleaseId,
-	apvts::ampGainId,
+	apvts::ampCompGainId,
 },
 {
 	apvts::ampHighPassOnId,
@@ -53,8 +70,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::ampHighShelfGainId,
 },
 {
-	apvts::ampImpulseResponseConvolutionOnId,
-	apvts::cabImpulseResponseConvolutionOnId,
+	apvts::cabinetImpulseResponseConvolutionOnId,
 	apvts::outputGainId
 }
 	};
@@ -65,6 +81,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 
 		for (const auto& parameterId : colIds)
 		{
+
 			if (mComponentRows.size() < row + 1)
 			{
 				mComponentRows.add(new juce::OwnedArray<juce::Component>());
@@ -80,6 +97,29 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 					*button
 				));
 				mContainerPtr->addAndMakeVisible(button);
+			}
+			else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isModeId(parameterId))
+			{
+				auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
+				if (PluginUtils::isWaveshaperId(parameterId))
+				{
+					for (int waveshaperIndex = 0; waveshaperIndex < apvts::waveShaperIds.size(); waveshaperIndex++) {
+						comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
+					}
+				}
+				else
+				{
+					for (int modeIndex = 0; modeIndex < apvts::modeIds.size(); modeIndex++) {
+						comboBox->addItem(apvts::modeIds.at(modeIndex), modeIndex + 1);
+					}
+				}
+				mComponentRows[row]->add(comboBox);
+				new juce::AudioProcessorValueTreeState::ComboBoxAttachment(
+					mAudioProcessorValueTreeState,
+					parameterId,
+					*comboBox
+				);
+				mContainerPtr->addAndMakeVisible(comboBox);
 			}
 			else
 			{

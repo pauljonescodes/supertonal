@@ -10,15 +10,43 @@
 
 #include "PluginUtils.h"
 
+bool PluginUtils::isNumeric(const std::string& str) {
+    return !str.empty() && std::find_if(str.begin(),
+        str.end(), [](unsigned char c) { return !std::isdigit(c); }) == str.end();
+}
+
 bool PluginUtils::isToggleId(const std::string& str) 
 {
-    std::string target = "on";
-    if (str.length() >= target.length()) {
-        // Compare the end of the string with "on"
-        return (0 == str.compare(str.length() - target.length(), target.length(), target));
+    if (str.length() >= apvts::onComponentId.length()) 
+    {
+        return (0 == str.compare(str.length() - apvts::onComponentId.length(), apvts::onComponentId.length(), apvts::onComponentId));
     }
-    else {
-        // The string is shorter than the target, so it can't end with "on"
+    else 
+    {
+        return false;
+    }
+}
+
+bool PluginUtils::isModeId(const std::string& str)
+{
+    if (str.length() >= apvts::modeComponentId.length())
+    {
+        return (0 == str.compare(str.length() - apvts::modeComponentId.length(), apvts::modeComponentId.length(), apvts::modeComponentId));
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool PluginUtils::isWaveshaperId(const std::string& str)
+{
+    if (str.length() >= apvts::waveshaperComponentId.length())
+    {
+        return (0 == str.compare(str.length() - apvts::waveshaperComponentId.length(), apvts::waveshaperComponentId.length(), apvts::waveshaperComponentId));
+    }
+    else
+    {
         return false;
     }
 }
