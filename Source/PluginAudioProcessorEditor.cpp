@@ -27,7 +27,6 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::stage1WaveShaperId,
 	apvts::stage1OutputGainId,
 	apvts::stage1DryWetId,
-	apvts::stage1ModeId,
 },
 {
 	apvts::stage2OnId,
@@ -35,7 +34,6 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::stage2WaveShaperId,
 	apvts::stage2OutputGainId,
 	apvts::stage2DryWetId,
-	apvts::stage2ModeId,
 },
 {
 	apvts::stage3OnId,
@@ -43,31 +41,41 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::stage3WaveShaperId,
 	apvts::stage3OutputGainId,
 	apvts::stage3DryWetId,
-	apvts::stage3ModeId,
 },
 {
-	apvts::ampCompThresholdId,
-	apvts::ampCompAttackId,
-	apvts::ampCompRatioId,
-	apvts::ampCompReleaseId,
-	apvts::ampCompGainId,
+	apvts::stage4OnId,
+	apvts::stage4InputGainId,
+	apvts::stage4WaveShaperId,
+	apvts::stage4OutputGainId,
+	apvts::stage4DryWetId,
 },
 {
-	apvts::ampHighPassOnId,
-	apvts::ampHighPassFrequencyId,
-	apvts::ampHighPassQId,
+	apvts::modeId,
+	apvts::biasComponentId,
 },
 {
-	apvts::ampMidPeakOnId,
-	apvts::ampMidPeakFrequencyId,
-	apvts::ampMidPeakQId,
-	apvts::ampMidPeakGainId,
+	apvts::compressorThresholdId,
+	apvts::compressorAttackId,
+	apvts::compressorRatioId,
+	apvts::compressorReleaseId,
+	apvts::compressorGainId,
 },
 {
-	apvts::ampHighShelfOnId,
-	apvts::ampHighShelfFrequencyId,
-	apvts::ampHighShelfQId,
-	apvts::ampHighShelfGainId,
+	apvts::highPassOnId,
+	apvts::highPassFrequencyId,
+	apvts::highPassQId,
+},
+{
+	apvts::midPeakOnId,
+	apvts::midPeakFrequencyId,
+	apvts::midPeakQId,
+	apvts::midPeakGainId,
+},
+{
+	apvts::highShelfOnId,
+	apvts::highShelfFrequencyId,
+	apvts::highShelfQId,
+	apvts::highShelfGainId,
 },
 {
 	apvts::cabinetImpulseResponseConvolutionOnId,
@@ -107,18 +115,18 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 						comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
 					}
 				}
-				else
+				else if (PluginUtils::isModeId(parameterId))
 				{
 					for (int modeIndex = 0; modeIndex < apvts::modeIds.size(); modeIndex++) {
 						comboBox->addItem(apvts::modeIds.at(modeIndex), modeIndex + 1);
 					}
 				}
 				mComponentRows[row]->add(comboBox);
-				new juce::AudioProcessorValueTreeState::ComboBoxAttachment(
+				mComboBoxAttachments.add(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(
 					mAudioProcessorValueTreeState,
 					parameterId,
 					*comboBox
-				);
+				));
 				mContainerPtr->addAndMakeVisible(comboBox);
 			}
 			else
@@ -149,6 +157,7 @@ PluginAudioProcessorEditor::~PluginAudioProcessorEditor()
 {
 	mSliderAttachments.clear();
 	mButtonAttachments.clear();
+	mComboBoxAttachments.clear();
 	mComponentRows.clear();
 	mViewportPtr.reset();
 	mContainerPtr.reset();

@@ -63,6 +63,12 @@ private:
     std::unique_ptr<juce::dsp::Gain<float>> mStage3OutputGainPtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage3DryWetMixerPtr;
 
+    std::unique_ptr<juce::AudioBuffer<float>> mStage4Buffer;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage4InputGainPtr;
+    std::unique_ptr<juce::dsp::WaveShaper<float>> mStage4WaveShaperPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mStage4OutputGainPtr;
+    std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage4DryWetMixerPtr;
+
     std::unique_ptr<juce::dsp::Bias<float>> mBiasPtr;
     
     std::unique_ptr<juce::dsp::Compressor<float>> mAmpCompressorPtr;
@@ -76,14 +82,12 @@ private:
 
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
 
+    bool mParallel = false;
+
     bool mStage1On = false;
-    bool mStage1Series = false;
-    
     bool mStage2On = false;
-    bool mStage2Series = false;
-    
     bool mStage3On = false;
-    bool mStage3Series = false;
+    bool mStage4On = false;
     
     bool mAmpHighPassFilterOn = false;
     bool mAmpMidPeakFilterOn = false;

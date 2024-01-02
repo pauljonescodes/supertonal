@@ -19,31 +19,36 @@ namespace apvts
 	static const std::string identifier = "supertonal-apvts";
 	static constexpr int version = 3;
 
-	//
+	// Wave Shaper
 
 	static const std::string waveshaperComponentId = "wave_shaper";
 
-	static const std::string hyperbolicTangentWaveshaperId = "htan";
-	static const std::string softClipWaveshaperId = "soft";
-	static const std::string arctangentWaveshaperId = "atan";
-	static const std::string cubicNonLineartyWaveshaperId = "cube";
-	static const std::string hardClipWaveshaperId = "hard";
+	static const std::string hyperbolicTangentWaveShaperId = "htan";
+	static const std::string softClipWaveShaperId = "soft";
+	static const std::string arctangentWaveShaperId = "atan";
+	static const std::string cubicNonLineartyWaveShaperId = "cube";
+	static const std::string hardClipWaveShaperId = "hard";
+	static const std::string exponentialWaveShaperId = "expo";
 
 	static const std::vector<std::string> waveShaperIds = {
-		hyperbolicTangentWaveshaperId,
-		softClipWaveshaperId,
-		arctangentWaveshaperId,
-		cubicNonLineartyWaveshaperId,
-		hardClipWaveshaperId,
+		hyperbolicTangentWaveShaperId,
+		softClipWaveShaperId,
+		arctangentWaveShaperId,
+		cubicNonLineartyWaveShaperId,
+		hardClipWaveShaperId,
+		exponentialWaveShaperId,
 	};
 
-	static const std::map<std::string, float (*) (float)> waveshaperFunctions = {
-		{hyperbolicTangentWaveshaperId, [](float x) { return std::tanh(x); }},
-		{softClipWaveshaperId, [](float x) { return x / (std::abs(x) + 1.0f); }},
-		{arctangentWaveshaperId, [](float x) { return std::atan(x); }},
-		{cubicNonLineartyWaveshaperId, [](float x) { return x - (1.0f / 3.0f) * std::pow(x, 3.0f); }},
-		{hardClipWaveshaperId, [](float x) { return std::max(-1.0f, std::min(1.0f, x)); }}
+	static const std::map<std::string, float (*) (float)> waveShaperIdToFunctionMap = {
+		{hyperbolicTangentWaveShaperId, [](float x) { return std::tanh(x); }},
+		{softClipWaveShaperId, [](float x) { return x / (std::abs(x) + 1.0f); }},
+		{arctangentWaveShaperId, [](float x) { return std::atan(x); }},
+		{cubicNonLineartyWaveShaperId, [](float x) { return x - (1.0f / 3.0f) * std::pow(x, 3.0f); }},
+		{hardClipWaveShaperId, [](float x) { return std::max(-1.0f, std::min(1.0f, x)); }},
+		{exponentialWaveShaperId, [](float x) {return std::exp(x) - 1; }}
 	};
+
+	// Series/Parallel
 
 	static const std::string modeComponentId = "mode";
 
@@ -51,54 +56,62 @@ namespace apvts
 	static const std::string parallelModeId = "parallel";
 
 	static const std::vector<std::string> modeIds = {
-		parallelModeId,
 		seriesModeId,
+		parallelModeId,
 	};
 
+	// Stages
+
+	static const std::string modeId = "mode";
 
 	static const std::string stage1OnId = "stage_1_on";
 	static const std::string stage1InputGainId = "stage_1_input_gain";
 	static const std::string stage1WaveShaperId = "stage_1_wave_shaper";
 	static const std::string stage1OutputGainId = "stage_1_output_gain";
 	static const std::string stage1DryWetId = "stage_1_dry_wet";
-	static const std::string stage1ModeId = "stage_1_mode";
 
 	static const std::string stage2OnId = "stage_2_on";
 	static const std::string stage2InputGainId = "stage_2_input_gain";
 	static const std::string stage2WaveShaperId = "stage_2_wave_shaper";
 	static const std::string stage2OutputGainId = "stage_2_output_gain";
 	static const std::string stage2DryWetId = "stage_2_dry_wet";
-	static const std::string stage2ModeId = "stage_2_mode";
 
 	static const std::string stage3OnId = "stage_3_on";
 	static const std::string stage3InputGainId = "stage_3_input_gain";
 	static const std::string stage3WaveShaperId = "stage_3_wave_shaper";
 	static const std::string stage3OutputGainId = "stage_3_output_gain";
 	static const std::string stage3DryWetId = "stage_3_dry_wet";
-	static const std::string stage3ModeId = "stage_3_mode";
+
+	static const std::string stage4OnId = "stage_4_on";
+	static const std::string stage4InputGainId = "stage_4_input_gain";
+	static const std::string stage4WaveShaperId = "stage_4_wave_shaper";
+	static const std::string stage4OutputGainId = "stage_4_output_gain";
+	static const std::string stage4DryWetId = "stage_4_dry_wet";
+
+	static const std::string compressorThresholdId = "comp_threshold";
+	static const std::string compressorAttackId = "comp_attack";
+	static const std::string compressorRatioId = "comp_ratio";
+	static const std::string compressorReleaseId = "comp_release";
+	static const std::string compressorGainId = "comp_gain";
+
+	static const std::string highPassOnId = "high-pass_on";
+	static const std::string highPassFrequencyId = "high-pass_frequency";
+	static const std::string highPassQId = "high-pass_q";
+
+	static const std::string midPeakOnId = "mid-peak_on";
+	static const std::string midPeakFrequencyId = "mid-peak_frequency";
+	static const std::string midPeakQId = "mid-peak_q";
+	static const std::string midPeakGainId = "mid-peak_gain";
+
+	static const std::string highShelfOnId = "high-shelf_on";
+	static const std::string highShelfFrequencyId = "high-shelf_frequency";
+	static const std::string highShelfQId = "high-shelf_q";
+	static const std::string highShelfGainId = "high-shelf_gain";
+
+	// Cab
 
 	static const std::string cabinetImpulseResponseConvolutionOnId = "cab_on";
-	static const std::string outputGainId = "cab_gain";
-
-	static const std::string ampCompThresholdId = "amp_comp_threshold";
-	static const std::string ampCompAttackId = "amp_comp_attack";
-	static const std::string ampCompRatioId = "amp_comp_ratio";
-	static const std::string ampCompReleaseId = "amp_comp_release";
-	static const std::string ampCompGainId = "amp_comp_gain";
-
-	static const std::string ampHighPassOnId = "amp_high-pass_on";
-	static const std::string ampHighPassFrequencyId = "amp_high-pass_frequency";
-	static const std::string ampHighPassQId = "amp_high-pass_q";
-
-	static const std::string ampMidPeakOnId = "amp_mid-peak_on";
-	static const std::string ampMidPeakFrequencyId = "amp_mid-peak_frequency";
-	static const std::string ampMidPeakQId = "amp_mid-peak_q";
-	static const std::string ampMidPeakGainId = "amp_mid-peak_gain";
-
-	static const std::string ampHighShelfOnId = "amp_high-shelf_on";
-	static const std::string ampHighShelfFrequencyId = "amp_high-shelf_frequency";
-	static const std::string ampHighShelfQId = "amp_high-shelf_q";
-	static const std::string ampHighShelfGainId = "amp_high-shelf_gain";
+	static const std::string outputGainId = "output_gain";
 
 	// BYPASS
 
@@ -210,81 +223,87 @@ namespace apvts
 
 
 	enum class ParameterEnum {
+		MODE,
 		STAGE1_ON,
 		STAGE1_INPUT_GAIN,
 		STAGE1_WAVE_SHAPER,
 		STAGE1_OUTPUT_GAIN,
 		STAGE1_DRY_WET,
-		STAGE1_MODE,
 		STAGE2_ON,
 		STAGE2_INPUT_GAIN,
 		STAGE2_WAVE_SHAPER,
 		STAGE2_OUTPUT_GAIN,
 		STAGE2_DRY_WET,
-		STAGE2_MODE,
 		STAGE3_ON,
 		STAGE3_INPUT_GAIN,
 		STAGE3_WAVE_SHAPER,
 		STAGE3_OUTPUT_GAIN,
 		STAGE3_DRY_WET,
-		STAGE3_MODE,
+		STAGE4_ON,
+		STAGE4_INPUT_GAIN,
+		STAGE4_WAVE_SHAPER,
+		STAGE4_OUTPUT_GAIN,
+		STAGE4_DRY_WET,
 		BIAS,
-		AMP_COMPRESSOR_THRESHOLD,
-		AMP_COMPRESSOR_ATTACK,
-		AMP_COMPRESSOR_RATIO,
-		AMP_COMPRESSOR_RELEASE,
-		AMP_COMPRESSOR_GAIN,
-		AMP_HIGH_PASS_ON,
-		AMP_HIGH_PASS_FREQUENCY,
-		AMP_HIGH_PASS_Q,
-		AMP_MID_PEAK_ON,
-		AMP_MID_PEAK_FREQUENCY,
-		AMP_MID_PEAK_Q,
-		AMP_MID_PEAK_GAIN,
-		AMP_HIGH_SHELF_ON,
-		AMP_HIGH_SHELF_FREQUENCY,
-		AMP_HIGH_SHELF_Q,
-		AMP_HIGH_SHELF_GAIN,
+		COMPRESSOR_THRESHOLD,
+		COMPRESSOR_ATTACK,
+		COMPRESSOR_RATIO,
+		COMPRESSOR_RELEASE,
+		COMPRESSOR_GAIN,
+		HIGH_PASS_ON,
+		HIGH_PASS_FREQUENCY,
+		HIGH_PASS_Q,
+		MID_PEAK_ON,
+		MID_PEAK_FREQUENCY,
+		MID_PEAK_Q,
+		MID_PEAK_GAIN,
+		HIGH_SHELF_ON,
+		HIGH_SHELF_FREQUENCY,
+		HIGH_SHELF_Q,
+		HIGH_SHELF_GAIN,
 		CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON,
 		OUTPUT_GAIN
 	};
 
 	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap{
+		{modeId, ParameterEnum::MODE},
 		{stage1OnId, ParameterEnum::STAGE1_ON},
 		{stage1InputGainId, ParameterEnum::STAGE1_INPUT_GAIN},
 		{stage1WaveShaperId, ParameterEnum::STAGE1_WAVE_SHAPER},
 		{stage1OutputGainId, ParameterEnum::STAGE1_OUTPUT_GAIN},
 		{stage1DryWetId, ParameterEnum::STAGE1_DRY_WET},
-		{stage1ModeId, ParameterEnum::STAGE1_MODE},
 		{stage2OnId, ParameterEnum::STAGE2_ON},
 		{stage2InputGainId, ParameterEnum::STAGE2_INPUT_GAIN},
 		{stage2WaveShaperId, ParameterEnum::STAGE2_WAVE_SHAPER},
 		{stage2OutputGainId, ParameterEnum::STAGE2_OUTPUT_GAIN},
 		{stage2DryWetId, ParameterEnum::STAGE2_DRY_WET},
-		{stage2ModeId, ParameterEnum::STAGE2_MODE},
 		{stage3OnId, ParameterEnum::STAGE3_ON},
 		{stage3InputGainId, ParameterEnum::STAGE3_INPUT_GAIN},
 		{stage3WaveShaperId, ParameterEnum::STAGE3_WAVE_SHAPER},
 		{stage3OutputGainId, ParameterEnum::STAGE3_OUTPUT_GAIN},
 		{stage3DryWetId, ParameterEnum::STAGE3_DRY_WET},
-		{stage3ModeId, ParameterEnum::STAGE3_MODE},
+		{stage4OnId, ParameterEnum::STAGE4_ON},
+		{stage4InputGainId, ParameterEnum::STAGE4_INPUT_GAIN},
+		{stage4WaveShaperId, ParameterEnum::STAGE4_WAVE_SHAPER},
+		{stage4OutputGainId, ParameterEnum::STAGE4_OUTPUT_GAIN},
+		{stage4DryWetId, ParameterEnum::STAGE4_DRY_WET},
 		{biasComponentId, ParameterEnum::BIAS},
-		{ampCompThresholdId, ParameterEnum::AMP_COMPRESSOR_THRESHOLD},
-		{ampCompAttackId, ParameterEnum::AMP_COMPRESSOR_ATTACK},
-		{ampCompRatioId, ParameterEnum::AMP_COMPRESSOR_RATIO},
-		{ampCompReleaseId, ParameterEnum::AMP_COMPRESSOR_RELEASE},
-		{ampCompGainId, ParameterEnum::AMP_COMPRESSOR_GAIN},
-		{ampHighPassOnId, ParameterEnum::AMP_HIGH_PASS_ON},
-		{ampHighPassFrequencyId, ParameterEnum::AMP_HIGH_PASS_FREQUENCY},
-		{ampHighPassQId, ParameterEnum::AMP_HIGH_PASS_Q},
-		{ampMidPeakOnId, ParameterEnum::AMP_MID_PEAK_ON},
-		{ampMidPeakFrequencyId, ParameterEnum::AMP_MID_PEAK_FREQUENCY},
-		{ampMidPeakQId, ParameterEnum::AMP_MID_PEAK_Q},
-		{ampMidPeakGainId, ParameterEnum::AMP_MID_PEAK_GAIN},
-		{ampHighShelfOnId, ParameterEnum::AMP_HIGH_SHELF_ON},
-		{ampHighShelfFrequencyId, ParameterEnum::AMP_HIGH_SHELF_FREQUENCY},
-		{ampHighShelfQId, ParameterEnum::AMP_HIGH_SHELF_Q},
-		{ampHighShelfGainId, ParameterEnum::AMP_HIGH_SHELF_GAIN},
+		{compressorThresholdId, ParameterEnum::COMPRESSOR_THRESHOLD},
+		{compressorAttackId, ParameterEnum::COMPRESSOR_ATTACK},
+		{compressorRatioId, ParameterEnum::COMPRESSOR_RATIO},
+		{compressorReleaseId, ParameterEnum::COMPRESSOR_RELEASE},
+		{compressorGainId, ParameterEnum::COMPRESSOR_GAIN},
+		{highPassOnId, ParameterEnum::HIGH_PASS_ON},
+		{highPassFrequencyId, ParameterEnum::HIGH_PASS_FREQUENCY},
+		{highPassQId, ParameterEnum::HIGH_PASS_Q},
+		{midPeakOnId, ParameterEnum::MID_PEAK_ON},
+		{midPeakFrequencyId, ParameterEnum::MID_PEAK_FREQUENCY},
+		{midPeakQId, ParameterEnum::MID_PEAK_Q},
+		{midPeakGainId, ParameterEnum::MID_PEAK_GAIN},
+		{highShelfOnId, ParameterEnum::HIGH_SHELF_ON},
+		{highShelfFrequencyId, ParameterEnum::HIGH_SHELF_FREQUENCY},
+		{highShelfQId, ParameterEnum::HIGH_SHELF_Q},
+		{highShelfGainId, ParameterEnum::HIGH_SHELF_GAIN},
 		{cabinetImpulseResponseConvolutionOnId, ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON},
 		{outputGainId, ParameterEnum::OUTPUT_GAIN}
 	};
