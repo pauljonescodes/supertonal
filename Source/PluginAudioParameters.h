@@ -60,7 +60,353 @@ namespace apvts
 		parallelModeId,
 	};
 
-	// Stages
+	// BYPASS
+
+	static const std::string onComponentId = "on";
+
+	// BIAS
+
+	static const std::string biasComponentId = "bias";
+
+	static const float biasDefaultValue = 0.0f;
+	static const float biasMinimumValue = -1.0f;
+	static const float biasMaximumValue = 1.0f;
+	static const float biasIntervalValue = 0.01f;
+	static const juce::NormalisableRange<float> biasNormalizableRange = juce::NormalisableRange<float>(
+		biasMinimumValue, 
+		biasMaximumValue, 
+		biasIntervalValue);
+
+	// GAIN
+
+	static const std::string gainComponentId = "gain";
+
+	static constexpr float gainMinimumValue = -128.0f;
+	static constexpr float gainMaximumValue = 128.0f;
+	static constexpr float gainIntervalValue = 0.01f;
+	static constexpr float gainDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> gainNormalizableRange = juce::NormalisableRange<float>(
+		gainMinimumValue, 
+		gainMaximumValue, 
+		gainIntervalValue);
+
+	// GAIN
+
+	static const std::string dryWetComponentId = "gain";
+
+	static constexpr float dryWetMinimumValue = 0.0f;
+	static constexpr float dryWetMaximumValue = 1.0f;
+	static constexpr float dryWetIntervalValue = 0.001f;
+	static constexpr float dryWetDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> dryWetNormalizableRange = juce::NormalisableRange<float>(
+		dryWetMinimumValue, 
+		dryWetMaximumValue, 
+		dryWetIntervalValue);
+
+
+	// COMPRESSION
+
+	static const std::string compressionComponentId = "comp";
+
+	static const std::string thresholdComponentId = "threshold";
+	static constexpr float thresholdMinimumValue = -64.0f;
+	static constexpr float thresholdMaximumValue = 0.0f;
+	static constexpr float thresholdIntervalValue = 0.01f;
+	static constexpr float thresholdDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> thresholdNormalizableRange = juce::NormalisableRange<float>(
+		thresholdMinimumValue, 
+		thresholdMaximumValue, 
+		thresholdIntervalValue);
+
+	static const std::string attackComponentId = "attack";
+	static constexpr float attackMinimumValue = 0.0f;
+	static constexpr float attackMaximumValue = 1000.0f;
+	static constexpr float attackIntervalValue = 1.0f;
+	static constexpr float attackDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> attackNormalizableRange = juce::NormalisableRange<float>(
+		attackMinimumValue, 
+		attackMaximumValue, 
+		attackIntervalValue);
+
+	static const std::string ratioComponentId = "ratio";
+	static constexpr float ratioMinimumValue = 1.0f;
+	static constexpr float ratioMaximumValue = 100.0f;
+	static constexpr float ratioIntervalValue = 1.0f;
+	static constexpr float ratioDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> ratioNormalizableRange = juce::NormalisableRange<float>(
+		ratioMinimumValue, 
+		ratioMaximumValue, 
+		ratioIntervalValue);
+
+	static const std::string releaseComponentId = "release";
+	static constexpr float releaseMinimumValue = 0.0f;
+	static constexpr float releaseMaximumValue = 1000.0f;
+	static constexpr float releaseIntervalValue = 1.0f;
+	static constexpr float releaseDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> releaseNormalizableRange = juce::NormalisableRange<float>(
+		releaseMinimumValue, 
+		releaseMaximumValue, 
+		releaseIntervalValue);
+
+	// EQ
+
+	static const std::string highPassEqualizationComponentId = "high-pass";
+	static const std::string midPeakEqualizationComponentId = "mid-peak";
+	static const std::string highShelfEqualizationComponentId = "high-shelf";
+
+	static constexpr float lowShelfFrequencyDefaultValue = 20.0f;
+	static constexpr float midPeakFrequencyDefaultValue = 1000.0f;
+	static constexpr float highShelfFrequencyDefaultValue = 15000.0f;
+
+	static const std::map<std::string, float> equalizationTypeIdToDefaultFrequencyMap = {
+	{highShelfEqualizationComponentId,highShelfFrequencyDefaultValue},
+	{midPeakEqualizationComponentId,midPeakFrequencyDefaultValue},
+	{highPassEqualizationComponentId,lowShelfFrequencyDefaultValue}
+	};
+
+	static const std::string qualityComponentId = "q";
+	static constexpr float qualityDefaultValue = 1.1f;
+	static constexpr float qualityMinimumValue = 0.1f;
+	static constexpr float qualityMaximumValue = 10.f;
+	static constexpr float qualityIntervalValue = 0.001f;
+	static const juce::NormalisableRange<float> qualityNormalizableRange = juce::NormalisableRange<float>(
+		qualityMinimumValue, 
+		qualityMaximumValue, 
+		qualityIntervalValue);
+
+	static const std::string frequencyComponentId = "frequency";
+	static constexpr float frequencyMinimumValue = 15.0f;
+	static constexpr float frequencyMaximumValue = 20000.0f;
+	static constexpr float frequencyIntervalValue = 1.0f;
+	static const juce::NormalisableRange<float> frequencyNormalizableRange = juce::NormalisableRange<float>(
+		frequencyMinimumValue, 
+		frequencyMaximumValue, 
+		frequencyIntervalValue);
+
+	// gain id from above
+	static constexpr float eqGainMinimumValue = 0.001f;
+	static constexpr float eqGainMaximumValue = 12.0f;
+	static constexpr float eqGainInterval = 0.001;
+	static constexpr float eqGainDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> eqGainNormalizableRange = juce::NormalisableRange<float>(
+		eqGainMinimumValue, 
+		eqGainMaximumValue, 
+		eqGainInterval);
+
+	// Limiter 
+
+	static constexpr float limiterThresholdMinimumValue = -128.0f;
+	static constexpr float limiterThresholdMaximumValue = 0.0f;
+	static constexpr float limiterThresholdInterval = 0.01;
+	static constexpr float limiterThresholdDefaultValue = -1.0f;
+	static const juce::NormalisableRange<float> limiterThresholdNormalizableRange = juce::NormalisableRange<float>(
+		limiterThresholdMinimumValue, 
+		limiterThresholdMaximumValue, 
+		limiterThresholdInterval);
+
+	static constexpr float limiterReleaseMinimumValue = 0.0f;
+	static constexpr float limiterReleaseMaximumValue = 2000.0f;
+	static constexpr float limiterReleaseInterval = 0.01;
+	static constexpr float limiterReleaseDefaultValue = 100.0f;
+	static const juce::NormalisableRange<float> limiterReleaseNormalizableRange = juce::NormalisableRange<float>(
+		limiterReleaseMinimumValue,
+		limiterReleaseMaximumValue,
+		limiterReleaseInterval);
+
+	// CHORUS
+
+	static constexpr float chorusRateMinimumValue = 0.0f;
+	static constexpr float chorusRateMaximumValue = 99.99f;
+	static constexpr float chorusRateInterval = 0.01;
+	static constexpr float chorusRateDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> chorusRateNormalizableRange = juce::NormalisableRange<float>(
+		chorusRateMinimumValue,
+		chorusRateMaximumValue,
+		chorusRateInterval);
+
+	static constexpr float chorusDepthMinimumValue = 0.0f;
+	static constexpr float chorusDepthMaximumValue = 1.0f;
+	static constexpr float chorusDepthInterval = 0.001;
+	static constexpr float chorusDepthDefaultValue = 0.1f;
+	static const juce::NormalisableRange<float> chorusDepthNormalizableRange = juce::NormalisableRange<float>(
+		chorusDepthMinimumValue,
+		chorusDepthMaximumValue,
+		chorusDepthInterval);
+
+	static constexpr float chorusCenterDelayMinimumValue = 0.0f;
+	static constexpr float chorusCenterDelayMaximumValue = 30.0f;
+	static constexpr float chorusCenterDelayInterval = 0.01;
+	static constexpr float chorusCenterDelayDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> chorusCenterDelayNormalizableRange = juce::NormalisableRange<float>(
+		chorusCenterDelayMinimumValue,
+		chorusCenterDelayMaximumValue,
+		chorusCenterDelayInterval);
+
+	static constexpr float chorusFeedbackMinimumValue = 0.0f;
+	static constexpr float chorusFeedbackMaximumValue = 1.0f;
+	static constexpr float chorusFeedbackInterval = 0.01;
+	static constexpr float chorusFeedbackDefaultValue = 0.75f;
+	static const juce::NormalisableRange<float> chorusFeedbackNormalizableRange = juce::NormalisableRange<float>(
+		chorusFeedbackMinimumValue,
+		chorusFeedbackMaximumValue,
+		chorusFeedbackInterval);
+
+	// PHASER
+
+	static constexpr float phaserRateMinimumValue = 0.0f;
+	static constexpr float phaserRateMaximumValue = 99.99f;
+	static constexpr float phaserRateInterval = 0.01;
+	static constexpr float phaserRateDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> phaserRateNormalizableRange = juce::NormalisableRange<float>(
+		phaserRateMinimumValue,
+		phaserRateMaximumValue,
+		phaserRateInterval);
+
+	static constexpr float phaserDepthMinimumValue = 0.0f;
+	static constexpr float phaserDepthMaximumValue = 1.0f;
+	static constexpr float phaserDepthInterval = 0.001;
+	static constexpr float phaserDepthDefaultValue = 0.1f;
+	static const juce::NormalisableRange<float> phaserDepthNormalizableRange = juce::NormalisableRange<float>(
+		phaserDepthMinimumValue,
+		phaserDepthMaximumValue,
+		phaserDepthInterval);
+
+	static constexpr float phaserCenterFrequencyMinimumValue = 15.0f;
+	static constexpr float phaserCenterFrequencyMaximumValue = 20000.0f;
+	static constexpr float phaserCenterFrequencyInterval = 0.1;
+	static constexpr float phaserCenterFrequencyDefaultValue = 1000.0f;
+	static const juce::NormalisableRange<float> phaserCenterFrequencyNormalizableRange = juce::NormalisableRange<float>(
+		phaserCenterFrequencyMinimumValue,
+		phaserCenterFrequencyMaximumValue,
+		phaserCenterFrequencyInterval);
+
+	static constexpr float phaserFeedbackMinimumValue = 0.0f;
+	static constexpr float phaserFeedbackMaximumValue = 1.0f;
+	static constexpr float phaserFeedbackInterval = 0.01;
+	static constexpr float phaserFeedbackDefaultValue = 0.75f;
+	static const juce::NormalisableRange<float> phaserFeedbackNormalizableRange = juce::NormalisableRange<float>(
+		phaserFeedbackMinimumValue,
+		phaserFeedbackMaximumValue,
+		phaserFeedbackInterval);
+
+	// REVERB
+
+	static constexpr float reverbRoomSizeMinimumValue = 0.0f;
+	static constexpr float reverbRoomSizeMaximumValue = 1.0f;
+	static constexpr float reverbRoomSizeInterval = 0.001;
+	static constexpr float reverbRoomSizeDefaultValue = 0.5f;
+	static const juce::NormalisableRange<float> reverbRoomSizeNormalizableRange = juce::NormalisableRange<float>(
+		reverbRoomSizeMinimumValue,
+		reverbRoomSizeMaximumValue,
+		reverbRoomSizeInterval);
+
+	static constexpr float reverbDampingMinimumValue = 0.0f;
+	static constexpr float reverbDampingMaximumValue = 1.0f;
+	static constexpr float reverbDampingInterval = 0.001;
+	static constexpr float reverbDampingDefaultValue = 0.5f;
+	static const juce::NormalisableRange<float> reverbDampingNormalizableRange = juce::NormalisableRange<float>(
+		reverbDampingMinimumValue,
+		reverbDampingMaximumValue,
+		reverbDampingInterval);
+
+	static constexpr float reverbWetLevelMinimumValue = 0.0f;
+	static constexpr float reverbWetLevelMaximumValue = 1.0f;
+	static constexpr float reverbWetLevelInterval = 0.001;
+	static constexpr float reverbWetLevelDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> reverbWetLevelNormalizableRange = juce::NormalisableRange<float>(
+		reverbWetLevelMinimumValue,
+		reverbWetLevelMaximumValue,
+		reverbWetLevelInterval);
+
+	static constexpr float reverbDryLevelMinimumValue = 0.0f;
+	static constexpr float reverbDryLevelMaximumValue = 1.0f;
+	static constexpr float reverbDryLevelInterval = 0.001;
+	static constexpr float reverbDryLevelDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> reverbDryLevelNormalizableRange = juce::NormalisableRange<float>(
+		reverbDryLevelMinimumValue,
+		reverbDryLevelMaximumValue,
+		reverbDryLevelInterval);
+
+	static constexpr float reverbWidthMinimumValue = 0.0f;
+	static constexpr float reverbWidthMaximumValue = 1.0f;
+	static constexpr float reverbWidthInterval = 0.001;
+	static constexpr float reverbWidthDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> reverbWidthNormalizableRange = juce::NormalisableRange<float>(
+		reverbWidthMinimumValue,
+		reverbWidthMaximumValue,
+		reverbWidthInterval);
+
+	enum class ParameterEnum {
+		MODE,
+		STAGE1_ON,
+		STAGE1_INPUT_GAIN,
+		STAGE1_WAVE_SHAPER,
+		STAGE1_OUTPUT_GAIN,
+		STAGE1_DRY_WET,
+		
+		STAGE2_ON,
+		STAGE2_INPUT_GAIN,
+		STAGE2_WAVE_SHAPER,
+		STAGE2_OUTPUT_GAIN,
+		STAGE2_DRY_WET,
+		
+		STAGE3_ON,
+		STAGE3_INPUT_GAIN,
+		STAGE3_WAVE_SHAPER,
+		STAGE3_OUTPUT_GAIN,
+		STAGE3_DRY_WET,
+		
+		STAGE4_ON,
+		STAGE4_INPUT_GAIN,
+		STAGE4_WAVE_SHAPER,
+		STAGE4_OUTPUT_GAIN,
+		STAGE4_DRY_WET,
+		
+		BIAS,
+		
+		COMPRESSOR_THRESHOLD,
+		COMPRESSOR_ATTACK,
+		COMPRESSOR_RATIO,
+		COMPRESSOR_RELEASE,
+		COMPRESSOR_GAIN,
+		
+		HIGH_PASS_ON,
+		HIGH_PASS_FREQUENCY,
+		HIGH_PASS_Q,
+		
+		MID_PEAK_ON,
+		MID_PEAK_FREQUENCY,
+		MID_PEAK_Q,
+		MID_PEAK_GAIN,
+		
+		HIGH_SHELF_ON,
+		HIGH_SHELF_FREQUENCY,
+		HIGH_SHELF_Q,
+		HIGH_SHELF_GAIN,
+		
+		CHORUS_RATE,
+		CHORUS_DEPTH,
+		CHORUS_CENTER_DELAY,
+		CHORUS_FEEDBACK,
+		CHORUS_MIX,
+		
+		PHASER_RATE,
+		PHASER_DEPTH,
+		PHASER_CENTER_FREQUENCY,
+		PHASER_FEEDBACK,
+		PHASER_MIX,
+		
+		REVERB_ROOM_SIZE,
+		REVERB_DAMPING,
+		REVERB_WET_LEVEL,
+		REVERB_DRY_LEVEL,
+		REVERB_WIDTH,
+
+		CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON,
+		OUTPUT_GAIN,
+		LIMITER_THRESHOLD,
+		LIMITER_RELEASE
+	};
 
 	static const std::string modeId = "mode";
 
@@ -108,162 +454,29 @@ namespace apvts
 	static const std::string highShelfQId = "high-shelf_q";
 	static const std::string highShelfGainId = "high-shelf_gain";
 
-	// Cab
+	static const std::string chorusRateId = "chorus_rate";
+	static const std::string chorusDepthId = "chorus_depth";
+	static const std::string chorusCenterDelayId = "chorus_center_delay";
+	static const std::string chorusFeedbackId = "chorus_feedback";
+	static const std::string chorusMixId = "chorus_mix";
+
+	static const std::string phaserRateId = "phaser_rate";
+	static const std::string phaserDepthId = "phaser_depth";
+	static const std::string phaserCenterFrequencyId = "phaser_center_freq";
+	static const std::string phaserFeedbackId = "phaser_feedback";
+	static const std::string phaserMixId = "phaser_mix";
+
+	static const std::string reverbRoomSize = "reverb_room_size";
+	static const std::string reverbDamping = "reverb_damping";
+	static const std::string reverbWetLevel = "reverb_wet_level";
+	static const std::string reverbDryLevel = "reverb_dry_level";
+	static const std::string reverbWidth = "reverb_width";
 
 	static const std::string cabinetImpulseResponseConvolutionOnId = "cab_on";
 	static const std::string outputGainId = "output_gain";
 
-	// BYPASS
-
-	static const std::string onComponentId = "on";
-
-	// BIAS
-
-	static const std::string biasComponentId = "bias";
-
-	static const float biasDefaultValue = 0.0f;
-	static const float biasMinimumValue = -1.0f;
-	static const float biasMaximumValue = 1.0f;
-	static const float biasIntervalValue = 0.01f;
-	static const juce::NormalisableRange<float> biasNormalizableRange = juce::NormalisableRange<float>(biasMinimumValue, biasMaximumValue, biasIntervalValue);
-
-	// GAIN
-
-	static const std::string gainComponentId = "gain";
-
-	static constexpr float gainMinimumValue = -128.0f;
-	static constexpr float gainMaximumValue = 128.0f;
-	static constexpr float gainIntervalValue = 0.01f;
-	static constexpr float gainDefaultValue = 0.0f;
-	static const juce::NormalisableRange<float> gainNormalizableRange = juce::NormalisableRange<float>(gainMinimumValue, gainMaximumValue, gainIntervalValue);
-
-	// GAIN
-
-	static const std::string dryWetComponentId = "gain";
-
-	static constexpr float dryWetMinimumValue = 0.0f;
-	static constexpr float dryWetMaximumValue = 1.0f;
-	static constexpr float dryWetIntervalValue = 0.001f;
-	static constexpr float dryWetDefaultValue = 0.0f;
-	static const juce::NormalisableRange<float> dryWetNormalizableRange = juce::NormalisableRange<float>(dryWetMinimumValue, dryWetMaximumValue, dryWetIntervalValue);
-
-
-	// COMPRESSION
-
-	static const std::string compressionComponentId = "comp";
-
-	static const std::string thresholdComponentId = "threshold";
-	static constexpr float thresholdMinimumValue = -64.0f;
-	static constexpr float thresholdMaximumValue = 0.0f;
-	static constexpr float thresholdIntervalValue = 0.01f;
-	static constexpr float thresholdDefaultValue = 0.0f;
-	static const juce::NormalisableRange<float> thresholdNormalizableRange = juce::NormalisableRange<float>(thresholdMinimumValue, thresholdMaximumValue, thresholdIntervalValue);
-
-	static const std::string attackComponentId = "attack";
-	static constexpr float attackMinimumValue = 0.0f;
-	static constexpr float attackMaximumValue = 1000.0f;
-	static constexpr float attackIntervalValue = 1.0f;
-	static constexpr float attackDefaultValue = 0.0f;
-	static const juce::NormalisableRange<float> attackNormalizableRange = juce::NormalisableRange<float>(attackMinimumValue, attackMaximumValue, attackIntervalValue);
-
-	static const std::string ratioComponentId = "ratio";
-	static constexpr float ratioMinimumValue = 1.0f;
-	static constexpr float ratioMaximumValue = 100.0f;
-	static constexpr float ratioIntervalValue = 1.0f;
-	static constexpr float ratioDefaultValue = 1.0f;
-	static const juce::NormalisableRange<float> ratioNormalizableRange = juce::NormalisableRange<float>(ratioMinimumValue, ratioMaximumValue, ratioIntervalValue);
-
-	static const std::string releaseComponentId = "release";
-	static constexpr float releaseMinimumValue = 0.0f;
-	static constexpr float releaseMaximumValue = 1000.0f;
-	static constexpr float releaseIntervalValue = 1.0f;
-	static constexpr float releaseDefaultValue = 0.0f;
-	static const juce::NormalisableRange<float> releaseNormalizableRange = juce::NormalisableRange<float>(releaseMinimumValue, releaseMaximumValue, releaseIntervalValue);
-
-	// EQ
-
-	static const std::string highPassEqualizationComponentId = "high-pass";
-	static const std::string midPeakEqualizationComponentId = "mid-peak";
-	static const std::string highShelfEqualizationComponentId = "high-shelf";
-
-	static constexpr float lowShelfFrequencyDefaultValue = 20.0f;
-	static constexpr float midPeakFrequencyDefaultValue = 1000.0f;
-	static constexpr float highShelfFrequencyDefaultValue = 15000.0f;
-
-	static const std::map<std::string, float> equalizationTypeIdToDefaultFrequencyMap = {
-	{highShelfEqualizationComponentId,highShelfFrequencyDefaultValue},
-	{midPeakEqualizationComponentId,midPeakFrequencyDefaultValue},
-	{highPassEqualizationComponentId,lowShelfFrequencyDefaultValue}
-	};
-
-	static const std::string qualityComponentId = "q";
-	static constexpr float qualityDefaultValue = 1.1f;
-	static constexpr float qualityMinimumValue = 0.1f;
-	static constexpr float qualityMaximumValue = 10.f;
-	static constexpr float qualityIntervalValue = 0.001f;
-	static const juce::NormalisableRange<float> qualityNormalizableRange = juce::NormalisableRange<float>(qualityMinimumValue, qualityMaximumValue, qualityIntervalValue);
-
-	static const std::string frequencyComponentId = "frequency";
-	static constexpr float frequencyMinimumValue = 15.0f;
-	static constexpr float frequencyMaximumValue = 20000.0f;
-	static constexpr float frequencyIntervalValue = 1.0f;
-	static const juce::NormalisableRange<float> frequencyNormalizableRange = juce::NormalisableRange<float>(frequencyMinimumValue, frequencyMaximumValue, frequencyIntervalValue);
-
-	// gain id from above
-	static constexpr float eqGainMinimumValue = 0.001f;
-	static constexpr float eqGainMaximumValue = 12.0f;
-	static constexpr float eqGainInterval = 0.001;
-	static constexpr float eqGainDefaultValue = 1.0f;
-	static const juce::NormalisableRange<float> eqGainNormalizableRange = juce::NormalisableRange<float>(eqGainMinimumValue, eqGainMaximumValue, eqGainInterval);
-
-	//
-
-	static const std::string ampComponentId = "amp";
-	static const std::string outputComponentId = "output";
-
-
-	enum class ParameterEnum {
-		MODE,
-		STAGE1_ON,
-		STAGE1_INPUT_GAIN,
-		STAGE1_WAVE_SHAPER,
-		STAGE1_OUTPUT_GAIN,
-		STAGE1_DRY_WET,
-		STAGE2_ON,
-		STAGE2_INPUT_GAIN,
-		STAGE2_WAVE_SHAPER,
-		STAGE2_OUTPUT_GAIN,
-		STAGE2_DRY_WET,
-		STAGE3_ON,
-		STAGE3_INPUT_GAIN,
-		STAGE3_WAVE_SHAPER,
-		STAGE3_OUTPUT_GAIN,
-		STAGE3_DRY_WET,
-		STAGE4_ON,
-		STAGE4_INPUT_GAIN,
-		STAGE4_WAVE_SHAPER,
-		STAGE4_OUTPUT_GAIN,
-		STAGE4_DRY_WET,
-		BIAS,
-		COMPRESSOR_THRESHOLD,
-		COMPRESSOR_ATTACK,
-		COMPRESSOR_RATIO,
-		COMPRESSOR_RELEASE,
-		COMPRESSOR_GAIN,
-		HIGH_PASS_ON,
-		HIGH_PASS_FREQUENCY,
-		HIGH_PASS_Q,
-		MID_PEAK_ON,
-		MID_PEAK_FREQUENCY,
-		MID_PEAK_Q,
-		MID_PEAK_GAIN,
-		HIGH_SHELF_ON,
-		HIGH_SHELF_FREQUENCY,
-		HIGH_SHELF_Q,
-		HIGH_SHELF_GAIN,
-		CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON,
-		OUTPUT_GAIN
-	};
+	static const std::string limiterThresholdId = "limiter_threshold";
+	static const std::string limiterReleaseId = "limiter_release";
 
 	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap{
 		{modeId, ParameterEnum::MODE},
@@ -305,6 +518,28 @@ namespace apvts
 		{highShelfQId, ParameterEnum::HIGH_SHELF_Q},
 		{highShelfGainId, ParameterEnum::HIGH_SHELF_GAIN},
 		{cabinetImpulseResponseConvolutionOnId, ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON},
-		{outputGainId, ParameterEnum::OUTPUT_GAIN}
+		
+		{outputGainId, ParameterEnum::OUTPUT_GAIN},
+		
+		{limiterThresholdId, ParameterEnum::LIMITER_THRESHOLD},
+		{limiterReleaseId, ParameterEnum::LIMITER_RELEASE},
+		
+		{chorusRateId, ParameterEnum::CHORUS_RATE},
+		{chorusDepthId, ParameterEnum::CHORUS_DEPTH},
+		{chorusCenterDelayId, ParameterEnum::CHORUS_CENTER_DELAY},
+		{chorusFeedbackId, ParameterEnum::CHORUS_FEEDBACK},
+		{chorusMixId, ParameterEnum::CHORUS_MIX},
+
+		{phaserRateId, ParameterEnum::PHASER_RATE},
+		{phaserDepthId, ParameterEnum::PHASER_DEPTH},
+		{phaserCenterFrequencyId, ParameterEnum::PHASER_CENTER_FREQUENCY},
+		{phaserFeedbackId, ParameterEnum::PHASER_FEEDBACK},
+		{phaserMixId, ParameterEnum::PHASER_MIX},
+
+		{reverbRoomSize, ParameterEnum::REVERB_ROOM_SIZE},
+		{reverbDamping, ParameterEnum::REVERB_DAMPING},
+		{reverbWetLevel, ParameterEnum::REVERB_WET_LEVEL},
+		{reverbDryLevel, ParameterEnum::REVERB_DRY_LEVEL},
+		{reverbWidth, ParameterEnum::REVERB_WIDTH},
 	};
 }

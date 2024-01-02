@@ -71,16 +71,21 @@ private:
 
     std::unique_ptr<juce::dsp::Bias<float>> mBiasPtr;
     
-    std::unique_ptr<juce::dsp::Compressor<float>> mAmpCompressorPtr;
-    std::unique_ptr<juce::dsp::Gain<float>> mAmpCompressorGainPtr;
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpHighPassFilterPtr;
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpMidPeakFilterPtr;
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mAmpHighShelfFilterPtr;
+    std::unique_ptr<juce::dsp::Compressor<float>> mCompressorPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mCompressorGainPtr;
+    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighPassFilterPtr;
+    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mMidPeakFilterPtr;
+    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighShelfFilterPtr;
     
+    std::unique_ptr<juce::dsp::Chorus<float>> mChorus;
+    std::unique_ptr<juce::dsp::Phaser<float>> mPhaser;
+    std::unique_ptr<juce::dsp::Reverb> mReverb;
+
     std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;
     std::unique_ptr<juce::dsp::Convolution> mCabinetImpulseResponseConvolutionPtr;
 
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
+    std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
 
     bool mParallel = false;
 

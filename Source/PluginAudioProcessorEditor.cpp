@@ -54,13 +54,6 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::biasComponentId,
 },
 {
-	apvts::compressorThresholdId,
-	apvts::compressorAttackId,
-	apvts::compressorRatioId,
-	apvts::compressorReleaseId,
-	apvts::compressorGainId,
-},
-{
 	apvts::highPassOnId,
 	apvts::highPassFrequencyId,
 	apvts::highPassQId,
@@ -78,8 +71,38 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::highShelfGainId,
 },
 {
+	apvts::compressorThresholdId,
+	apvts::compressorAttackId,
+	apvts::compressorRatioId,
+	apvts::compressorReleaseId,
+	apvts::compressorGainId,
+},
+{
+	apvts::chorusRateId,
+	apvts::chorusDepthId,
+	apvts::chorusCenterDelayId,
+	apvts::chorusFeedbackId,
+	apvts::chorusMixId,
+},
+{
+	apvts::phaserRateId,
+	apvts::phaserDepthId,
+	apvts::phaserCenterFrequencyId,
+	apvts::phaserFeedbackId,
+	apvts::phaserMixId,
+},
+{
+	apvts::reverbRoomSize,
+	apvts::reverbDamping,
+	apvts::reverbWetLevel,
+	apvts::reverbDryLevel,
+	apvts::reverbWidth,
+},
+{
 	apvts::cabinetImpulseResponseConvolutionOnId,
-	apvts::outputGainId
+	apvts::outputGainId,
+	apvts::limiterThresholdId,
+	apvts::limiterReleaseId,
 }
 	};
 
