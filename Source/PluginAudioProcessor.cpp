@@ -613,7 +613,7 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		}
 	}
 
-	if (!mStage1On && !mStage2On && !mStage3On && !mStage4On || mParallel)
+	if ((!mStage1On && !mStage2On && !mStage3On && !mStage4On) || mParallel)
 	{
 		audioBlock.clear();
 	}
