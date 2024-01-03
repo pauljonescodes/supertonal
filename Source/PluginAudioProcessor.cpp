@@ -54,12 +54,17 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mMidPeakFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 	mHighShelfFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 
-	mChorus(std::make_unique<juce::dsp::Chorus<float>>()),
-	mPhaser(std::make_unique<juce::dsp::Phaser<float>>()),
-	mReverb(std::make_unique<juce::dsp::Reverb>()),
+	mDelayLinePtr(std::make_unique<juce::dsp::DelayLine<float>>()),
+	mDelayLineDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
+
+	mChorusPtr(std::make_unique<juce::dsp::Chorus<float>>()),
+	mPhaserPtr(std::make_unique<juce::dsp::Phaser<float>>()),
 
 	mConvolutionMessageQueuePtr(std::make_unique<juce::dsp::ConvolutionMessageQueue>()),
 	mCabinetImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 2048 }, * mConvolutionMessageQueuePtr.get())),
+	
+	mReverb(std::make_unique<juce::dsp::Reverb>()),
+
 	mOutputGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
 	mLimiter(std::make_unique<juce::dsp::Limiter<float>>())
 {
@@ -145,11 +150,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::STAGE3_DRY_WET:
 		case apvts::ParameterEnum::STAGE4_DRY_WET:
 		case apvts::ParameterEnum::CHORUS_MIX:
+		case apvts::ParameterEnum::DELAY_DRY_WET:
+		case apvts::ParameterEnum::PHASER_MIX:
+		case apvts::ParameterEnum::REVERB_WET_LEVEL:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
 				apvts::dryWetNormalizableRange,
-				apvts::dryWetDefaultValue
+				apvts::notWetDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::REVERB_DRY_LEVEL:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				parameterId,
+				apvts::dryWetNormalizableRange,
+				apvts::allDryDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::MODE:
@@ -308,14 +324,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::phaserFeedbackDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::PHASER_MIX:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				parameterId,
-				apvts::dryWetNormalizableRange,
-				apvts::dryWetDefaultValue
-				));
-			break;
 		case apvts::ParameterEnum::REVERB_ROOM_SIZE:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -332,22 +340,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::reverbDampingDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::REVERB_WET_LEVEL:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				parameterId,
-				apvts::reverbWetLevelNormalizableRange,
-				apvts::reverbWetLevelDefaultValue
-				));
-			break;
-		case apvts::ParameterEnum::REVERB_DRY_LEVEL:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				parameterId,
-				apvts::reverbDryLevelNormalizableRange,
-				apvts::reverbDryLevelDefaultValue
-				));
-			break;
 		case apvts::ParameterEnum::REVERB_WIDTH:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -356,7 +348,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::reverbWidthDefaultValue
 				));
 			break;
-
+		case apvts::ParameterEnum::DELAY_TIME_SAMPLES:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				parameterId,
+				apvts::delayTimeNormalizableRange,
+				apvts::delayTimeDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::DELAY_FEEDBACK:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				parameterId,
+				apvts::delayFeedbackNormalizableRange,
+				apvts::delayFeedbackDefaultValue
+				));
+			break;
 		default:
 			assert(false);
 			break;
@@ -409,8 +416,11 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mMidPeakFilterPtr->prepare(spec);
 	mHighShelfFilterPtr->prepare(spec);
 
-	mChorus->prepare(spec);
-	mPhaser->prepare(spec);
+	mDelayLinePtr->prepare(spec);
+	mDelayLineDryWetMixerPtr->prepare(spec);
+
+	mChorusPtr->prepare(spec);
+	mPhaserPtr->prepare(spec);
 
 	mCabinetImpulseResponseConvolutionPtr->prepare(spec);
 	mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
@@ -420,6 +430,8 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 		juce::dsp::Convolution::Trim::no,
 		BinaryData::cory_bread_and_butter_normalized_wavSize,
 		juce::dsp::Convolution::Normalise::yes);
+
+	mReverb->prepare(spec);
 
 	mOutputGainPtr->prepare(spec);
 	mLimiter->prepare(spec);
@@ -460,10 +472,15 @@ void PluginAudioProcessor::reset()
 	mHighShelfFilterPtr->reset();
 	mCompressorGainPtr->reset();
 
-	mChorus->reset();
-	mPhaser->reset();
+	mDelayLinePtr->reset();
+	mDelayLineDryWetMixerPtr->reset();
+
+	mChorusPtr->reset();
+	mPhaserPtr->reset();
 
 	mCabinetImpulseResponseConvolutionPtr->reset();
+
+	mReverb->reset();
 
 	mOutputGainPtr->reset();
 
@@ -642,8 +659,31 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	mCompressorGainPtr->process(processContext);
 
-	mChorus->process(processContext);
-	mPhaser->process(processContext);
+	mDelayLineDryWetMixerPtr->pushDrySamples(audioBlock);
+
+	for (int channelIndex = 0; channelIndex < getTotalNumInputChannels(); ++channelIndex)
+	{
+		auto* channelData = audioBlock.getChannelPointer(channelIndex);
+
+		if (channelData)
+		{
+			for (int i = 0; i < numSamples; ++i)
+			{
+				const float delayedSample = mDelayLinePtr->popSample(channelIndex, mDelayLinePtr->getDelay());
+
+				if (i < audioBlock.getNumSamples())
+				{
+					mDelayLinePtr->pushSample(channelIndex, channelData[i] + mDelayFeedback * delayedSample);
+					channelData[i] += delayedSample;
+				}
+			}
+		}
+	}
+
+	mDelayLineDryWetMixerPtr->mixWetSamples(audioBlock);
+
+	mChorusPtr->process(processContext);
+	mPhaserPtr->process(processContext);
 
 	if (mCabImpulseResponseConvolutionOn)
 	{
@@ -861,35 +901,35 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 
 	case apvts::ParameterEnum::CHORUS_RATE:
-		mChorus->setRate(newValue);
+		mChorusPtr->setRate(newValue);
 		break;
 	case apvts::ParameterEnum::CHORUS_DEPTH:
-		mChorus->setDepth(newValue);
+		mChorusPtr->setDepth(newValue);
 		break;
 	case apvts::ParameterEnum::CHORUS_CENTER_DELAY:
-		mChorus->setCentreDelay(newValue);
+		mChorusPtr->setCentreDelay(newValue);
 		break;
 	case apvts::ParameterEnum::CHORUS_FEEDBACK:
-		mChorus->setFeedback(newValue);
+		mChorusPtr->setFeedback(newValue);
 		break;
 	case apvts::ParameterEnum::CHORUS_MIX:
-		mChorus->setMix(newValue);
+		mChorusPtr->setMix(newValue);
 		break;
 
 	case apvts::ParameterEnum::PHASER_RATE:
-		mPhaser->setRate(newValue);
+		mPhaserPtr->setRate(newValue);
 		break;
 	case apvts::ParameterEnum::PHASER_DEPTH:
-		mPhaser->setDepth(newValue);
+		mPhaserPtr->setDepth(newValue);
 		break;
 	case apvts::ParameterEnum::PHASER_CENTER_FREQUENCY:
-		mPhaser->setCentreFrequency(newValue);
+		mPhaserPtr->setCentreFrequency(newValue);
 		break;
 	case apvts::ParameterEnum::PHASER_FEEDBACK:
-		mPhaser->setFeedback(newValue);
+		mPhaserPtr->setFeedback(newValue);
 		break;
 	case apvts::ParameterEnum::PHASER_MIX:
-		mPhaser->setMix(newValue);
+		mPhaserPtr->setMix(newValue);
 		break;
 
 	case apvts::ParameterEnum::REVERB_ROOM_SIZE:
@@ -952,7 +992,16 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 			0.0f });
 	}
 		break;
-
+	case apvts::ParameterEnum::DELAY_DRY_WET:
+		mDelayLineDryWetMixerPtr->setWetMixProportion(newValue);
+		break;
+	case apvts::ParameterEnum::DELAY_FEEDBACK:
+		mDelayFeedback = newValue;
+		break;
+	case apvts::ParameterEnum::DELAY_TIME_SAMPLES:
+		mDelayLinePtr->setMaximumDelayInSamples(newValue);
+		mDelayLinePtr->setDelay(newValue);
+		break;
 	default:
 		assert(false);
 		}

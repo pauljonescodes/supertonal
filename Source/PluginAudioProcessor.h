@@ -77,13 +77,18 @@ private:
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mMidPeakFilterPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighShelfFilterPtr;
     
-    std::unique_ptr<juce::dsp::Chorus<float>> mChorus;
-    std::unique_ptr<juce::dsp::Phaser<float>> mPhaser;
-    std::unique_ptr<juce::dsp::Reverb> mReverb;
+    std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLinePtr;
+    std::unique_ptr<juce::dsp::DryWetMixer<float>> mDelayLineDryWetMixerPtr;
+    float mDelayFeedback = 0.5f;
+
+    std::unique_ptr<juce::dsp::Chorus<float>> mChorusPtr;
+    std::unique_ptr<juce::dsp::Phaser<float>> mPhaserPtr;
 
     std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;
     std::unique_ptr<juce::dsp::Convolution> mCabinetImpulseResponseConvolutionPtr;
 
+    std::unique_ptr<juce::dsp::Reverb> mReverb;
+    
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
 

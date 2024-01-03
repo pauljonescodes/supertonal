@@ -97,7 +97,8 @@ namespace apvts
 	static constexpr float dryWetMinimumValue = 0.0f;
 	static constexpr float dryWetMaximumValue = 1.0f;
 	static constexpr float dryWetIntervalValue = 0.001f;
-	static constexpr float dryWetDefaultValue = 0.0f;
+	static constexpr float notWetDefaultValue = 0.0f;
+	static constexpr float allDryDefaultValue = 1.0f;
 	static const juce::NormalisableRange<float> dryWetNormalizableRange = juce::NormalisableRange<float>(
 		dryWetMinimumValue, 
 		dryWetMaximumValue, 
@@ -213,6 +214,26 @@ namespace apvts
 		limiterReleaseMaximumValue,
 		limiterReleaseInterval);
 
+	// DELAY
+
+	static constexpr float delayTimeMinimumValue = 0.0f;
+	static constexpr float delayTimeMaximumValue = 96000.0f;
+	static constexpr float delayTimeInterval = 1.0f;
+	static constexpr float delayTimeDefaultValue = 10000.0f;
+	static const juce::NormalisableRange<float> delayTimeNormalizableRange = juce::NormalisableRange<float>(
+		delayTimeMinimumValue,
+		delayTimeMaximumValue,
+		delayTimeInterval);
+
+	static constexpr float delayFeedbackMinimumValue = 0.0f;
+	static constexpr float delayFeedbackMaximumValue = 1.0f;
+	static constexpr float delayFeedbackInterval = 0.001f;
+	static constexpr float delayFeedbackDefaultValue = 0.25f;
+	static const juce::NormalisableRange<float> delayFeedbackNormalizableRange = juce::NormalisableRange<float>(
+		delayFeedbackMinimumValue,
+		delayFeedbackMaximumValue,
+		delayFeedbackInterval);
+
 	// CHORUS
 
 	static constexpr float chorusRateMinimumValue = 0.0f;
@@ -309,24 +330,6 @@ namespace apvts
 		reverbDampingMaximumValue,
 		reverbDampingInterval);
 
-	static constexpr float reverbWetLevelMinimumValue = 0.0f;
-	static constexpr float reverbWetLevelMaximumValue = 1.0f;
-	static constexpr float reverbWetLevelInterval = 0.001;
-	static constexpr float reverbWetLevelDefaultValue = 0.0f;
-	static const juce::NormalisableRange<float> reverbWetLevelNormalizableRange = juce::NormalisableRange<float>(
-		reverbWetLevelMinimumValue,
-		reverbWetLevelMaximumValue,
-		reverbWetLevelInterval);
-
-	static constexpr float reverbDryLevelMinimumValue = 0.0f;
-	static constexpr float reverbDryLevelMaximumValue = 1.0f;
-	static constexpr float reverbDryLevelInterval = 0.001;
-	static constexpr float reverbDryLevelDefaultValue = 1.0f;
-	static const juce::NormalisableRange<float> reverbDryLevelNormalizableRange = juce::NormalisableRange<float>(
-		reverbDryLevelMinimumValue,
-		reverbDryLevelMaximumValue,
-		reverbDryLevelInterval);
-
 	static constexpr float reverbWidthMinimumValue = 0.0f;
 	static constexpr float reverbWidthMaximumValue = 1.0f;
 	static constexpr float reverbWidthInterval = 0.001;
@@ -384,6 +387,10 @@ namespace apvts
 		HIGH_SHELF_Q,
 		HIGH_SHELF_GAIN,
 		
+		DELAY_TIME_SAMPLES,
+		DELAY_FEEDBACK,
+		DELAY_DRY_WET,
+
 		CHORUS_RATE,
 		CHORUS_DEPTH,
 		CHORUS_CENTER_DELAY,
@@ -454,6 +461,10 @@ namespace apvts
 	static const std::string highShelfQId = "high-shelf_q";
 	static const std::string highShelfGainId = "high-shelf_gain";
 
+	static const std::string delayTimeId = "delay_time";
+	static const std::string delayFeedbackId = "delay_feedback";
+	static const std::string delayDryWetId = "delay_dry_wet";
+
 	static const std::string chorusRateId = "chorus_rate";
 	static const std::string chorusDepthId = "chorus_depth";
 	static const std::string chorusCenterDelayId = "chorus_center_delay";
@@ -480,50 +491,64 @@ namespace apvts
 
 	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap{
 		{modeId, ParameterEnum::MODE},
+		
 		{stage1OnId, ParameterEnum::STAGE1_ON},
 		{stage1InputGainId, ParameterEnum::STAGE1_INPUT_GAIN},
 		{stage1WaveShaperId, ParameterEnum::STAGE1_WAVE_SHAPER},
 		{stage1OutputGainId, ParameterEnum::STAGE1_OUTPUT_GAIN},
 		{stage1DryWetId, ParameterEnum::STAGE1_DRY_WET},
+		
 		{stage2OnId, ParameterEnum::STAGE2_ON},
 		{stage2InputGainId, ParameterEnum::STAGE2_INPUT_GAIN},
 		{stage2WaveShaperId, ParameterEnum::STAGE2_WAVE_SHAPER},
 		{stage2OutputGainId, ParameterEnum::STAGE2_OUTPUT_GAIN},
 		{stage2DryWetId, ParameterEnum::STAGE2_DRY_WET},
+		
 		{stage3OnId, ParameterEnum::STAGE3_ON},
 		{stage3InputGainId, ParameterEnum::STAGE3_INPUT_GAIN},
 		{stage3WaveShaperId, ParameterEnum::STAGE3_WAVE_SHAPER},
 		{stage3OutputGainId, ParameterEnum::STAGE3_OUTPUT_GAIN},
 		{stage3DryWetId, ParameterEnum::STAGE3_DRY_WET},
+		
 		{stage4OnId, ParameterEnum::STAGE4_ON},
 		{stage4InputGainId, ParameterEnum::STAGE4_INPUT_GAIN},
 		{stage4WaveShaperId, ParameterEnum::STAGE4_WAVE_SHAPER},
 		{stage4OutputGainId, ParameterEnum::STAGE4_OUTPUT_GAIN},
 		{stage4DryWetId, ParameterEnum::STAGE4_DRY_WET},
+		
 		{biasComponentId, ParameterEnum::BIAS},
+		
 		{compressorThresholdId, ParameterEnum::COMPRESSOR_THRESHOLD},
 		{compressorAttackId, ParameterEnum::COMPRESSOR_ATTACK},
 		{compressorRatioId, ParameterEnum::COMPRESSOR_RATIO},
 		{compressorReleaseId, ParameterEnum::COMPRESSOR_RELEASE},
 		{compressorGainId, ParameterEnum::COMPRESSOR_GAIN},
+		
 		{highPassOnId, ParameterEnum::HIGH_PASS_ON},
 		{highPassFrequencyId, ParameterEnum::HIGH_PASS_FREQUENCY},
 		{highPassQId, ParameterEnum::HIGH_PASS_Q},
+		
 		{midPeakOnId, ParameterEnum::MID_PEAK_ON},
 		{midPeakFrequencyId, ParameterEnum::MID_PEAK_FREQUENCY},
 		{midPeakQId, ParameterEnum::MID_PEAK_Q},
 		{midPeakGainId, ParameterEnum::MID_PEAK_GAIN},
+		
 		{highShelfOnId, ParameterEnum::HIGH_SHELF_ON},
 		{highShelfFrequencyId, ParameterEnum::HIGH_SHELF_FREQUENCY},
 		{highShelfQId, ParameterEnum::HIGH_SHELF_Q},
 		{highShelfGainId, ParameterEnum::HIGH_SHELF_GAIN},
+		
 		{cabinetImpulseResponseConvolutionOnId, ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON},
 		
 		{outputGainId, ParameterEnum::OUTPUT_GAIN},
 		
 		{limiterThresholdId, ParameterEnum::LIMITER_THRESHOLD},
 		{limiterReleaseId, ParameterEnum::LIMITER_RELEASE},
-		
+
+		{delayTimeId, ParameterEnum::DELAY_TIME_SAMPLES},
+		{delayFeedbackId, ParameterEnum::DELAY_FEEDBACK},
+		{delayDryWetId, ParameterEnum::DELAY_DRY_WET},
+
 		{chorusRateId, ParameterEnum::CHORUS_RATE},
 		{chorusDepthId, ParameterEnum::CHORUS_DEPTH},
 		{chorusCenterDelayId, ParameterEnum::CHORUS_CENTER_DELAY},

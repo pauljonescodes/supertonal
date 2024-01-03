@@ -78,6 +78,11 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::compressorGainId,
 },
 {
+	apvts::delayTimeId,
+	apvts::delayFeedbackId,
+	apvts::delayDryWetId,
+},
+{
 	apvts::chorusRateId,
 	apvts::chorusDepthId,
 	apvts::chorusCenterDelayId,
@@ -154,8 +159,9 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 			}
 			else
 			{
-				auto* slider = new juce::Slider(juce::Slider::Rotary, juce::Slider::TextBoxBelow);
+				auto* slider = new juce::Slider(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
 				slider->setTitle(PluginUtils::toTitleCase(parameterId));
+				slider->setScrollWheelEnabled(false);
 
 				auto* label = new juce::Label(parameterId, PluginUtils::toTitleCase(parameterId));
 				label->attachToComponent(slider, false);
