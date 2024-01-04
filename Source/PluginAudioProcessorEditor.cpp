@@ -22,6 +22,19 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 
 	static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
+	apvts::noiseGateOnId,
+	apvts::noiseGateThresholdId,
+	apvts::noiseGateAttackId,
+	apvts::noiseGateRatioId,
+	apvts::noiseGateReleaseId,
+},
+{
+	apvts::preCompressorThresholdId,
+	apvts::preCompressorAttackId,
+	apvts::preCompressorRatioId,
+	apvts::preCompressorReleaseId
+},
+{
 	apvts::stage1OnId,
 	apvts::stage1InputGainId,
 	apvts::stage1WaveShaperId,
@@ -71,11 +84,16 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	apvts::highShelfGainId,
 },
 {
-	apvts::compressorThresholdId,
-	apvts::compressorAttackId,
-	apvts::compressorRatioId,
-	apvts::compressorReleaseId,
-	apvts::compressorGainId,
+	apvts::lowPassOnId,
+	apvts::lowPassFrequencyId,
+	apvts::lowPassQId,
+},
+{
+	apvts::postCompressorThresholdId,
+	apvts::postCompressorAttackId,
+	apvts::postCompressorRatioId,
+	apvts::postCompressorReleaseId,
+	apvts::postCompressorGainId,
 },
 {
 	apvts::delayTimeId,

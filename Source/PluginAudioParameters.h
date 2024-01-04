@@ -107,10 +107,15 @@ namespace apvts
 
 	// COMPRESSION
 
-	static const std::string compressionComponentId = "comp";
+	static const std::string noiseGateComponentId = "noise_gate";
+
+	static const std::string compressorThresholdComponentId = "comp_threshold";
+	static const std::string compressorAttackComponentId = "comp_attack";
+	static const std::string compressorRatioComponentId = "comp_ratio";
+	static const std::string compressorReleaseComponentId = "comp_release";
 
 	static const std::string thresholdComponentId = "threshold";
-	static constexpr float thresholdMinimumValue = -64.0f;
+	static constexpr float thresholdMinimumValue = -128.0f;
 	static constexpr float thresholdMaximumValue = 0.0f;
 	static constexpr float thresholdIntervalValue = 0.01f;
 	static constexpr float thresholdDefaultValue = 0.0f;
@@ -118,6 +123,16 @@ namespace apvts
 		thresholdMinimumValue, 
 		thresholdMaximumValue, 
 		thresholdIntervalValue);
+
+	static const std::string ratioComponentId = "ratio";
+	static constexpr float ratioMinimumValue = 1.0f;
+	static constexpr float ratioMaximumValue = 100.0f;
+	static constexpr float ratioIntervalValue = 1.0f;
+	static constexpr float ratioDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> ratioNormalizableRange = juce::NormalisableRange<float>(
+		ratioMinimumValue,
+		ratioMaximumValue,
+		ratioIntervalValue);
 
 	static const std::string attackComponentId = "attack";
 	static constexpr float attackMinimumValue = 0.0f;
@@ -129,19 +144,9 @@ namespace apvts
 		attackMaximumValue, 
 		attackIntervalValue);
 
-	static const std::string ratioComponentId = "ratio";
-	static constexpr float ratioMinimumValue = 1.0f;
-	static constexpr float ratioMaximumValue = 100.0f;
-	static constexpr float ratioIntervalValue = 1.0f;
-	static constexpr float ratioDefaultValue = 1.0f;
-	static const juce::NormalisableRange<float> ratioNormalizableRange = juce::NormalisableRange<float>(
-		ratioMinimumValue, 
-		ratioMaximumValue, 
-		ratioIntervalValue);
-
 	static const std::string releaseComponentId = "release";
 	static constexpr float releaseMinimumValue = 0.0f;
-	static constexpr float releaseMaximumValue = 1000.0f;
+	static constexpr float releaseMaximumValue = 10000.0f;
 	static constexpr float releaseIntervalValue = 1.0f;
 	static constexpr float releaseDefaultValue = 0.0f;
 	static const juce::NormalisableRange<float> releaseNormalizableRange = juce::NormalisableRange<float>(
@@ -154,20 +159,23 @@ namespace apvts
 	static const std::string highPassEqualizationComponentId = "high-pass";
 	static const std::string midPeakEqualizationComponentId = "mid-peak";
 	static const std::string highShelfEqualizationComponentId = "high-shelf";
+	static const std::string lowPassEqualizationComponentId = "low-pass";
 
 	static constexpr float lowShelfFrequencyDefaultValue = 20.0f;
 	static constexpr float midPeakFrequencyDefaultValue = 1000.0f;
 	static constexpr float highShelfFrequencyDefaultValue = 15000.0f;
+	static constexpr float lowPassFrequencyDefaultValue = 20000.0f;
 
 	static const std::map<std::string, float> equalizationTypeIdToDefaultFrequencyMap = {
-	{highShelfEqualizationComponentId,highShelfFrequencyDefaultValue},
-	{midPeakEqualizationComponentId,midPeakFrequencyDefaultValue},
-	{highPassEqualizationComponentId,lowShelfFrequencyDefaultValue}
+		{highPassEqualizationComponentId,lowShelfFrequencyDefaultValue},
+		{midPeakEqualizationComponentId,midPeakFrequencyDefaultValue},
+		{highShelfEqualizationComponentId,highShelfFrequencyDefaultValue},
+		{lowPassEqualizationComponentId,lowPassFrequencyDefaultValue},
 	};
 
 	static const std::string qualityComponentId = "q";
-	static constexpr float qualityDefaultValue = 1.1f;
-	static constexpr float qualityMinimumValue = 0.1f;
+	static constexpr float qualityDefaultValue = 1.0f;
+	static constexpr float qualityMinimumValue = 0.001f;
 	static constexpr float qualityMaximumValue = 10.f;
 	static constexpr float qualityIntervalValue = 0.001f;
 	static const juce::NormalisableRange<float> qualityNormalizableRange = juce::NormalisableRange<float>(
@@ -185,13 +193,20 @@ namespace apvts
 		frequencyIntervalValue);
 
 	// gain id from above
-	static constexpr float eqGainMinimumValue = 0.001f;
-	static constexpr float eqGainMaximumValue = 12.0f;
-	static constexpr float eqGainInterval = 0.001;
+	static constexpr float eqGainMinimumValue = -128.0f;
+	static constexpr float eqGainMaximumValue = 24.0f;
+	static constexpr float eqGainInterval = 0.0001;
 	static constexpr float eqGainDefaultValue = 1.0f;
+	
 	static const juce::NormalisableRange<float> eqGainNormalizableRange = juce::NormalisableRange<float>(
 		eqGainMinimumValue, 
 		eqGainMaximumValue, 
+		eqGainInterval);
+
+	static constexpr float peakFilterGainMinimumValue = 0.0001f;
+	static const juce::NormalisableRange<float> peakGainNormalizableRange = juce::NormalisableRange<float>(
+		peakFilterGainMinimumValue,
+		eqGainMaximumValue,
 		eqGainInterval);
 
 	// Limiter 
@@ -339,8 +354,20 @@ namespace apvts
 		reverbWidthMaximumValue,
 		reverbWidthInterval);
 
-	enum class ParameterEnum {
+	enum class ParameterEnum {		
+		NOISE_GATE_ON,
+		NOISE_GATE_THRESHOLD,
+		NOISE_GATE_ATTACK,
+		NOISE_GATE_RATIO,
+		NOISE_GATE_RELEASE,
+
+		PRE_COMPRESSOR_THRESHOLD,
+		PRE_COMPRESSOR_ATTACK,
+		PRE_COMPRESSOR_RATIO,
+		PRE_COMPRESSOR_RELEASE,
+
 		MODE,
+
 		STAGE1_ON,
 		STAGE1_INPUT_GAIN,
 		STAGE1_WAVE_SHAPER,
@@ -367,11 +394,11 @@ namespace apvts
 		
 		BIAS,
 		
-		COMPRESSOR_THRESHOLD,
-		COMPRESSOR_ATTACK,
-		COMPRESSOR_RATIO,
-		COMPRESSOR_RELEASE,
-		COMPRESSOR_GAIN,
+		POST_COMPRESSOR_THRESHOLD,
+		POST_COMPRESSOR_ATTACK,
+		POST_COMPRESSOR_RATIO,
+		POST_COMPRESSOR_RELEASE,
+		POST_COMPRESSOR_GAIN,
 		
 		HIGH_PASS_ON,
 		HIGH_PASS_FREQUENCY,
@@ -386,6 +413,10 @@ namespace apvts
 		HIGH_SHELF_FREQUENCY,
 		HIGH_SHELF_Q,
 		HIGH_SHELF_GAIN,
+
+		LOW_PASS_ON,
+		LOW_PASS_FREQUENCY,
+		LOW_PASS_Q,
 		
 		DELAY_TIME_SAMPLES,
 		DELAY_FEEDBACK,
@@ -415,6 +446,18 @@ namespace apvts
 		LIMITER_RELEASE
 	};
 
+	static const std::string noiseGateOnId = "noise_gate_on";
+	static const std::string noiseGateThresholdId = "noise_gate_threshold";
+	static const std::string noiseGateAttackId = "noise_gate_attack";
+	static const std::string noiseGateRatioId = "noise_gate_ratio";
+	static const std::string noiseGateReleaseId = "noise_gate_release";
+	static const std::string noiseGateGainId = "noise_gate_gain";
+
+	static const std::string preCompressorThresholdId = "pre_comp_thresh";
+	static const std::string preCompressorAttackId = "pre_comp_attack";
+	static const std::string preCompressorRatioId = "pre_comp_ratio";
+	static const std::string preCompressorReleaseId = "pre_comp_release";
+
 	static const std::string modeId = "mode";
 
 	static const std::string stage1OnId = "stage_1_on";
@@ -441,11 +484,11 @@ namespace apvts
 	static const std::string stage4OutputGainId = "stage_4_output_gain";
 	static const std::string stage4DryWetId = "stage_4_dry_wet";
 
-	static const std::string compressorThresholdId = "comp_threshold";
-	static const std::string compressorAttackId = "comp_attack";
-	static const std::string compressorRatioId = "comp_ratio";
-	static const std::string compressorReleaseId = "comp_release";
-	static const std::string compressorGainId = "comp_gain";
+	static const std::string postCompressorThresholdId = "post_comp_thresh";
+	static const std::string postCompressorAttackId = "post_comp_attack";
+	static const std::string postCompressorRatioId = "post_comp_ratio";
+	static const std::string postCompressorReleaseId = "post_comp_release";
+	static const std::string postCompressorGainId = "post_comp_gain";
 
 	static const std::string highPassOnId = "high-pass_on";
 	static const std::string highPassFrequencyId = "high-pass_frequency";
@@ -460,6 +503,10 @@ namespace apvts
 	static const std::string highShelfFrequencyId = "high-shelf_frequency";
 	static const std::string highShelfQId = "high-shelf_q";
 	static const std::string highShelfGainId = "high-shelf_gain";
+
+	static const std::string lowPassOnId = "low-pass_on";
+	static const std::string lowPassFrequencyId = "low-pass_frequency";
+	static const std::string lowPassQId = "low-pass_q";
 
 	static const std::string delayTimeId = "delay_time";
 	static const std::string delayFeedbackId = "delay_feedback";
@@ -489,7 +536,18 @@ namespace apvts
 	static const std::string limiterThresholdId = "limiter_threshold";
 	static const std::string limiterReleaseId = "limiter_release";
 
-	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap{
+	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap {
+		{noiseGateOnId, ParameterEnum::NOISE_GATE_ON},
+		{noiseGateThresholdId, ParameterEnum::NOISE_GATE_THRESHOLD},
+		{noiseGateAttackId, ParameterEnum::NOISE_GATE_ATTACK},
+		{noiseGateRatioId, ParameterEnum::NOISE_GATE_RATIO},
+		{noiseGateReleaseId, ParameterEnum::NOISE_GATE_RELEASE},
+		
+		{preCompressorThresholdId, ParameterEnum::PRE_COMPRESSOR_THRESHOLD},
+		{preCompressorAttackId, ParameterEnum::PRE_COMPRESSOR_ATTACK},
+		{preCompressorRatioId, ParameterEnum::PRE_COMPRESSOR_RATIO},
+		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
+
 		{modeId, ParameterEnum::MODE},
 		
 		{stage1OnId, ParameterEnum::STAGE1_ON},
@@ -518,11 +576,11 @@ namespace apvts
 		
 		{biasComponentId, ParameterEnum::BIAS},
 		
-		{compressorThresholdId, ParameterEnum::COMPRESSOR_THRESHOLD},
-		{compressorAttackId, ParameterEnum::COMPRESSOR_ATTACK},
-		{compressorRatioId, ParameterEnum::COMPRESSOR_RATIO},
-		{compressorReleaseId, ParameterEnum::COMPRESSOR_RELEASE},
-		{compressorGainId, ParameterEnum::COMPRESSOR_GAIN},
+		{postCompressorThresholdId, ParameterEnum::POST_COMPRESSOR_THRESHOLD},
+		{postCompressorAttackId, ParameterEnum::POST_COMPRESSOR_ATTACK},
+		{postCompressorRatioId, ParameterEnum::POST_COMPRESSOR_RATIO},
+		{postCompressorReleaseId, ParameterEnum::POST_COMPRESSOR_RELEASE},
+		{postCompressorGainId, ParameterEnum::POST_COMPRESSOR_GAIN},
 		
 		{highPassOnId, ParameterEnum::HIGH_PASS_ON},
 		{highPassFrequencyId, ParameterEnum::HIGH_PASS_FREQUENCY},
@@ -537,6 +595,10 @@ namespace apvts
 		{highShelfFrequencyId, ParameterEnum::HIGH_SHELF_FREQUENCY},
 		{highShelfQId, ParameterEnum::HIGH_SHELF_Q},
 		{highShelfGainId, ParameterEnum::HIGH_SHELF_GAIN},
+
+		{lowPassOnId, ParameterEnum::LOW_PASS_ON},
+		{lowPassFrequencyId, ParameterEnum::LOW_PASS_FREQUENCY},
+		{lowPassQId, ParameterEnum::LOW_PASS_Q},
 		
 		{cabinetImpulseResponseConvolutionOnId, ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON},
 		
