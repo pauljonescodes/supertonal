@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="gKYDzO" name="Supertonal" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              version="0.1.3" companyName="Supertonal Company" companyCopyright="2112"
-              pluginFormats="buildAAX,buildStandalone,buildVST3" pluginAAXCategory="8192">
-  <MAINGROUP id="Pdzbsi" name="Supertonal">
+<JUCERPROJECT id="gKYDzO" name="Blueprint Cory Bergeron" projectType="audioplug"
+              useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
+              jucerFormatVersion="1" version="0.1.3" companyName="Supertonal DSP"
+              companyCopyright="2024" pluginFormats="buildAAX,buildAU,buildStandalone,buildVST3"
+              pluginAAXCategory="8192">
+  <MAINGROUP id="Pdzbsi" name="Blueprint Cory Bergeron">
     <GROUP id="{2ED2996E-C3B4-16E6-D794-2D6A2D1A240A}" name="Assets">
       <FILE id="NiXqDL" name="cory_bread_and_butter_normalized.wav" compile="0"
             resource="1" file="Assets/cory_bread_and_butter_normalized.wav"/>
@@ -12,12 +13,35 @@
             file="Assets/Guitar Plate.aif"/>
       <FILE id="cjKIfL" name="VTM60_low_pregain70_low50_mid50_high50_presence50.wav"
             compile="0" resource="1" file="Assets/VTM60_low_pregain70_low50_mid50_high50_presence50.wav"/>
+      <FILE id="gvjmmK" name="WorkSans-Bold.ttf" compile="0" resource="1"
+            file="Assets/WorkSans-Bold.ttf"/>
+      <FILE id="ZZvlmT" name="WorkSans-BoldItalic.ttf" compile="0" resource="1"
+            file="Assets/WorkSans-BoldItalic.ttf"/>
+      <FILE id="SqJGFB" name="WorkSans-Italic.ttf" compile="0" resource="1"
+            file="Assets/WorkSans-Italic.ttf"/>
+      <FILE id="HL2Hbb" name="WorkSans-Light.ttf" compile="0" resource="1"
+            file="Assets/WorkSans-Light.ttf"/>
+      <FILE id="uhdvVD" name="WorkSans-LightItalic.ttf" compile="0" resource="1"
+            file="Assets/WorkSans-LightItalic.ttf"/>
+      <FILE id="FNugSs" name="WorkSans-Regular.ttf" compile="0" resource="1"
+            file="Assets/WorkSans-Regular.ttf"/>
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
-      <FILE id="JTYTnm" name="PluginPresetComponent.cpp" compile="1" resource="0"
-            file="Source/PluginPresetComponent.cpp"/>
-      <FILE id="hb1EfE" name="PluginPresetComponent.h" compile="0" resource="0"
-            file="Source/PluginPresetComponent.h"/>
+      <GROUP id="{4158DADA-03E3-DF91-81E4-7F16E37B44DD}" name="Components">
+        <FILE id="d4eaVE" name="AmpComponent.h" compile="0" resource="0" file="Source/Components/AmpComponent.h"/>
+        <FILE id="qVRro4" name="CabinetComponent.h" compile="0" resource="0"
+              file="Source/Components/CabinetComponent.h"/>
+        <FILE id="cwTZnW" name="MixerComponent.h" compile="0" resource="0"
+              file="Source/Components/MixerComponent.h"/>
+        <FILE id="YfBmGp" name="PreAmpComponent.h" compile="0" resource="0"
+              file="Source/Components/PreAmpComponent.h"/>
+        <FILE id="g3k9OM" name="PresetComponent.h" compile="0" resource="0"
+              file="Source/Components/PresetComponent.h"/>
+      </GROUP>
+      <FILE id="v6KLmT" name="PluginLookAndFeel.cpp" compile="1" resource="0"
+            file="Source/PluginLookAndFeel.cpp"/>
+      <FILE id="bvxGLL" name="PluginLookAndFeel.h" compile="0" resource="0"
+            file="Source/PluginLookAndFeel.h"/>
       <FILE id="PK9IlS" name="PluginPresetManager.cpp" compile="1" resource="0"
             file="Source/PluginPresetManager.cpp"/>
       <FILE id="CRW4DQ" name="PluginPresetManager.h" compile="0" resource="0"
@@ -56,8 +80,8 @@
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="supertonal"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="supertonal"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Supertonal DEBUG"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Supertonal"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../modules"/>
@@ -78,8 +102,8 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" hardenedRuntime="1" iosDevelopmentTeamID="24TXZ384X3"
                buildNumber="77">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="supertonal"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="Supertonal2"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Supertonal DEBUG"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Supertonal"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../modules"/>

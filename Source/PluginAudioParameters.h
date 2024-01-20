@@ -45,7 +45,7 @@ namespace apvts
 		{arctangentWaveShaperId, [](float x) { return std::atan(x); }},
 		{cubicNonLineartyWaveShaperId, [](float x) { return x - (1.0f / 3.0f) * std::pow(x, 3.0f); }},
 		{hardClipWaveShaperId, [](float x) { return std::max(-1.0f, std::min(1.0f, x)); }},
-		{exponentialWaveShaperId, [](float x) {return std::exp(x) - 1; }}
+		{exponentialWaveShaperId, [](float x) { return std::exp(x) - 1; }}
 	};
 
 	// Series/Parallel

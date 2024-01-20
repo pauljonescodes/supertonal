@@ -1,12 +1,12 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "PluginPresetManager.h"
+#include "../PluginPresetManager.h"
 
-class PluginPresetComponent : public juce::Component, juce::Button::Listener, juce::ComboBox::Listener
+class PresetComponent : public juce::Component, juce::Button::Listener, juce::ComboBox::Listener
 {
 public:
-	PluginPresetComponent(PluginPresetManager& pm) : presetManager(pm)
+	PresetComponent(PluginPresetManager& pm) : presetManager(pm)
 	{
 		configureButton(saveButton, "Save");
 		configureButton(deleteButton, "Delete");
@@ -21,7 +21,7 @@ public:
 		loadPresetList();
 	}
 
-	~PluginPresetComponent()
+	~PresetComponent()
 	{
 		saveButton.removeListener(this);
 		deleteButton.removeListener(this);
@@ -104,5 +104,5 @@ private:
 	juce::ComboBox presetList;
 	std::unique_ptr<juce::FileChooser> fileChooser;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginPresetComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PresetComponent)
 };
