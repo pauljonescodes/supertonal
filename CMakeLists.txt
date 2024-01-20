@@ -72,7 +72,7 @@ juce_add_plugin(Blueprint
 # include all your JUCE module headers; if you're happy to include module headers directly, you
 # probably don't need to call this.
 
-# juce_generate_juce_header(Blueprint)
+juce_generate_juce_header(Blueprint)
 
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the
 # first argument, then a visibility parameter for the sources which should normally be PRIVATE.
@@ -123,15 +123,14 @@ target_compile_definitions(Blueprint
 # Conversion to binary-data will happen when your target is built.
 
 juce_add_binary_data(AudioPluginData SOURCES 
-    /Assets/Guitar Plate.aif 
-    /Assets/VTM60_low_pregain70_low50_mid50_high50_presence50.wav 
-    /Assets/WorkSans-Bold.ttf 
-    /Assets/WorkSans-BoldItalic.ttf 
-    /Assets/WorkSans-Italic.ttf 
-    /Assets/WorkSans-Light.ttf 
-    /Assets/WorkSans-LightItalic.ttf 
-    /Assets/WorkSans-Regular.ttf 
-    /Assets/cory_bread_and_butter_normalized.wav
+    Assets/VTM60_low_pregain70_low50_mid50_high50_presence50.wav 
+    Assets/WorkSans-Bold.ttf 
+    Assets/WorkSans-BoldItalic.ttf 
+    Assets/WorkSans-Italic.ttf 
+    Assets/WorkSans-Light.ttf 
+    Assets/WorkSans-LightItalic.ttf 
+    Assets/WorkSans-Regular.ttf 
+    Assets/cory_bread_and_butter_normalized.wav
 )
 
 # `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here,
@@ -144,6 +143,7 @@ target_link_libraries(Blueprint
     PRIVATE
         AudioPluginData           # If we'd created a binary data target, we'd link to it here
         juce::juce_audio_utils
+        juce::juce_dsp
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
