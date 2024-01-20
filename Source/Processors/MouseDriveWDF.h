@@ -1,6 +1,10 @@
 #pragma once
 
+#include <JuceHeader.h>
 #include "OmegaProvider.h"
+#include "chowdsp_wdf/chowdsp_wdf.h"
+
+namespace wdft = chowdsp::wdft;
 
 class MouseDriveWDF
 {

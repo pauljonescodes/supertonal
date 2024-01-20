@@ -3,6 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 #include "PluginPresetManager.h"
+#include "Processors/MouseDrive.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener
 {
@@ -47,6 +48,8 @@ private:
 
     std::unique_ptr<juce::dsp::NoiseGate<float>> mNoiseGate;
     std::unique_ptr<juce::dsp::Compressor<float>> mPreCompressorPtr;
+
+    std::unique_ptr<MouseDrive> mMouseDrivePtr;
 
     bool mStagesAreParallel = false;
 

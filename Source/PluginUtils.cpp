@@ -17,9 +17,10 @@ bool PluginUtils::isNumeric(const std::string& str) {
 
 bool PluginUtils::isToggleId(const std::string& str) 
 {
-    if (str.length() >= apvts::onComponentId.length()) 
+    const auto toggleId = "_" + apvts::onComponentId;
+    if (str.length() >= toggleId.length())
     {
-        return (0 == str.compare(str.length() - apvts::onComponentId.length(), apvts::onComponentId.length(), apvts::onComponentId));
+        return (0 == str.compare(str.length() - toggleId.length(), toggleId.length(), toggleId));
     }
     else 
     {

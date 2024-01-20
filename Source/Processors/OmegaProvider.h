@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math_approx/math_approx.hpp>
+
 struct OmegaProvider
 {
     template <typename T>

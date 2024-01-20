@@ -354,6 +354,17 @@ namespace apvts
 		reverbWidthMaximumValue,
 		reverbWidthInterval);
 
+	// Percent
+
+	static constexpr float percentMinimumValue = 0.0f;
+	static constexpr float percentMaximumValue = 1.0f;
+	static constexpr float percentInterval = 0.001;
+	static constexpr float percentDefaultValue = 0.75f;
+	static const juce::NormalisableRange<float> percentNormalizableRange = juce::NormalisableRange<float>(
+		percentMinimumValue,
+		percentMaximumValue,
+		percentInterval);
+
 	enum class ParameterEnum {		
 		NOISE_GATE_ON,
 		NOISE_GATE_THRESHOLD,
@@ -365,6 +376,9 @@ namespace apvts
 		PRE_COMPRESSOR_ATTACK,
 		PRE_COMPRESSOR_RATIO,
 		PRE_COMPRESSOR_RELEASE,
+
+		MOUSE_DISTORTION,
+		MOUSE_VOLUME,
 
 		MODE,
 
@@ -458,6 +472,9 @@ namespace apvts
 	static const std::string preCompressorRatioId = "pre_comp_ratio";
 	static const std::string preCompressorReleaseId = "pre_comp_release";
 
+	static const std::string mouseDistortionId = "mouse_distortion";
+	static const std::string mouseVolumeId = "mouse_volume";
+
 	static const std::string modeId = "mode";
 
 	static const std::string stage1OnId = "stage_1_on";
@@ -547,6 +564,9 @@ namespace apvts
 		{preCompressorAttackId, ParameterEnum::PRE_COMPRESSOR_ATTACK},
 		{preCompressorRatioId, ParameterEnum::PRE_COMPRESSOR_RATIO},
 		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
+
+		{mouseDistortionId, ParameterEnum::MOUSE_DISTORTION},
+		{mouseVolumeId, ParameterEnum::MOUSE_VOLUME},
 
 		{modeId, ParameterEnum::MODE},
 		
