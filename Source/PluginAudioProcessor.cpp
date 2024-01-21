@@ -398,10 +398,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::percentNormalizableRange,
 				apvts::percentDefaultValue,
 				[](float value) -> juce::String {
-					return juce::String(value, 2); // Converts float to string with 2 decimal places
+					return juce::String(value, 2);
 				},
 				[](const juce::String& text) -> float {
-					return text.getFloatValue(); // Converts string to float
+					return text.getFloatValue();
 				}
 				));
 			break;
@@ -427,7 +427,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mNoiseGate->prepare(spec);
 	mPreCompressorPtr->prepare(spec);
 
-	mMouseDrivePtr->prepareToPlay(sampleRate, samplesPerBlock);
+	mMouseDrivePtr->prepare(spec);
 
 	mStage1Buffer->setSize(numChannels, samplesPerBlock);
 	mStage1InputGainPtr->prepare(spec);
@@ -563,7 +563,7 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mNoiseGate->process(processContext);
 	}
 
-	mMouseDrivePtr->processBlock(buffer, midiMessages);
+	mMouseDrivePtr->processBlock(buffer);
 
 	mStage1Buffer->clear();
 	auto stage1Block = juce::dsp::AudioBlock<float>(*mStage1Buffer.get());

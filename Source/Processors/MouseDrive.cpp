@@ -1,6 +1,6 @@
 #include "MouseDrive.h"
 #include "ParamUtils.h"
-#include "CircuitQuantityHelper.h"
+
 
 MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::String& distortionParameterName, const juce::String& volumeParameterName)
 {
@@ -126,30 +126,29 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
             1.0e-3f);
 }
 
-void MouseDrive::prepareToPlay(double sampleRate, int samplesPerBlock)
+void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
 {
-    mDistortionParam.prepare(sampleRate, samplesPerBlock);
+    mDistortionParam.prepare(spec.sampleRate, spec.maximumBlockSize);
     for (auto& model : mWdf)
-        model.prepare(sampleRate);
+        model.prepare(spec);
 
-    const auto spec = dsp::ProcessSpec{ sampleRate, (uint32_t)samplesPerBlock, 2 };
     mGain.setGainLinear(0.0f);
     mGain.prepare(spec);
     mGain.setRampDurationSeconds(0.05);
 
     mDcBlocker.prepare(spec);
-    mDcBlocker.calcCoefs(15.0f, (float)sampleRate);
+    mDcBlocker.calcCoefs(15.0f, (float)spec.sampleRate);
 
     // pre-buffering
-    AudioBuffer<float> buffer(2, samplesPerBlock);
-    for (int i = 0; i < 40000; i += samplesPerBlock)
+    AudioBuffer<float> buffer(2, spec.maximumBlockSize);
+    for (int i = 0; i < 40000; i += spec.maximumBlockSize)
     {
         buffer.clear();
-        processBlock(buffer, MidiBuffer());
+        processBlock(buffer);
     }
 }
 
-void MouseDrive::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void MouseDrive::processBlock(AudioBuffer<float>& buffer)
 {
      mDistortionParam.process(buffer.getNumSamples());
      for (auto [ch, data] : chowdsp::buffer_iters::channels(buffer))
@@ -173,31 +172,15 @@ void MouseDrive::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessag
 
     const auto volumeParamVal = mVolumeParam->getCurrentValue();
     if (volumeParamVal < 0.01f)
+    {
         mGain.setGainLinear(0.0f);
+    }
     else
+    {
         mGain.setGainDecibels(-24.0f * (1.0f - volumeParamVal) - 12.0f);
+    }
+
     mGain.process(buffer);
 
     mDcBlocker.processBlock(buffer);
 }
-
-const juce::String MouseDrive::getName() const
-{
-    return "Mouse Drive";
-}
-
-/*
-
-ParamLayout MouseDrive::createParameterLayout()
-{
-    using namespace ParameterHelpers;
-
-    auto params = createBaseParams();
-
-    createPercentParameter(params, "distortion", "Distortion", 0.75f);
-    createPercentParameter(params, "volume", "Volume", 0.75f);
-
-    return { params.begin(), params.end() };
-}
-
-*/

@@ -4,21 +4,19 @@
 #include "OmegaProvider.h"
 #include "chowdsp_wdf/chowdsp_wdf.h"
 
-namespace wdft = chowdsp::wdft;
-
 class MouseDriveWDF
 {
 public:
     MouseDriveWDF() = default;
 
-    void prepare(double sampleRate)
+    void prepare(const juce::dsp::ProcessSpec& spec)
     {
-        Vin_C1.prepare((float)sampleRate);
-        C2.prepare((float)sampleRate);
-        Rd_C4.prepare((float)sampleRate);
-        R4_C5.prepare((float)sampleRate);
-        R5_C6.prepare((float)sampleRate);
-        R6_C7.prepare((float)sampleRate);
+        Vin_C1.prepare((float)spec.sampleRate);
+        C2.prepare((float)spec.sampleRate);
+        Rd_C4.prepare((float)spec.sampleRate);
+        R4_C5.prepare((float)spec.sampleRate);
+        R5_C6.prepare((float)spec.sampleRate);
+        R6_C7.prepare((float)spec.sampleRate);
 
         R2.setVoltage(4.5f);
     }
@@ -27,30 +25,30 @@ public:
     {
         Vin_C1.setVoltage(x);
         diodes.incident(Sd.reflected());
-        const auto y = wdft::voltage<float>(diodes);
+        const auto y = chowdsp::wdft::voltage<float>(diodes);
         Sd.incident(diodes.reflected());
         return y;
     }
 
     // Port A
-    wdft::CapacitiveVoltageSourceT<float> Vin_C1{ 22.0e-9f };
-    wdft::ResistiveVoltageSourceT<float> R2{ 1.0e6f };
-    wdft::WDFParallelT<float, decltype (Vin_C1), decltype (R2)> P1{ Vin_C1, R2 };
+    chowdsp::wdft::CapacitiveVoltageSourceT<float> Vin_C1{ 22.0e-9f };
+    chowdsp::wdft::ResistiveVoltageSourceT<float> R2{ 1.0e6f };
+    chowdsp::wdft::WDFParallelT<float, decltype (Vin_C1), decltype (R2)> P1{ Vin_C1, R2 };
 
-    wdft::ResistorT<float> R3{ 1.0e3f };
-    wdft::WDFSeriesT<float, decltype (P1), decltype (R3)> S2{ P1, R3 };
+    chowdsp::wdft::ResistorT<float> R3{ 1.0e3f };
+    chowdsp::wdft::WDFSeriesT<float, decltype (P1), decltype (R3)> S2{ P1, R3 };
 
-    wdft::CapacitorT<float> C2{ 1.0e-9f };
-    wdft::WDFParallelT<float, decltype (S2), decltype (C2)> Pa{ S2, C2 };
+    chowdsp::wdft::CapacitorT<float> C2{ 1.0e-9f };
+    chowdsp::wdft::WDFParallelT<float, decltype (S2), decltype (C2)> Pa{ S2, C2 };
 
     // Port B
-    wdft::ResistorCapacitorSeriesT<float> R4_C5{ 47.0f, 2.2e-6f };
-    wdft::ResistorCapacitorSeriesT<float> R5_C6{ 560.0f, 4.7e-6f };
-    wdft::WDFParallelT<float, decltype (R4_C5), decltype (R5_C6)> Pb{ R4_C5, R5_C6 };
+    chowdsp::wdft::ResistorCapacitorSeriesT<float> R4_C5{ 47.0f, 2.2e-6f };
+    chowdsp::wdft::ResistorCapacitorSeriesT<float> R5_C6{ 560.0f, 4.7e-6f };
+    chowdsp::wdft::WDFParallelT<float, decltype (R4_C5), decltype (R5_C6)> Pb{ R4_C5, R5_C6 };
 
     // Port C
     static constexpr float Rdistortion = 100.0e3f;
-    wdft::ResistorCapacitorParallelT<float> Rd_C4{ 0.5f * Rdistortion, 100.0e-12f };
+    chowdsp::wdft::ResistorCapacitorParallelT<float> Rd_C4{ 0.5f * Rdistortion, 100.0e-12f };
 
     // R-Type
     struct ImpedanceCalc
@@ -73,13 +71,13 @@ public:
             return Rd;
         }
     };
-    wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (Pa), decltype (Pb), decltype (Rd_C4)> R{ Pa, Pb, Rd_C4 };
+    chowdsp::wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (Pa), decltype (Pb), decltype (Rd_C4)> R{ Pa, Pb, Rd_C4 };
 
     // Port D
-    wdft::ResistorCapacitorSeriesT<float> R6_C7{ 1.0e3f, 4.7e-6f };
-    wdft::WDFSeriesT<float, decltype (R), decltype (R6_C7)> Sd{ R, R6_C7 };
+    chowdsp::wdft::ResistorCapacitorSeriesT<float> R6_C7{ 1.0e3f, 4.7e-6f };
+    chowdsp::wdft::WDFSeriesT<float, decltype (R), decltype (R6_C7)> Sd{ R, R6_C7 };
 
-    wdft::DiodePairT<float, decltype (Sd), wdft::DiodeQuality::Best, OmegaProvider> diodes{ Sd, 5.0e-9f, 25.85e-3f, 2.0f };
+    chowdsp::wdft::DiodePairT<float, decltype (Sd), chowdsp::wdft::DiodeQuality::Best, OmegaProvider> diodes{ Sd, 5.0e-9f, 25.85e-3f, 2.0f };
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MouseDriveWDF)
