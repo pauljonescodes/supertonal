@@ -1,25 +1,15 @@
 #include "MouseDrive.h"
-#include "ParamUtils.h"
 
-
-MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::String& distortionParameterName, const juce::String& volumeParameterName)
+MouseDrive::MouseDrive() :
+    mHighPassFilter(juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>())
 {
-    using namespace ParameterHelpers;
-    mDistortionParam.setParameterHandle(getParameterPointer<chowdsp::FloatParameter*>(apvts, distortionParameterName));
-    mDistortionParam.setRampLength(0.025);
-    mDistortionParam.mappingFunction = [](float x)
-    {
-        return 1.0f + MouseDriveWDF::Rdistortion * std::pow(x, 5.0f);
-    };
-    loadParameterPointer(mVolumeParam, apvts, volumeParameterName);
-
     mNetlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
     mNetlistCircuitQuantities->addResistor(
         1.0e6f,
         "R2",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R2.setResistanceValue(self.value.load());
         },
         10.0e3f,
@@ -29,7 +19,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "R3",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R3.setResistanceValue(self.value.load());
         },
         100.0f,
@@ -39,7 +29,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "R4",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R4_C5.setResistanceValue(self.value.load());
         },
         10.0f,
@@ -49,7 +39,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "R5",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R5_C6.setResistanceValue(self.value.load());
         },
         10.0f,
@@ -59,7 +49,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "R6",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R6_C7.setResistanceValue(self.value.load());
         },
         100.0f,
@@ -69,7 +59,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "C1",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.Vin_C1.setCapacitanceValue(self.value.load());
         },
         100.0e-12f,
@@ -79,7 +69,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "C2",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.C2.setCapacitanceValue(self.value.load());
         },
         1.0e-12f,
@@ -89,7 +79,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "C4",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.Rd_C4.setCapacitanceValue(self.value.load());
         },
         1.0e-12f,
@@ -99,7 +89,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "C5",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R4_C5.setCapacitanceValue(self.value.load());
         },
         100.0e-12f,
@@ -109,7 +99,7 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "C6",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R5_C6.setCapacitanceValue(self.value.load());
         },
         100.0e-12f,
@@ -119,25 +109,38 @@ MouseDrive::MouseDrive(juce::AudioProcessorValueTreeState& apvts, const juce::St
         "C7",
         [this](const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : mWdf)
+            for (auto& wdfModel : mWaveDesignFilter)
             wdfModel.R6_C7.setCapacitanceValue(self.value.load());
         },
         100.0e-12f,
             1.0e-3f);
 }
 
+void MouseDrive::setDistortion(float targetValue)
+{
+    mDistortionSmoothedValue.setTargetValue(1.0f + MouseDriveWDF::Rdistortion * std::pow(targetValue, 5.0f));
+};
+
+void MouseDrive::setVolume(float targetValue)
+{
+    mVolumeSmoothedValue.setTargetValue(targetValue);
+};
+
 void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
 {
-    mDistortionParam.prepare(spec.sampleRate, spec.maximumBlockSize);
-    for (auto& model : mWdf)
+    for (auto& model : mWaveDesignFilter)
         model.prepare(spec);
 
     mGain.setGainLinear(0.0f);
     mGain.prepare(spec);
     mGain.setRampDurationSeconds(0.05);
 
-    mDcBlocker.prepare(spec);
-    mDcBlocker.calcCoefs(15.0f, (float)spec.sampleRate);
+    mHighPassFilter.prepare(spec);
+
+    *mHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
+        spec.sampleRate,
+        15.0f,
+        0.70710678118654752440L);
 
     // pre-buffering
     AudioBuffer<float> buffer(2, spec.maximumBlockSize);
@@ -148,39 +151,42 @@ void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
     }
 }
 
+void MouseDrive::reset()
+{
+    mGain.reset();
+    mHighPassFilter.reset();
+}
+
 void MouseDrive::processBlock(AudioBuffer<float>& buffer)
 {
-     mDistortionParam.process(buffer.getNumSamples());
+     mDistortionSmoothedValue.skip(buffer.getNumSamples());
+     mVolumeSmoothedValue.skip(buffer.getNumSamples());
+     const auto currentDistortionValue = mDistortionSmoothedValue.getCurrentValue();
+     const auto currentVolumeValue = mVolumeSmoothedValue.getCurrentValue();
+
      for (auto [ch, data] : chowdsp::buffer_iters::channels(buffer))
      {
-         if (mDistortionParam.isSmoothing())
+         if (mDistortionSmoothedValue.isSmoothing())
          {
-             const auto* distParamSmoothData = mDistortionParam.getSmoothedBuffer();
              for (auto [n, x] : chowdsp::enumerate(data))
              {
-                 mWdf[ch].Rd_C4.setResistanceValue(distParamSmoothData[n]);
-                 x = mWdf[ch].process(x);
+                 mWaveDesignFilter[ch].Rd_C4.setResistanceValue(currentDistortionValue);
+                 x = mWaveDesignFilter[ch].process(x);
              }
          }
          else
          {
-             mWdf[ch].Rd_C4.setResistanceValue(mDistortionParam.getCurrentValue());
+             mWaveDesignFilter[ch].Rd_C4.setResistanceValue(currentDistortionValue);
              for (auto& x : data)
-                 x = mWdf[ch].process(x);
+                 x = mWaveDesignFilter[ch].process(x);
          }
      }
 
-    const auto volumeParamVal = mVolumeParam->getCurrentValue();
-    if (volumeParamVal < 0.01f)
-    {
-        mGain.setGainLinear(0.0f);
-    }
-    else
-    {
-        mGain.setGainDecibels(-24.0f * (1.0f - volumeParamVal) - 12.0f);
-    }
+    mGain.setGainDecibels(currentVolumeValue);
 
-    mGain.process(buffer);
+    auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
+    auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
 
-    mDcBlocker.processBlock(buffer);
+    mGain.process(processContext);
+    mHighPassFilter.process(processContext);
 }

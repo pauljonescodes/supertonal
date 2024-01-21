@@ -33,8 +33,9 @@ public:
 	apvts::preCompressorReleaseId
 },
 {
-	apvts::mouseDistortionId,
-	apvts::mouseVolumeId,
+	apvts::mouseDriveOnId,
+	apvts::mouseDriveDistortionId,
+	apvts::mouseDriveVolumeId,
 },
 {
 	apvts::delayTimeId,

@@ -49,6 +49,7 @@ private:
     std::unique_ptr<juce::dsp::NoiseGate<float>> mNoiseGate;
     std::unique_ptr<juce::dsp::Compressor<float>> mPreCompressorPtr;
 
+    bool mMouseDriveIsOn = false;
     std::unique_ptr<MouseDrive> mMouseDrivePtr;
 
     bool mStagesAreParallel = false;

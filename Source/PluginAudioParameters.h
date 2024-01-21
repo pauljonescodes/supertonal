@@ -16,6 +16,47 @@
 
 namespace apvts
 {
+	// https://www.desmos.com/calculator/qkc6naksy5
+	static inline juce::NormalisableRange<float> makeLogarithmicRange(float rangeStart, float rangeEnd, float intervalValue, float exponent = 6.0f)
+	{
+		juce::NormalisableRange<float> normalisableRange = {
+			rangeStart, rangeEnd,
+			// In all the following, "start" and "end" describe the unnormalized range
+			// for example 0 to 15 or 0 to 100.
+			[=](float start, float end, float normalised)
+			{
+				return start + (std::exp2(normalised * exponent) - 1) * (end - start) / (std::exp2(exponent) - 1);
+			},
+			[=](float start, float end, float unnormalised)
+			{
+				return std::log2(((unnormalised - start) / (end - start) * (std::exp2(exponent) - 1)) + 1) / exponent;
+			} };
+		normalisableRange.interval = intervalValue;
+		return normalisableRange;
+	}
+
+	static inline juce::NormalisableRange<float> makeDecibelRange(float rangeStart, float rangeEnd, float rangeInterval)
+	{
+		// jassert(rangeStart < rangeEnd);  // Ensuring the start is less than the end.
+		juce::NormalisableRange<float> range = {
+			rangeStart,
+			rangeEnd, // Directly using rangeEnd as the max dB value
+
+			// convertFrom0to1
+			[=](float min, float max, float normalizedGain)
+			{
+				return normalizedGain * (max - min) + min; // Linear mapping from normalized to dB
+			},
+
+			// convertTo0to1
+			[=](float min, float max, float dB)
+			{
+				return (dB - min) / (max - min); // Linear mapping from dB to normalized
+			} };
+		range.interval = rangeInterval; // Setting the interval for the range
+		return range;
+	}
+
 	static const std::string identifier = "supertonal-apvts";
 	static constexpr int version = 3;
 
@@ -90,7 +131,21 @@ namespace apvts
 		gainMaximumValue, 
 		gainIntervalValue);
 
-	// GAIN
+	static constexpr float gainDecibelsMinimumValue = -64.0f;
+	static constexpr float gainDeciblesMaximumValue = 24.0f;
+	static constexpr float gainDeciblesIntervalValue = 0.01f;
+	static constexpr float gainDeciblesDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> decibelGainNormalisableRange = makeDecibelRange(
+		gainDecibelsMinimumValue,
+		gainDeciblesMaximumValue,
+		gainDeciblesIntervalValue);
+
+	static const juce::NormalisableRange<float> decibelGainCuttingNormalisableRange = makeDecibelRange(
+		gainDecibelsMinimumValue,
+		gainDeciblesDefaultValue,
+		gainDeciblesIntervalValue);
+
+	// DryWet
 
 	static const std::string dryWetComponentId = "gain";
 
@@ -129,6 +184,7 @@ namespace apvts
 	static constexpr float ratioMaximumValue = 100.0f;
 	static constexpr float ratioIntervalValue = 1.0f;
 	static constexpr float ratioDefaultValue = 1.0f;
+	static constexpr float noiseGateRatioDefaultValue = 2.0f;
 	static const juce::NormalisableRange<float> ratioNormalizableRange = juce::NormalisableRange<float>(
 		ratioMinimumValue,
 		ratioMaximumValue,
@@ -329,8 +385,8 @@ namespace apvts
 
 	static constexpr float reverbRoomSizeMinimumValue = 0.0f;
 	static constexpr float reverbRoomSizeMaximumValue = 1.0f;
-	static constexpr float reverbRoomSizeInterval = 0.001;
-	static constexpr float reverbRoomSizeDefaultValue = 0.5f;
+	static constexpr float reverbRoomSizeInterval = 0.01;
+	static constexpr float reverbRoomSizeDefaultValue = 0.01f;
 	static const juce::NormalisableRange<float> reverbRoomSizeNormalizableRange = juce::NormalisableRange<float>(
 		reverbRoomSizeMinimumValue,
 		reverbRoomSizeMaximumValue,
@@ -339,7 +395,7 @@ namespace apvts
 	static constexpr float reverbDampingMinimumValue = 0.0f;
 	static constexpr float reverbDampingMaximumValue = 1.0f;
 	static constexpr float reverbDampingInterval = 0.001;
-	static constexpr float reverbDampingDefaultValue = 0.5f;
+	static constexpr float reverbDampingDefaultValue = 0.0f;
 	static const juce::NormalisableRange<float> reverbDampingNormalizableRange = juce::NormalisableRange<float>(
 		reverbDampingMinimumValue,
 		reverbDampingMaximumValue,
@@ -377,8 +433,9 @@ namespace apvts
 		PRE_COMPRESSOR_RATIO,
 		PRE_COMPRESSOR_RELEASE,
 
-		MOUSE_DISTORTION,
-		MOUSE_VOLUME,
+		MOUSE_DRIVE_ON,
+		MOUSE_DRIVE_DISTORTION,
+		MOUSE_DRIVE_VOLUME,
 
 		MODE,
 
@@ -472,8 +529,9 @@ namespace apvts
 	static const std::string preCompressorRatioId = "pre_comp_ratio";
 	static const std::string preCompressorReleaseId = "pre_comp_release";
 
-	static const std::string mouseDistortionId = "mouse_distortion";
-	static const std::string mouseVolumeId = "mouse_volume";
+	static const std::string mouseDriveOnId = "mouse_drive_on";
+	static const std::string mouseDriveDistortionId = "mouse_drive_distortion";
+	static const std::string mouseDriveVolumeId = "mouse_drive_volume";
 
 	static const std::string modeId = "mode";
 
@@ -565,8 +623,9 @@ namespace apvts
 		{preCompressorRatioId, ParameterEnum::PRE_COMPRESSOR_RATIO},
 		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
 
-		{mouseDistortionId, ParameterEnum::MOUSE_DISTORTION},
-		{mouseVolumeId, ParameterEnum::MOUSE_VOLUME},
+		{mouseDriveOnId, ParameterEnum::MOUSE_DRIVE_ON},
+		{mouseDriveDistortionId, ParameterEnum::MOUSE_DRIVE_DISTORTION},
+		{mouseDriveVolumeId, ParameterEnum::MOUSE_DRIVE_VOLUME},
 
 		{modeId, ParameterEnum::MODE},
 		

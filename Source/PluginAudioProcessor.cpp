@@ -26,7 +26,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mNoiseGate(std::make_unique<juce::dsp::NoiseGate<float>>()),
 	mPreCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
 
-	mMouseDrivePtr(std::make_unique<MouseDrive>(*mAudioProcessorValueTreeStatePtr.get(), apvts::mouseDistortionId, apvts::mouseVolumeId)),
+	mMouseDrivePtr(std::make_unique<MouseDrive>()),
 
 	mStage1Buffer(std::make_unique<juce::AudioBuffer<float>>()),
 	mStage1InputGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
@@ -112,6 +112,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		{
 		case apvts::ParameterEnum::NOISE_GATE_ON:
 		case apvts::ParameterEnum::STAGE1_ON:
+		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
+			layout.add(std::make_unique<juce::AudioParameterBool>(
+				juce::ParameterID{ parameterId, apvts::version },
+				parameterId,
+				true
+				));
+			break;
+		case apvts::ParameterEnum::MOUSE_DRIVE_ON:
 		case apvts::ParameterEnum::STAGE2_ON:
 		case apvts::ParameterEnum::STAGE3_ON:
 		case apvts::ParameterEnum::STAGE4_ON:
@@ -119,7 +127,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::MID_PEAK_ON:
 		case apvts::ParameterEnum::HIGH_SHELF_ON:
 		case apvts::ParameterEnum::LOW_PASS_ON:
-		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
@@ -214,12 +221,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_RATIO:
 		case apvts::ParameterEnum::POST_COMPRESSOR_RATIO:
-		case apvts::ParameterEnum::NOISE_GATE_RATIO:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::ratioNormalizableRange,
 				apvts::ratioDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::NOISE_GATE_RATIO:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::ratioNormalizableRange,
+				apvts::noiseGateRatioDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_RELEASE:
@@ -390,19 +404,20 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::delayFeedbackDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::MOUSE_DISTORTION:
-		case apvts::ParameterEnum::MOUSE_VOLUME:
-			layout.add(std::make_unique<chowdsp::FloatParameter>(
+		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::percentNormalizableRange,
-				apvts::percentDefaultValue,
-				[](float value) -> juce::String {
-					return juce::String(value, 2);
-				},
-				[](const juce::String& text) -> float {
-					return text.getFloatValue();
-				}
+				apvts::percentDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::decibelGainCuttingNormalisableRange,
+				apvts::gainDeciblesDefaultValue
 				));
 			break;
 		default:
@@ -495,7 +510,7 @@ void PluginAudioProcessor::reset()
 	mNoiseGate->reset();
 	mPreCompressorPtr->reset();
 
-	//mMouseDrive->reset();
+	mMouseDrivePtr->reset();
 
 	mStage1InputGainPtr->reset();
 	mStage1WaveShaperPtr->reset();
@@ -563,8 +578,11 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mNoiseGate->process(processContext);
 	}
 
-	mMouseDrivePtr->processBlock(buffer);
-
+	if (mMouseDriveIsOn)
+	{
+		mMouseDrivePtr->processBlock(buffer);
+	}
+	
 	mStage1Buffer->clear();
 	auto stage1Block = juce::dsp::AudioBlock<float>(*mStage1Buffer.get());
 	
@@ -1120,9 +1138,14 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::NOISE_GATE_RELEASE:
 		mNoiseGate->setRelease(newValue);
 		break;
-	case apvts::ParameterEnum::MOUSE_DISTORTION:
-	case apvts::ParameterEnum::MOUSE_VOLUME:
-		DBG("mouse");
+	case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
+		mMouseDrivePtr->setDistortion(newValue);
+		break;
+	case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
+		mMouseDrivePtr->setVolume(newValue);
+		break;
+	case apvts::ParameterEnum::MOUSE_DRIVE_ON:
+		mMouseDriveIsOn = newValue;
 		break;
 	default:
 		assert(false);

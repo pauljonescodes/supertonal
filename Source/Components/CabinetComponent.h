@@ -20,10 +20,7 @@ public:
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
-	apvts::cabinetImpulseResponseConvolutionOnId,
-	apvts::outputGainId,
-	apvts::limiterThresholdId,
-	apvts::limiterReleaseId,
+	apvts::cabinetImpulseResponseConvolutionOnId
 }
 		};
 
