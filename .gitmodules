@@ -1,9 +1,6 @@
 [submodule "Modules/JUCE"]
 	path = Modules/JUCE
 	url = https://github.com/juce-framework/JUCE
-[submodule "Modules/chowdsp_utils"]
-	path = Modules/chowdsp_utils
-	url = https://github.com/Chowdhury-DSP/chowdsp_utils
 [submodule "Modules/math_approx"]
 	path = Modules/math_approx
 	url = https://github.com/Chowdhury-DSP/math_approx/
