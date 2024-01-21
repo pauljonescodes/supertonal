@@ -129,7 +129,9 @@ void MouseDrive::setVolume(float targetValue)
 void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
 {
     for (auto& model : mWaveDesignFilter)
+    {
         model.prepare(spec);
+    }
 
     mGain.setGainLinear(0.0f);
     mGain.prepare(spec);
@@ -159,28 +161,22 @@ void MouseDrive::reset()
 
 void MouseDrive::processBlock(AudioBuffer<float>& buffer)
 {
-     mDistortionSmoothedValue.skip(buffer.getNumSamples());
-     mVolumeSmoothedValue.skip(buffer.getNumSamples());
-     const auto currentDistortionValue = mDistortionSmoothedValue.getCurrentValue();
-     const auto currentVolumeValue = mVolumeSmoothedValue.getCurrentValue();
+    const int numChannels = buffer.getNumChannels();
+    const int numSamples = buffer.getNumSamples();
 
-     for (auto [ch, data] : chowdsp::buffer_iters::channels(buffer))
-     {
-         if (mDistortionSmoothedValue.isSmoothing())
-         {
-             for (auto [n, x] : chowdsp::enumerate(data))
-             {
-                 mWaveDesignFilter[ch].Rd_C4.setResistanceValue(currentDistortionValue);
-                 x = mWaveDesignFilter[ch].process(x);
-             }
-         }
-         else
-         {
-             mWaveDesignFilter[ch].Rd_C4.setResistanceValue(currentDistortionValue);
-             for (auto& x : data)
-                 x = mWaveDesignFilter[ch].process(x);
-         }
-     }
+    const auto currentDistortionValue = mDistortionSmoothedValue.skip(numSamples);
+    const auto currentVolumeValue = mVolumeSmoothedValue.skip(numSamples);
+
+    for (int channel = 0; channel < numChannels; ++channel)
+    {
+        auto* channelData = buffer.getWritePointer(channel);
+
+        mWaveDesignFilter[channel].Rd_C4.setResistanceValue(currentDistortionValue);
+        for (int i = 0; i < numSamples; ++i)
+        {
+            channelData[i] = mWaveDesignFilter[channel].process(channelData[i]);
+        }
+    }
 
     mGain.setGainDecibels(currentVolumeValue);
 

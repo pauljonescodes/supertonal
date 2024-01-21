@@ -33,7 +33,6 @@ struct CircuitQuantity
     Setter setter;
 };
 
-juce::String toString (const CircuitQuantity& q);
 float fromString (const juce::String& str, const CircuitQuantity& q);
 
 struct CircuitQuantityList

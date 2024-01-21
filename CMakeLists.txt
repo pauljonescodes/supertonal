@@ -89,16 +89,12 @@ target_sources(Blueprint
         Source/Components/MixerComponent.h 
         Source/Components/PreAmpComponent.h
 
-        Source/Processors/BaseProcessor.cpp
-        Source/Processors/BaseProcessor.h
         Source/Processors/CircuitQuantityHelper.h
         Source/Processors/CircuitQuantityHelper.cpp
-        Source/Processors/JuceProcWrapper.h
         Source/Processors/MouseDrive.cpp
         Source/Processors/MouseDrive.h
         Source/Processors/MouseDriveWDF.h
         Source/Processors/OmegaProvider.h
-        Source/Processors/ParamUtils.h
 
         Source/PluginUtils.h 
         Source/PluginAudioParameters.h 
@@ -155,14 +151,7 @@ target_link_libraries(Blueprint
         AudioPluginData           # If we'd created a binary data target, we'd link to it here
         juce::juce_audio_utils
         juce::juce_dsp
-        chowdsp::chowdsp_dsp_utils
-        chowdsp::chowdsp_dsp_data_structures
         chowdsp::chowdsp_wdf
-        chowdsp::chowdsp_version
-        chowdsp::chowdsp_gui
-        chowdsp::chowdsp_plugin_utils
-        chowdsp::chowdsp_parameters
-        chowdsp::chowdsp_units
         math_approx
     PUBLIC
         juce::juce_recommended_config_flags

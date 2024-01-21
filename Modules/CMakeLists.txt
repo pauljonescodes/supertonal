@@ -1,4 +1,3 @@
 add_subdirectory(JUCE)
-add_subdirectory(chowdsp_utils)
 add_subdirectory(math_approx)
 add_subdirectory(chowdsp_wdf)

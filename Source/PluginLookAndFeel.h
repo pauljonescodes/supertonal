@@ -94,9 +94,9 @@ public:
 			Justification::centredLeft, 10);
 	}
 
-	int getTabButtonBestWidth(juce::TabBarButton& /*tabIndex*/, int /*tabDepth*/) override
+	int getTabButtonBestWidth(juce::TabBarButton& button, int tabDepth) override
 	{
-		return 150; // This controls the width of the tab
+		return button.getTabbedButtonBar().getWidth() / button.getTabbedButtonBar().getNumTabs();
 	}
 
 	void drawButtonText(juce::Graphics& g, juce::TextButton& button, bool /*shouldDrawButtonAsHighlighted*/, bool /*shouldDrawButtonAsDown*/) override;

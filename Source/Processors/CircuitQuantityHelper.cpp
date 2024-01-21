@@ -1,5 +1,4 @@
 #include "CircuitQuantityHelper.h"
-#include <chowdsp_units/chowdsp_units.h>
 
 namespace netlist
 {
@@ -31,42 +30,6 @@ CircuitQuantity::CircuitQuantity (float defaultVal,
 {
 }
 
-namespace MetricUnit = chowdsp::Units::Metric;
-template <typename Metric = MetricUnit::Unit>
-juce::String getStringForValue (float value)
-{
-    if (value < (float) MetricUnit::Nano::multiplier)
-    {
-        return getStringForValue<MetricUnit::Pico> (value * 1.0e12f);
-    }
-    if (value < (float) MetricUnit::Micro::multiplier)
-    {
-        return getStringForValue<MetricUnit::Nano> (value * 1.0e9f);
-    }
-    if (value < (float) MetricUnit::Milli::multiplier)
-    {
-        return getStringForValue<MetricUnit::Micro> (value * 1.0e6f);
-    }
-    if (value < (float) MetricUnit::Unit::multiplier)
-    {
-        return getStringForValue<MetricUnit::Milli> (value * 1.0e3f);
-    }
-    if (value < (float) MetricUnit::Kilo::multiplier)
-    {
-        return juce::String { value, 1 } + ' ' + chowdsp::toString (Metric::prefix); // base case!
-    }
-    if (value < (float) MetricUnit::Mega::multiplier)
-    {
-        return getStringForValue<MetricUnit::Kilo> (value * 1.0e-3f);
-    }
-    if (value < (float) MetricUnit::Giga::multiplier)
-    {
-        return getStringForValue<MetricUnit::Mega> (value * 1.0e-6f);
-    }
-
-    return {};
-}
-
 static juce::String getPostFixForQuantity (CircuitQuantity::Type type)
 {
     switch (type)
@@ -79,11 +42,6 @@ static juce::String getPostFixForQuantity (CircuitQuantity::Type type)
             return "H";
     }
     return {};
-}
-
-juce::String toString (const CircuitQuantity& q)
-{
-    return getStringForValue (q.value) + getPostFixForQuantity (q.type);
 }
 
 float fromString (const juce::String& str, const CircuitQuantity& q)
