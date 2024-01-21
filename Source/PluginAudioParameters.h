@@ -421,6 +421,26 @@ namespace apvts
 		percentMaximumValue,
 		percentInterval);
 
+	// Tube screamer
+
+	static constexpr float tubeScreamerDiodeTypeMinimumValue = 0.0f;
+	static constexpr float tubeScreamerDiodeTypeMaximumValue = 2.0f;
+	static constexpr float tubeScreamerDiodeTypeInterval = 1.0;
+	static constexpr float tubeScreamerDiodeTypeDefaultValue = 0.0f;
+	static const juce::NormalisableRange<float> tubeScreamerDiodeTypeNormalizableRange = juce::NormalisableRange<float>(
+		tubeScreamerDiodeTypeMinimumValue,
+		tubeScreamerDiodeTypeMaximumValue,
+		tubeScreamerDiodeTypeInterval);
+
+	static constexpr float tubeScreamerDiodeCountMinimumValue = 1.0f;
+	static constexpr float tubeScreamerDiodeCountMaximumValue = 3.0f;
+	static constexpr float tubeScreamerDiodeCountInterval = 1.0;
+	static constexpr float tubeScreamerDiodeCountDefaultValue = 2.0f;
+	static const juce::NormalisableRange<float> tubeScreamerDiodeCountNormalizableRange = juce::NormalisableRange<float>(
+		tubeScreamerDiodeCountMinimumValue,
+		tubeScreamerDiodeCountMaximumValue,
+		tubeScreamerDiodeCountInterval);
+
 	enum class ParameterEnum {		
 		NOISE_GATE_ON,
 		NOISE_GATE_THRESHOLD,
@@ -432,6 +452,11 @@ namespace apvts
 		PRE_COMPRESSOR_ATTACK,
 		PRE_COMPRESSOR_RATIO,
 		PRE_COMPRESSOR_RELEASE,
+
+		TUBE_SCREAMER_ON,
+		TUBE_SCREAMER_GAIN,
+		TUBE_SCREAMER_DIODE_TYPE,
+		TUBE_SCREAMER_DIODE_COUNT,
 
 		MOUSE_DRIVE_ON,
 		MOUSE_DRIVE_DISTORTION,
@@ -529,6 +554,11 @@ namespace apvts
 	static const std::string preCompressorRatioId = "pre_comp_ratio";
 	static const std::string preCompressorReleaseId = "pre_comp_release";
 
+	static const std::string tubeScreamerOnId = "tube_screamer_on";
+	static const std::string tubeScreamerGainId = "tube_screamer_gain";
+	static const std::string tubeScreamerDiodeTypeId = "tube_screamer_diode_type";
+	static const std::string tubeScreamerDiodeCountId = "tube_screamer_diode_count";
+
 	static const std::string mouseDriveOnId = "mouse_drive_on";
 	static const std::string mouseDriveDistortionId = "mouse_drive_distortion";
 	static const std::string mouseDriveVolumeId = "mouse_drive_volume";
@@ -622,6 +652,11 @@ namespace apvts
 		{preCompressorAttackId, ParameterEnum::PRE_COMPRESSOR_ATTACK},
 		{preCompressorRatioId, ParameterEnum::PRE_COMPRESSOR_RATIO},
 		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
+
+		{tubeScreamerOnId, ParameterEnum::TUBE_SCREAMER_ON},
+		{tubeScreamerGainId, ParameterEnum::TUBE_SCREAMER_GAIN},
+		{tubeScreamerDiodeTypeId, ParameterEnum::TUBE_SCREAMER_DIODE_TYPE},
+		{tubeScreamerDiodeCountId, ParameterEnum::TUBE_SCREAMER_DIODE_COUNT},
 
 		{mouseDriveOnId, ParameterEnum::MOUSE_DRIVE_ON},
 		{mouseDriveDistortionId, ParameterEnum::MOUSE_DRIVE_DISTORTION},

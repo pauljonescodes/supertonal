@@ -33,6 +33,12 @@ public:
 	apvts::preCompressorReleaseId
 },
 {
+	apvts::tubeScreamerOnId,
+	apvts::tubeScreamerGainId,
+	apvts::tubeScreamerDiodeTypeId,
+	apvts::tubeScreamerDiodeCountId,
+},
+{
 	apvts::mouseDriveOnId,
 	apvts::mouseDriveDistortionId,
 	apvts::mouseDriveVolumeId,

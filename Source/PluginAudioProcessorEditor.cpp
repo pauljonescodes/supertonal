@@ -34,8 +34,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 
 PluginAudioProcessorEditor::~PluginAudioProcessorEditor()
 {
-	mPresetComponentPtr.reset();
-	mTabbedComponentPtr.reset();
+	setLookAndFeel(nullptr);
 }
 
 void PluginAudioProcessorEditor::paint(juce::Graphics& g)

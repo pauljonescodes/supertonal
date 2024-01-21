@@ -1,7 +1,7 @@
 #include "MouseDrive.h"
 
 MouseDrive::MouseDrive() :
-    mHighPassFilter(juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>())
+    mDirectCurrentBlockerHighPassFilter(juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>())
 {
     mNetlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
     mNetlistCircuitQuantities->addResistor(
@@ -137,9 +137,9 @@ void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
     mGain.prepare(spec);
     mGain.setRampDurationSeconds(0.05);
 
-    mHighPassFilter.prepare(spec);
+    mDirectCurrentBlockerHighPassFilter.prepare(spec);
 
-    *mHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
+    *mDirectCurrentBlockerHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
         spec.sampleRate,
         15.0f,
         0.70710678118654752440L);
@@ -156,7 +156,7 @@ void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
 void MouseDrive::reset()
 {
     mGain.reset();
-    mHighPassFilter.reset();
+    mDirectCurrentBlockerHighPassFilter.reset();
 }
 
 void MouseDrive::processBlock(AudioBuffer<float>& buffer)
@@ -184,5 +184,5 @@ void MouseDrive::processBlock(AudioBuffer<float>& buffer)
     auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
 
     mGain.process(processContext);
-    mHighPassFilter.process(processContext);
+    mDirectCurrentBlockerHighPassFilter.process(processContext);
 }

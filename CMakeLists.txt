@@ -95,6 +95,9 @@ target_sources(Blueprint
         Source/Processors/MouseDrive.h
         Source/Processors/MouseDriveWDF.h
         Source/Processors/OmegaProvider.h
+        Source/Processors/TubeScreamer.cpp
+        Source/Processors/TubeScreamer.h
+        Source/Processors/TubeScreamerWDF.h
 
         Source/PluginUtils.h 
         Source/PluginAudioParameters.h 

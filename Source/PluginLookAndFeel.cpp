@@ -304,7 +304,12 @@ void PluginLookAndFeel::drawTabButton(juce::TabBarButton& button, juce::Graphics
 {
     using namespace juce;
 
-    const auto baseColour = g_secondaryColour.withMultipliedAlpha(button.isEnabled() ? 0.75f : 0.3f);
+    const auto currentIndex = button.getTabbedButtonBar().getCurrentTabIndex();
+    const auto buttonIndex = button.getIndex();
+
+    const auto selected = currentIndex == buttonIndex;
+    
+    const auto baseColour = g_secondaryColour.darker(selected ? 0.25 : 0.0);
 
     const auto width = float(button.getWidth());
     const auto height = float(button.getHeight());

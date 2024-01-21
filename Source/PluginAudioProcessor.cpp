@@ -26,6 +26,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mNoiseGate(std::make_unique<juce::dsp::NoiseGate<float>>()),
 	mPreCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
 
+	mTubeScreamerPtr(std::make_unique<TubeScreamer>()),
 	mMouseDrivePtr(std::make_unique<MouseDrive>()),
 
 	mStage1Buffer(std::make_unique<juce::AudioBuffer<float>>()),
@@ -110,7 +111,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 
 		switch (parameterIdAndEnum.second)
 		{
-		case apvts::ParameterEnum::NOISE_GATE_ON:
 		case apvts::ParameterEnum::STAGE1_ON:
 		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
@@ -119,6 +119,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				true
 				));
 			break;
+		case apvts::ParameterEnum::NOISE_GATE_ON:
+		case apvts::ParameterEnum::TUBE_SCREAMER_ON:
 		case apvts::ParameterEnum::MOUSE_DRIVE_ON:
 		case apvts::ParameterEnum::STAGE2_ON:
 		case apvts::ParameterEnum::STAGE3_ON:
@@ -158,7 +160,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				waveShaperIdsJuceStringArray,
-				0));
+				1));
 			break;
 
 		case apvts::ParameterEnum::STAGE1_DRY_WET:
@@ -405,6 +407,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				));
 			break;
 		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
+		case apvts::ParameterEnum::TUBE_SCREAMER_GAIN:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
@@ -418,6 +421,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				PluginUtils::toTitleCase(parameterId),
 				apvts::decibelGainCuttingNormalisableRange,
 				apvts::gainDeciblesDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_TYPE:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::tubeScreamerDiodeTypeNormalizableRange,
+				apvts::tubeScreamerDiodeTypeDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_COUNT:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::tubeScreamerDiodeCountNormalizableRange,
+				apvts::tubeScreamerDiodeCountDefaultValue
 				));
 			break;
 		default:
@@ -442,6 +461,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mNoiseGate->prepare(spec);
 	mPreCompressorPtr->prepare(spec);
 
+	mTubeScreamerPtr->prepare(spec);
 	mMouseDrivePtr->prepare(spec);
 
 	mStage1Buffer->setSize(numChannels, samplesPerBlock);
@@ -510,6 +530,7 @@ void PluginAudioProcessor::reset()
 	mNoiseGate->reset();
 	mPreCompressorPtr->reset();
 
+	mTubeScreamerPtr->reset();
 	mMouseDrivePtr->reset();
 
 	mStage1InputGainPtr->reset();
@@ -576,6 +597,11 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	if (mNoiseGateIsOn)
 	{
 		mNoiseGate->process(processContext);
+	}
+
+	if (mTubeScreamerIsOn)
+	{
+		mTubeScreamerPtr->processBlock(buffer);
 	}
 
 	if (mMouseDriveIsOn)
@@ -1020,7 +1046,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::LIMITER_THRESHOLD:
 		mLimiter->setThreshold(newValue);
 		break;
-
 	case apvts::ParameterEnum::CHORUS_RATE:
 		mChorusPtr->setRate(newValue);
 		break;
@@ -1052,7 +1077,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::PHASER_MIX:
 		mPhaserPtr->setMix(newValue);
 		break;
-
 	case apvts::ParameterEnum::REVERB_ROOM_SIZE:
 	{
 		const auto& parameters = mReverb->getParameters();
@@ -1146,6 +1170,18 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_ON:
 		mMouseDriveIsOn = newValue;
+		break;
+	case apvts::ParameterEnum::TUBE_SCREAMER_ON:
+		mTubeScreamerIsOn = newValue;
+		break;
+	case apvts::ParameterEnum::TUBE_SCREAMER_GAIN:
+		mTubeScreamerPtr->setGain(newValue);
+		break;
+	case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_TYPE:
+		mTubeScreamerPtr->setDiodeType(newValue);
+		break;
+	case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_COUNT:
+		mTubeScreamerPtr->setDiodeCount(newValue);
 		break;
 	default:
 		assert(false);

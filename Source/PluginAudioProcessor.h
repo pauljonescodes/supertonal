@@ -4,6 +4,7 @@
 #include <juce_dsp/juce_dsp.h>
 #include "PluginPresetManager.h"
 #include "Processors/MouseDrive.h"
+#include "Processors/TubeScreamer.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener
 {
@@ -48,6 +49,9 @@ private:
 
     std::unique_ptr<juce::dsp::NoiseGate<float>> mNoiseGate;
     std::unique_ptr<juce::dsp::Compressor<float>> mPreCompressorPtr;
+
+    bool mTubeScreamerIsOn = false;
+    std::unique_ptr<TubeScreamer> mTubeScreamerPtr;
 
     bool mMouseDriveIsOn = false;
     std::unique_ptr<MouseDrive> mMouseDrivePtr;
