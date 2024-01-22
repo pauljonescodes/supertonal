@@ -290,7 +290,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::eqGainNormalizableRange,
+				apvts::peakGainNormalizableRange,
 				apvts::eqGainDefaultValue
 				));
 			break;
@@ -592,12 +592,12 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
 	auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
 
-	mPreCompressorPtr->process(processContext);
-
 	if (mNoiseGateIsOn)
 	{
 		mNoiseGate->process(processContext);
 	}
+
+	mPreCompressorPtr->process(processContext);
 
 	if (mTubeScreamerIsOn)
 	{
@@ -751,6 +751,7 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	mBiasPtr->process(processContext);
 
 	mPostCompressorPtr->process(processContext);
+	mCompressorGainPtr->process(processContext);
 
 	if (mHighPassFilterIsOn)
 	{
@@ -771,8 +772,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	{
 		mLowPassFilterPtr->process(processContext);
 	}
-
-	mCompressorGainPtr->process(processContext);
 
 	mDelayLineDryWetMixerPtr->pushDrySamples(audioBlock);
 
