@@ -80,6 +80,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 {
 	mAudioFormatManagerPtr->registerBasicFormats();
 
+	mAudioProcessorValueTreeStatePtr->state.addListener(this);
 	for (const auto& parameterIdAndEnum : apvts::parameterIdToEnumMap) {
 		mAudioProcessorValueTreeStatePtr->addParameterListener(parameterIdAndEnum.first, this);
 	}
@@ -1133,6 +1134,38 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		assert(false);
 		}
 }
+
+
+void PluginAudioProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) 
+{
+	if (property == juce::Identifier(apvts::impulseResponseFileFullPathNameId))
+	{
+		const auto impulseResponseFullPathName = mAudioProcessorValueTreeStatePtr->state.getProperty(
+			juce::String(apvts::impulseResponseFileFullPathNameId),
+			juce::String()).toString();
+		juce::File* impulseResponseFile = &juce::File(impulseResponseFullPathName);
+
+		if (impulseResponseFullPathName.length() > 0)
+		{
+			mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
+				*impulseResponseFile, juce::dsp::Convolution::Stereo::yes,
+				juce::dsp::Convolution::Trim::no, 0,
+				juce::dsp::Convolution::Normalise::yes
+			);
+		}
+		else
+		{
+			mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
+				BinaryData::cory_bread_and_butter_normalized_wav,
+				BinaryData::cory_bread_and_butter_normalized_wavSize,
+				juce::dsp::Convolution::Stereo::yes,
+				juce::dsp::Convolution::Trim::no,
+				BinaryData::cory_bread_and_butter_normalized_wavSize,
+				juce::dsp::Convolution::Normalise::yes);
+		}
+	}
+}
+
 
 void PluginAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {

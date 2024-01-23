@@ -55,6 +55,8 @@ namespace apvts
 	static const std::string identifier = "apvts";
 	static constexpr int version = 3;
 
+	static const std::string impulseResponseFileFullPathNameId = "ir_full_path";
+
 	// Defaults
 
 	static const float defaultIntervalValue = 0.001;
@@ -420,25 +422,25 @@ namespace apvts
 	static const std::string stage1InputGainId = "stage_1_input_gain";
 	static const std::string stage1WaveShaperId = "stage_1_wave_shaper";
 	static const std::string stage1OutputGainId = "stage_1_output_gain";
-	static const std::string stage1DryWetId = "stage_1_dry_wet";
+	static const std::string stage1DryWetId = "stage_1_mix";
 
 	static const std::string stage2OnId = "stage_2_on";
 	static const std::string stage2InputGainId = "stage_2_input_gain";
 	static const std::string stage2WaveShaperId = "stage_2_wave_shaper";
 	static const std::string stage2OutputGainId = "stage_2_output_gain";
-	static const std::string stage2DryWetId = "stage_2_dry_wet";
+	static const std::string stage2DryWetId = "stage_2_mix";
 
 	static const std::string stage3OnId = "stage_3_on";
 	static const std::string stage3InputGainId = "stage_3_input_gain";
 	static const std::string stage3WaveShaperId = "stage_3_wave_shaper";
 	static const std::string stage3OutputGainId = "stage_3_output_gain";
-	static const std::string stage3DryWetId = "stage_3_dry_wet";
+	static const std::string stage3DryWetId = "stage_3_mix";
 
 	static const std::string stage4OnId = "stage_4_on";
 	static const std::string stage4InputGainId = "stage_4_input_gain";
 	static const std::string stage4WaveShaperId = "stage_4_wave_shaper";
 	static const std::string stage4OutputGainId = "stage_4_output_gain";
-	static const std::string stage4DryWetId = "stage_4_dry_wet";
+	static const std::string stage4DryWetId = "stage_4_mix";
 
 	static const std::string postCompressorThresholdId = "post_comp_thresh";
 	static const std::string postCompressorAttackId = "post_comp_attack";
@@ -462,7 +464,7 @@ namespace apvts
 
 	static const std::string delayTimeFractionalDenominatorId = "delay_per_beat";
 	static const std::string delayFeedbackId = "delay_feedback";
-	static const std::string delayDryWetId = "delay_dry_wet";
+	static const std::string delayDryWetId = "delay_mix";
 
 	static const std::string chorusFractionOfBeatId = "chorus_per_beat";
 	static const std::string chorusDepthId = "chorus_depth";
@@ -483,6 +485,7 @@ namespace apvts
 	static const std::string reverbWidthId = "room_width";
 
 	static const std::string cabinetImpulseResponseConvolutionOnId = "cab_on";
+	static const std::string cabinetImpulseResponseConvolutionFileId = "cab_file";
 	static const std::string cabinetGainId = "cabinet_gain";
 
 	static const std::string limiterOnId = "limiter_on";

@@ -5,22 +5,44 @@
 #include "../PluginAudioParameters.h"
 #include "../PluginUtils.h"
 
-class CabinetComponent : public juce::Component
+class CabinetComponent : public juce::Component, private juce::Button::Listener, private juce::ValueTree::Listener
 {
 public:
 	CabinetComponent(
-		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) :
-		mAudioProcessorValueTreeState(audioProcessorValueTreeState)
+		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState,
+		std::function<void()> onClickedSelectFile
+		) :
+		mAudioProcessorValueTreeState(audioProcessorValueTreeState),
+		mOnClickedSelectFile(onClickedSelectFile),
+		mViewportPtr(std::make_unique<juce::Viewport>()),
+		mContainerPtr(std::make_unique<juce::Component>()),
+		mImpulseResponseFileLabelPtr(std::make_unique<juce::Label>())
 	{
-		mViewportPtr = std::make_unique<juce::Viewport>();
-		mContainerPtr = std::make_unique<juce::Component>();
-
+		 
 		addAndMakeVisible(mViewportPtr.get());
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
+
+		mAudioProcessorValueTreeState.state.addListener(this);
+
+		const auto impulseResponseFullPathName = mAudioProcessorValueTreeState.state.getProperty(
+			juce::String(apvts::impulseResponseFileFullPathNameId),
+			juce::String()).toString();
+
+		if (impulseResponseFullPathName.length() > 0)
+		{
+			mImpulseResponseFileLabelPtr->setText(impulseResponseFullPathName, juce::dontSendNotification);
+		}
+		else
+		{
+			mImpulseResponseFileLabelPtr->setText(juce::String("Default cab loaded"), juce::dontSendNotification);
+		}
+		
+		addAndMakeVisible(mImpulseResponseFileLabelPtr.get());
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
 	apvts::cabinetImpulseResponseConvolutionOnId,
+	apvts::cabinetImpulseResponseConvolutionFileId,
 	apvts::cabinetGainId
 }
 		};
@@ -48,28 +70,13 @@ public:
 					));
 					mContainerPtr->addAndMakeVisible(button);
 				}
-				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isStageModeId(parameterId))
+				else if (parameterId == apvts::cabinetImpulseResponseConvolutionFileId)
 				{
-					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
-					if (PluginUtils::isWaveshaperId(parameterId))
-					{
-						for (int waveshaperIndex = 0; waveshaperIndex < apvts::waveShaperIds.size(); waveshaperIndex++) {
-							comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
-						}
-					}
-					else if (PluginUtils::isStageModeId(parameterId))
-					{
-						for (int modeIndex = 0; modeIndex < apvts::stageModeIds.size(); modeIndex++) {
-							comboBox->addItem(apvts::stageModeIds.at(modeIndex), modeIndex + 1);
-						}
-					}
-					mComponentRows[row]->add(comboBox);
-					mComboBoxAttachments.add(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(
-						mAudioProcessorValueTreeState,
-						parameterId,
-						*comboBox
-					));
-					mContainerPtr->addAndMakeVisible(comboBox);
+					auto* selectFileButton = new juce::TextButton();
+					selectFileButton->setButtonText("Select IR File");
+					addAndMakeVisible(selectFileButton);
+					selectFileButton->addListener(this);
+					mComponentRows[row]->add(selectFileButton);
 				}
 				else
 				{
@@ -101,6 +108,7 @@ public:
 		mComponentRows.clear();
 		mViewportPtr.reset();
 		mContainerPtr.reset();
+		mAudioProcessorValueTreeState.state.removeListener(this);
 	};
 
 	void paint(juce::Graphics& g) override
@@ -127,26 +135,50 @@ public:
 		int buttonWidth = localBounds.getWidth() / numCols;
 		int buttonHeight = buttonWidth;
 
-		int totalHeight = ((buttonHeight + 12.5) * numRows);
-		mContainerPtr->setBounds(0, 0, mViewportPtr->getMaximumVisibleWidth() - 8, totalHeight);
+		int contentHeight = ((buttonHeight + 12.5) * numRows) + 50;
+		const int maximumVisibleWidth = mViewportPtr->getMaximumVisibleWidth() - 8;
+		mContainerPtr->setBounds(0, 0, maximumVisibleWidth, contentHeight);
 
+		mImpulseResponseFileLabelPtr->setBounds(0, 0, maximumVisibleWidth, 50);
 
 		for (int row = 0; row < mComponentRows.size(); ++row)
 		{
 			for (int col = 0; col < mComponentRows[row]->size(); ++col)
 			{
-				(*mComponentRows[row])[col]->setBounds(col * buttonWidth, row * buttonHeight + 50, buttonWidth, buttonHeight - 50);
+				(*mComponentRows[row])[col]->setBounds(col * buttonWidth, row * buttonHeight + 100, buttonWidth, buttonHeight - 50);
 			}
 		}
 	};
 
+	void buttonClicked(juce::Button* button) override
+	{
+		// Call the provided file selection function
+		if (mOnClickedSelectFile)
+		{
+			mOnClickedSelectFile();
+		}
+	}
+
+	void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override
+	{
+		if (property == juce::Identifier(apvts::impulseResponseFileFullPathNameId))
+		{
+			juce::String newFilePath = treeWhosePropertyHasChanged.getProperty(property).toString();
+			mImpulseResponseFileLabelPtr->setText(newFilePath.isNotEmpty() ? newFilePath : "Default cab loaded", juce::dontSendNotification);
+		}
+	}
+
 private:
 	juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
+
+	std::unique_ptr<juce::Label> mImpulseResponseFileLabelPtr;
 
 	std::unique_ptr <juce::Viewport> mViewportPtr;
 	std::unique_ptr <juce::Component> mContainerPtr;
 
 	juce::OwnedArray<juce::OwnedArray<juce::Component>> mComponentRows;
+
+	std::function<void()> mOnClickedSelectFile;
 
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> mButtonAttachments;
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;

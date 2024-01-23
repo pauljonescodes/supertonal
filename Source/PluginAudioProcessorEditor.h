@@ -17,14 +17,17 @@ public:
         PluginPresetManager& presetManager);
     ~PluginAudioProcessorEditor() override;
 
-    //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+
+    void launchAsyncFileChooserForImpulseResponse();
 
 private:
     PluginAudioProcessor& mProcessorRef;
 
     PluginLookAndFeel mLookAndFeel;
+
+    std::unique_ptr<FileChooser> mFileChooser;
 
     juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
 

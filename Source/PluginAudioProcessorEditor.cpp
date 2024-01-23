@@ -3,19 +3,22 @@
 #include "PluginUtils.h"
 
 PluginAudioProcessorEditor::PluginAudioProcessorEditor(
-	PluginAudioProcessor& p,
+	PluginAudioProcessor& processorRef,
 	juce::AudioProcessorValueTreeState& apvts,
 	PluginPresetManager& presetManager)
 	:
-	AudioProcessorEditor(&p),
-	mProcessorRef(p),
+	AudioProcessorEditor(&processorRef),
+	mProcessorRef(processorRef),
 	mAudioProcessorValueTreeState(apvts),
 	mTabbedComponentPtr(std::make_unique<juce::TabbedComponent>(juce::TabbedButtonBar::Orientation::TabsAtTop)),
 	mPresetComponentPtr(std::make_unique<PresetComponent>(presetManager)),
 	mPedalsComponentPtr(std::make_unique<PedalsComponent>(mAudioProcessorValueTreeState)),
 	mAmpComponentPtr(std::make_unique<AmpComponent>(mAudioProcessorValueTreeState)),
-	mCabinetComponentPtr(std::make_unique<CabinetComponent>(mAudioProcessorValueTreeState)),
-	mMixerComponentPtr(std::make_unique<MixerComponent>(mAudioProcessorValueTreeState))
+	mFileChooser(std::make_unique<juce::FileChooser>("Select an Impulse Response File", juce::File{}, "*.wav;*.aiff;*.flac")),
+	mCabinetComponentPtr(std::make_unique<CabinetComponent>(mAudioProcessorValueTreeState, [this]() {
+	this->launchAsyncFileChooserForImpulseResponse();
+		})),
+		mMixerComponentPtr(std::make_unique<MixerComponent>(mAudioProcessorValueTreeState))
 {
 	setLookAndFeel(&mLookAndFeel);
 
@@ -30,6 +33,18 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 
 	setSize(750, 750);
 	setResizable(true, true);
+}
+
+void PluginAudioProcessorEditor::launchAsyncFileChooserForImpulseResponse()
+{
+	mFileChooser->launchAsync(
+		juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
+		[this](const juce::FileChooser& chooser)
+		{
+			mAudioProcessorValueTreeState.state.setProperty(
+				juce::Identifier(apvts::impulseResponseFileFullPathNameId), 
+				chooser.getResult().getFullPathName(), nullptr);
+		});
 }
 
 PluginAudioProcessorEditor::~PluginAudioProcessorEditor()
