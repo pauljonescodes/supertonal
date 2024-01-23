@@ -32,6 +32,7 @@ public:
 	apvts::limiterReleaseId
 },
 {
+	apvts::outputGainId,
 	apvts::bypassId,
 }
 		};

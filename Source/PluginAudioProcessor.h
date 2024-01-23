@@ -43,6 +43,7 @@ public:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
 
 private:
+
     std::unique_ptr<juce::AudioProcessorValueTreeState> mAudioProcessorValueTreeStatePtr;
     std::unique_ptr<PluginPresetManager> mPresetManagerPtr;
     std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
@@ -99,6 +100,7 @@ private:
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mLowPassFilterPtr;
     
     float mDelayFeedback = 0.5f;
+    juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
     std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLinePtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mDelayLineDryWetMixerPtr;
 
@@ -116,6 +118,8 @@ private:
 
     bool mLimiterOn = true;
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
+
+    std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessor)
 };

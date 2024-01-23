@@ -123,6 +123,8 @@ namespace apvts
 	static const std::string onComponentId = "on";
 	static const std::string biasId = "bias";
 
+	// GAIN
+
 	static constexpr float gainLinearMinimumValue = 0.001f;
 	static constexpr float gainLinearMaximumValue = 64.0f;
 	static constexpr float gainLinearDefaultValue = 1.0f;
@@ -155,21 +157,58 @@ namespace apvts
 		ratioMaximumValue,
 		defaultIntervalValue);
 
-	static constexpr float attackMinimumValue = 0.0f;
-	static constexpr float attackMaximumValue = 1000.0f;
-	static constexpr float attackDefaultValue = 3.0f;
+	static constexpr float attackMsMinimumValue = 0.0f;
+	static constexpr float attackMsMaximumValue = 1000.0f;
+	static constexpr float attackMsDefaultValue = 3.0f;
 	static const juce::NormalisableRange<float> attackNormalisableRange = makeLogarithmicRange(
-		attackMinimumValue, 
-		attackMaximumValue, 
+		attackMsMinimumValue, 
+		attackMsMaximumValue, 
 		defaultIntervalValue);
 
-	static constexpr float releaseMinimumValue = 0.0f;
-	static constexpr float releaseMaximumValue = 10000.0f;
-	static constexpr float releaseDefaultValue = 500.0f;
-	static const juce::NormalisableRange<float> releaseNormalisableRange = makeLogarithmicRange(
-		releaseMinimumValue, 
-		releaseMaximumValue, 
+	static constexpr float releaseMsMinimumValue = 0.0f;
+	static constexpr float releaseMsMaximumValue = 10000.0f;
+	static constexpr float releaseMsDefaultValue = 500.0f;
+	static const juce::NormalisableRange<float> releaseMsNormalisableRange = makeLogarithmicRange(
+		releaseMsMinimumValue, 
+		releaseMsMaximumValue, 
 		defaultIntervalValue);
+
+	// TIME
+
+	static const std::string wholeNoteId = "whole";
+	static const std::string halfId = "half";
+	static const std::string quarterId = "quarter";
+	static const std::string eighthId = "eighth";
+	static const std::string sixteenthId = "sixteenth";
+	static const std::string dottedHalfId = "dotted_half";
+	static const std::string dottedQuarterId = "dotted_quarter";
+	static const std::string dottedEighthId = "dotted_eighth";
+	static const std::string dottedSixteenthId = "dotted_sixteenth";
+	static const std::string tripletHalfId = "triplet_half";
+	static const std::string tripletQuarterId = "triplet_quarter";
+	static const std::string tripletEighthId = "triplet_eighth";
+	static const std::string tripletSixteenthId = "triplet_sixteenth";
+
+	static const std::string timeModeMs = "ms";
+	static const std::string timeModeBpm = "bpm";
+
+	static constexpr float fractionalTimeMinimumValue = 0.001f;
+	static constexpr float fractionalTimeMaximumValue = 64.0f;
+	static constexpr float fractionalTimeDefaultValue = 1.0f;
+	static const juce::NormalisableRange<float> fractionalTimeNormalizableRange = makeLogarithmicRange(
+		fractionalTimeMinimumValue,
+		fractionalTimeMaximumValue,
+		defaultIntervalValue);
+
+	static float calculateSamplesForBpmFractionAndRate(
+		float beatsPerMinute, // 120
+		float fractionOfBeat, // 4.0f
+		const float samplesPerSecond // 48,000
+	) {
+		float beatDurationSeconds = (60.0f / beatsPerMinute); // 0.5
+		float samplesPerBeat = beatDurationSeconds * samplesPerSecond; // 24,000
+		return samplesPerBeat / fractionOfBeat; // 200;
+	}
 
 	// EQ
 
@@ -212,40 +251,22 @@ namespace apvts
 
 	// DELAY
 
-	static constexpr float delayTimeMsMinimumValue = 0.0f;
 	static constexpr float delayTimeMsMaximumValue = 10000.0f;
-	static constexpr float delayTimeMsDefaultValue = 1000.0f;
-	static const juce::NormalisableRange<float> delayTimeMsNormalizableRange = makeLogarithmicRange(
-		delayTimeMsMinimumValue,
-		delayTimeMsMaximumValue,
-		defaultIntervalValue);
-
-	// CHORUS
-
-	static constexpr float chorusRateHzMinimumValue = 0.0f;
-	static constexpr float chorusRateHzMaximumValue = 99.99f;
-	static const juce::NormalisableRange<float> chorusRateHzNormalisableRange = makeLogarithmicRange(
-		chorusRateHzMinimumValue,
-		chorusRateHzMaximumValue,
-		defaultIntervalValue);
-
-	static constexpr float chorusCenterDelayMsMinimumValue = 0.0f;
-	static constexpr float chorusCenterDelayMsMaximumValue = 100.0f;
-	static const juce::NormalisableRange<float> chorusCenterDelayMsNormalisableRange = juce::NormalisableRange<float>(
-		chorusCenterDelayMsMinimumValue,
-		chorusCenterDelayMsMaximumValue,
-		defaultIntervalValue);
 
 	// PHASER
 
-	static constexpr float phaserRateHzMinimumValue = 0.0f;
-	static constexpr float phaserRateHzMaximumValue = 99.99f;
-	static const juce::NormalisableRange<float> phaserRateHzNormalisableRange = makeLogarithmicRange(
-		phaserRateHzMinimumValue,
-		phaserRateHzMaximumValue,
-		defaultIntervalValue);
-
 	static constexpr float phaserCenterFrequencyDefaultValue = 1000.0f;
+
+	// Rate to BPM
+
+	static float clampedValueForFractionOfBeat(
+		float beatsPerMinute, 
+		float fractionOfBeat, float minimumValue = 0.000f, float maximumValue = 99.999f) 
+	{
+		float noteDurationSeconds = 60.0f / beatsPerMinute * fractionOfBeat;
+		float frequencyHz = 1.0f / noteDurationSeconds;
+		return std::clamp(frequencyHz, minimumValue, maximumValue);
+	}
 
 	// Tube screamer
 
@@ -338,17 +359,17 @@ namespace apvts
 		LOW_PASS_FREQUENCY,
 		LOW_PASS_Q,
 		
-		DELAY_TIME_MS,
+		DELAY_TIME_FRACTIONAL_DENOMINATOR,
 		DELAY_FEEDBACK,
 		DELAY_DRY_WET,
 
-		CHORUS_RATE_HZ,
+		CHORUS_FRACTION_OF_BEAT,
 		CHORUS_DEPTH,
-		CHORUS_CENTER_DELAY,
+		CHORUS_CENTER_DELAY_FRACTION_OF_BEAT,
 		CHORUS_FEEDBACK,
 		CHORUS_MIX,
 		
-		PHASER_RATE_HZ,
+		PHASER_RATE_FRACTION_OF_BEAT,
 		PHASER_DEPTH,
 		PHASER_CENTER_FREQUENCY,
 		PHASER_FEEDBACK,
@@ -365,7 +386,9 @@ namespace apvts
 
 		LIMITER_ON,
 		LIMITER_THRESHOLD,
-		LIMITER_RELEASE
+		LIMITER_RELEASE,
+
+		OUTPUT_GAIN
 	};
 
 	static const std::string bypassId = "bypass_on";
@@ -437,17 +460,17 @@ namespace apvts
 	static const std::string lowPassFrequencyId = "low-pass_frequency";
 	static const std::string lowPassQId = "low-pass_q";
 
-	static const std::string delayTimeMsId = "delay_time";
+	static const std::string delayTimeFractionalDenominatorId = "delay_per_beat";
 	static const std::string delayFeedbackId = "delay_feedback";
 	static const std::string delayDryWetId = "delay_dry_wet";
 
-	static const std::string chorusRateId = "chorus_rate";
+	static const std::string chorusFractionOfBeatId = "chorus_per_beat";
 	static const std::string chorusDepthId = "chorus_depth";
-	static const std::string chorusCenterDelayId = "chorus_center_delay";
+	static const std::string chorusCenterDelayFractionOfBeatId = "chorus_delay_per_beat";
 	static const std::string chorusFeedbackId = "chorus_feedback";
 	static const std::string chorusMixId = "chorus_mix";
 
-	static const std::string phaserRateId = "phaser_rate";
+	static const std::string phaserRateFractionOfBeatId = "phaser_per_beat";
 	static const std::string phaserDepthId = "phaser_depth";
 	static const std::string phaserCenterFrequencyId = "phaser_center_freq";
 	static const std::string phaserFeedbackId = "phaser_feedback";
@@ -465,6 +488,8 @@ namespace apvts
 	static const std::string limiterOnId = "limiter_on";
 	static const std::string limiterThresholdId = "limiter_threshold";
 	static const std::string limiterReleaseId = "limiter_release";
+
+	static const std::string outputGainId = "output_gain";
 
 	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap {
 		{bypassId, ParameterEnum::BYPASS_ON},
@@ -545,17 +570,17 @@ namespace apvts
 		{limiterThresholdId, ParameterEnum::LIMITER_THRESHOLD},
 		{limiterReleaseId, ParameterEnum::LIMITER_RELEASE},
 
-		{delayTimeMsId, ParameterEnum::DELAY_TIME_MS},
+		{delayTimeFractionalDenominatorId, ParameterEnum::DELAY_TIME_FRACTIONAL_DENOMINATOR},
 		{delayFeedbackId, ParameterEnum::DELAY_FEEDBACK},
 		{delayDryWetId, ParameterEnum::DELAY_DRY_WET},
 
-		{chorusRateId, ParameterEnum::CHORUS_RATE_HZ},
+		{chorusFractionOfBeatId, ParameterEnum::CHORUS_FRACTION_OF_BEAT},
 		{chorusDepthId, ParameterEnum::CHORUS_DEPTH},
-		{chorusCenterDelayId, ParameterEnum::CHORUS_CENTER_DELAY},
+		{chorusCenterDelayFractionOfBeatId, ParameterEnum::CHORUS_CENTER_DELAY_FRACTION_OF_BEAT},
 		{chorusFeedbackId, ParameterEnum::CHORUS_FEEDBACK},
 		{chorusMixId, ParameterEnum::CHORUS_MIX},
 
-		{phaserRateId, ParameterEnum::PHASER_RATE_HZ},
+		{phaserRateFractionOfBeatId, ParameterEnum::PHASER_RATE_FRACTION_OF_BEAT},
 		{phaserDepthId, ParameterEnum::PHASER_DEPTH},
 		{phaserCenterFrequencyId, ParameterEnum::PHASER_CENTER_FREQUENCY},
 		{phaserFeedbackId, ParameterEnum::PHASER_FEEDBACK},
@@ -566,6 +591,8 @@ namespace apvts
 		{reverbDampingId, ParameterEnum::REVERB_DAMPING},
 		{reverbMixId, ParameterEnum::REVERB_MIX},
 		{reverbWidthId, ParameterEnum::REVERB_WIDTH},
+
+		{ outputGainId, ParameterEnum::OUTPUT_GAIN},
 	};
 
 	static const std::map<std::string, float> defaults = {

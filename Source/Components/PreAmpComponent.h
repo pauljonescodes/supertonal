@@ -42,19 +42,19 @@ public:
 	apvts::mouseDriveVolumeId
 },
 {
-	apvts::delayTimeMsId,
+	apvts::delayTimeFractionalDenominatorId,
 	apvts::delayFeedbackId,
 	apvts::delayDryWetId,
 },
 {
-	apvts::chorusRateId,
+	apvts::chorusFractionOfBeatId,
 	apvts::chorusDepthId,
-	apvts::chorusCenterDelayId,
+	apvts::chorusCenterDelayFractionOfBeatId,
 	apvts::chorusFeedbackId,
 	apvts::chorusMixId,
 },
 {
-	apvts::phaserRateId,
+	apvts::phaserRateFractionOfBeatId,
 	apvts::phaserDepthId,
 	apvts::phaserCenterFrequencyId,
 	apvts::phaserFeedbackId,
