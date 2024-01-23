@@ -4,6 +4,10 @@
 
 - Select IR
 
+```C++
+fmax(-54 * pow(distortion, 2) - 32 * distortion + 3, -24)
+```
+
 ## Sunday, January 21, 2024 6:57:15 PM
 
 - **Pre-amp Stage**

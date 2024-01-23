@@ -1,8 +1,8 @@
 #pragma once
 
+#include <JuceHeader.h>
 #include "TubeScreamerWDF.h"
 #include "CircuitQuantityHelper.h"
-#include <JuceHeader.h>
 
 class TubeScreamer
 {

@@ -444,13 +444,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mPhaserPtr->prepare(spec);
 
 	mCabinetImpulseResponseConvolutionPtr->prepare(spec);
-	mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
-		BinaryData::cory_bread_and_butter_normalized_wav,
-		BinaryData::cory_bread_and_butter_normalized_wavSize,
-		juce::dsp::Convolution::Stereo::yes,
-		juce::dsp::Convolution::Trim::no,
-		BinaryData::cory_bread_and_butter_normalized_wavSize,
-		juce::dsp::Convolution::Normalise::yes);
+	loadImpulseResponseFromState();
 
 	mReverb->prepare(spec);
 
@@ -527,7 +521,7 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	const auto totalNumInputChannels = getTotalNumInputChannels();
 	const auto totalNumOutputChannels = getTotalNumOutputChannels();
 	const auto numSamples = buffer.getNumSamples();
-	const auto sampleRate = getSampleRate();
+	const auto samplesPerSecond = getSampleRate();
 	const double rawBeatsPerMinute = getPlayHead()->getPosition()->getBpm().orFallback(120);
 	mBpmSmoothedValue.setTargetValue(rawBeatsPerMinute);
 	const auto smoothedBeatsPerMinute = mBpmSmoothedValue.skip(numSamples);
@@ -708,8 +702,8 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	if (mDelayFeedback > 0.0f)
 	{
-		float delayFraction = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::delayTimeFractionalDenominatorId);
-		const auto nextDelaySamples = apvts::calculateSamplesForBpmFractionAndRate(smoothedBeatsPerMinute, delayFraction, sampleRate);
+		float fractionOfWholeBeat = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::delayTimeFractionalDenominatorId);
+		const auto nextDelaySamples = apvts::calculateSamplesForBpmFractionAndRate(smoothedBeatsPerMinute, fractionOfWholeBeat, samplesPerSecond);
 
 		if (mDelayLinePtr->getDelay() != nextDelaySamples)
 		{
@@ -736,7 +730,7 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		}
 	}
 	
-
+	
 	mDelayLineDryWetMixerPtr->mixWetSamples(audioBlock);
 	
 	float chorusFractionOfBeat = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::chorusFractionOfBeatId);
@@ -1104,7 +1098,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
 		mMouseDrivePtr->setDistortion(newValue);
-		//mMouseDrivePtr->setVolume(fmax(-54 * pow(newValue, 2) - 32 * newValue + 3, -24));
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
 		mMouseDrivePtr->setVolume(newValue);
@@ -1135,37 +1128,40 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		}
 }
 
-
 void PluginAudioProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) 
 {
 	if (property == juce::Identifier(apvts::impulseResponseFileFullPathNameId))
 	{
-		const auto impulseResponseFullPathName = mAudioProcessorValueTreeStatePtr->state.getProperty(
-			juce::String(apvts::impulseResponseFileFullPathNameId),
-			juce::String()).toString();
-		juce::File* impulseResponseFile = &juce::File(impulseResponseFullPathName);
-
-		if (impulseResponseFullPathName.length() > 0)
-		{
-			mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
-				*impulseResponseFile, juce::dsp::Convolution::Stereo::yes,
-				juce::dsp::Convolution::Trim::no, 0,
-				juce::dsp::Convolution::Normalise::yes
-			);
-		}
-		else
-		{
-			mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
-				BinaryData::cory_bread_and_butter_normalized_wav,
-				BinaryData::cory_bread_and_butter_normalized_wavSize,
-				juce::dsp::Convolution::Stereo::yes,
-				juce::dsp::Convolution::Trim::no,
-				BinaryData::cory_bread_and_butter_normalized_wavSize,
-				juce::dsp::Convolution::Normalise::yes);
-		}
+		loadImpulseResponseFromState();
 	}
 }
 
+void PluginAudioProcessor::loadImpulseResponseFromState()
+{
+	const auto impulseResponseFullPathName = mAudioProcessorValueTreeStatePtr->state.getProperty(
+		juce::String(apvts::impulseResponseFileFullPathNameId),
+		juce::String()).toString();
+	juce::File* impulseResponseFile = &juce::File(impulseResponseFullPathName);
+
+	if (impulseResponseFullPathName.length() > 0)
+	{
+		mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
+			*impulseResponseFile, juce::dsp::Convolution::Stereo::yes,
+			juce::dsp::Convolution::Trim::no, 0,
+			juce::dsp::Convolution::Normalise::yes
+		);
+	}
+	else
+	{
+		mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
+			BinaryData::cory_bread_and_butter_normalized_wav,
+			BinaryData::cory_bread_and_butter_normalized_wavSize,
+			juce::dsp::Convolution::Stereo::yes,
+			juce::dsp::Convolution::Trim::no,
+			BinaryData::cory_bread_and_butter_normalized_wavSize,
+			juce::dsp::Convolution::Normalise::yes);
+	}
+}
 
 void PluginAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
@@ -1182,7 +1178,9 @@ void PluginAudioProcessor::setStateInformation(const void* data, int sizeInBytes
 	{
 		if (xmlState->hasTagName(mAudioProcessorValueTreeStatePtr->state.getType()))
 		{
-			mAudioProcessorValueTreeStatePtr->replaceState(juce::ValueTree::fromXml(*xmlState));
+			const auto valueTree = juce::ValueTree::fromXml(*xmlState);
+			mAudioProcessorValueTreeStatePtr->replaceState(valueTree);
+			loadImpulseResponseFromState();
 		}
 	}
 }

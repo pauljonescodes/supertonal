@@ -120,6 +120,8 @@ private:
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
 
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
+
+    void loadImpulseResponseFromState();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessor)
 };

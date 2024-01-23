@@ -177,23 +177,6 @@ namespace apvts
 
 	// TIME
 
-	static const std::string wholeNoteId = "whole";
-	static const std::string halfId = "half";
-	static const std::string quarterId = "quarter";
-	static const std::string eighthId = "eighth";
-	static const std::string sixteenthId = "sixteenth";
-	static const std::string dottedHalfId = "dotted_half";
-	static const std::string dottedQuarterId = "dotted_quarter";
-	static const std::string dottedEighthId = "dotted_eighth";
-	static const std::string dottedSixteenthId = "dotted_sixteenth";
-	static const std::string tripletHalfId = "triplet_half";
-	static const std::string tripletQuarterId = "triplet_quarter";
-	static const std::string tripletEighthId = "triplet_eighth";
-	static const std::string tripletSixteenthId = "triplet_sixteenth";
-
-	static const std::string timeModeMs = "ms";
-	static const std::string timeModeBpm = "bpm";
-
 	static constexpr float fractionalTimeMinimumValue = 0.001f;
 	static constexpr float fractionalTimeMaximumValue = 64.0f;
 	static constexpr float fractionalTimeDefaultValue = 1.0f;
