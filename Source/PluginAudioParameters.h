@@ -186,9 +186,9 @@ namespace apvts
 		defaultIntervalValue);
 
 	static float calculateSamplesForBpmFractionAndRate(
-		float beatsPerMinute, // 120
-		float fractionOfBeat, // 4.0f
-		const float samplesPerSecond // 48,000
+		float beatsPerMinute, // ex. 120
+		float fractionOfBeat, // ex. 4.0f
+		const float samplesPerSecond // ex. 48,000
 	) {
 		float beatDurationSeconds = (60.0f / beatsPerMinute); // 0.5
 		float samplesPerBeat = beatDurationSeconds * samplesPerSecond; // 24,000

@@ -368,3 +368,4 @@ FodyWeavers.xsd
 /JuceLibraryCode/
 wrap-sign-cmds.md
 **/*.DS_Store
+/build-ios/

@@ -771,7 +771,18 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceString, float newValue)
 {
 	auto sampleRate = getSampleRate();
-	double beatsPerMinute = getPlayHead()->getPosition()->getBpm().orFallback(120);
+    auto playhead = this->getPlayHead();
+    double beatsPerMinute = 120; // Default fallback BPM
+
+    if (playhead != nullptr) // Check if playhead is valid
+    {
+        juce::AudioPlayHead::CurrentPositionInfo positionInfo;
+
+        if (playhead->getCurrentPosition(positionInfo)) // Check if position info is valid
+        {
+            beatsPerMinute = positionInfo.bpm; // Use actual BPM if available
+        }
+    }
 
 	switch (apvts::parameterIdToEnumMap.at(parameterIdJuceString.toStdString()))
 	{
@@ -1141,12 +1152,13 @@ void PluginAudioProcessor::loadImpulseResponseFromState()
 	const auto impulseResponseFullPathName = mAudioProcessorValueTreeStatePtr->state.getProperty(
 		juce::String(apvts::impulseResponseFileFullPathNameId),
 		juce::String()).toString();
-	juce::File* impulseResponseFile = &juce::File(impulseResponseFullPathName);
+	juce::File* impulseResponseFile = new juce::File(impulseResponseFullPathName);
 
 	if (impulseResponseFullPathName.length() > 0)
 	{
 		mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
-			*impulseResponseFile, juce::dsp::Convolution::Stereo::yes,
+			*impulseResponseFile,
+            juce::dsp::Convolution::Stereo::yes,
 			juce::dsp::Convolution::Trim::no, 0,
 			juce::dsp::Convolution::Normalise::yes
 		);
