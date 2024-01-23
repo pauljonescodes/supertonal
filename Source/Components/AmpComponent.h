@@ -49,28 +49,24 @@ public:
 	apvts::stage4DryWetId,
 },
 {
-	apvts::modeId,
-	apvts::biasComponentId,
+	apvts::stageModeId,
+	apvts::biasId,
 },
 {
-	apvts::highPassOnId,
 	apvts::highPassFrequencyId,
 	apvts::highPassQId,
 },
 {
-	apvts::midPeakOnId,
 	apvts::midPeakFrequencyId,
 	apvts::midPeakQId,
 	apvts::midPeakGainId,
 },
 {
-	apvts::highShelfOnId,
 	apvts::highShelfFrequencyId,
 	apvts::highShelfQId,
 	apvts::highShelfGainId,
 },
 {
-	apvts::lowPassOnId,
 	apvts::lowPassFrequencyId,
 	apvts::lowPassQId,
 },
@@ -106,7 +102,7 @@ public:
 					));
 					mContainerPtr->addAndMakeVisible(button);
 				}
-				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isModeId(parameterId))
+				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isStageModeId(parameterId))
 				{
 					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
 					if (PluginUtils::isWaveshaperId(parameterId))
@@ -115,10 +111,10 @@ public:
 							comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
 						}
 					}
-					else if (PluginUtils::isModeId(parameterId))
+					else if (PluginUtils::isStageModeId(parameterId))
 					{
-						for (int modeIndex = 0; modeIndex < apvts::modeIds.size(); modeIndex++) {
-							comboBox->addItem(apvts::modeIds.at(modeIndex), modeIndex + 1);
+						for (int modeIndex = 0; modeIndex < apvts::stageModeIds.size(); modeIndex++) {
+							comboBox->addItem(apvts::stageModeIds.at(modeIndex), modeIndex + 1);
 						}
 					}
 					mComponentRows[row]->add(comboBox);

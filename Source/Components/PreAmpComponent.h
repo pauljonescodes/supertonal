@@ -8,19 +8,18 @@
 class PedalsComponent : public juce::Component
 {
 public:
-    PedalsComponent(
-        juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) : 
-        mAudioProcessorValueTreeState(audioProcessorValueTreeState) 
-    {
-        mViewportPtr = std::make_unique<juce::Viewport>();
-        mContainerPtr = std::make_unique<juce::Component>();
+	PedalsComponent(
+		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) :
+		mAudioProcessorValueTreeState(audioProcessorValueTreeState)
+	{
+		mViewportPtr = std::make_unique<juce::Viewport>();
+		mContainerPtr = std::make_unique<juce::Component>();
 
-        addAndMakeVisible(mViewportPtr.get());
-        mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
+		addAndMakeVisible(mViewportPtr.get());
+		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
-	apvts::noiseGateOnId,
 	apvts::noiseGateThresholdId,
 	apvts::noiseGateAttackId,
 	apvts::noiseGateRatioId,
@@ -34,17 +33,16 @@ public:
 },
 {
 	apvts::tubeScreamerOnId,
-	apvts::tubeScreamerGainId,
-	apvts::tubeScreamerDiodeTypeId,
-	apvts::tubeScreamerDiodeCountId,
+	apvts::tubeScreamerDriveId,
+	apvts::tubeScreamerLevelId,
 },
 {
 	apvts::mouseDriveOnId,
 	apvts::mouseDriveDistortionId,
-	apvts::mouseDriveVolumeId,
+	apvts::mouseDriveVolumeId
 },
 {
-	apvts::delayTimeId,
+	apvts::delayTimeMsId,
 	apvts::delayFeedbackId,
 	apvts::delayDryWetId,
 },
@@ -87,7 +85,7 @@ public:
 					));
 					mContainerPtr->addAndMakeVisible(button);
 				}
-				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isModeId(parameterId))
+				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isStageModeId(parameterId))
 				{
 					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
 					if (PluginUtils::isWaveshaperId(parameterId))
@@ -96,10 +94,10 @@ public:
 							comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
 						}
 					}
-					else if (PluginUtils::isModeId(parameterId))
+					else if (PluginUtils::isStageModeId(parameterId))
 					{
-						for (int modeIndex = 0; modeIndex < apvts::modeIds.size(); modeIndex++) {
-							comboBox->addItem(apvts::modeIds.at(modeIndex), modeIndex + 1);
+						for (int modeIndex = 0; modeIndex < apvts::stageModeIds.size(); modeIndex++) {
+							comboBox->addItem(apvts::stageModeIds.at(modeIndex), modeIndex + 1);
 						}
 					}
 					mComponentRows[row]->add(comboBox);
@@ -130,25 +128,25 @@ public:
 			}
 
 		}
-    };
+	};
 
-    ~PedalsComponent()
-    {
+	~PedalsComponent()
+	{
 		mSliderAttachments.clear();
 		mButtonAttachments.clear();
 		mComboBoxAttachments.clear();
 		mComponentRows.clear();
 		mViewportPtr.reset();
 		mContainerPtr.reset();
-    };
+	};
 
-    void paint(juce::Graphics& g) override
-    {
+	void paint(juce::Graphics& g) override
+	{
 		g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-    };
+	};
 
-    void resized() override
-    {
+	void resized() override
+	{
 		const auto localBounds = getLocalBounds();
 		mViewportPtr->setBounds(localBounds);
 
@@ -177,19 +175,19 @@ public:
 				(*mComponentRows[row])[col]->setBounds(col * buttonWidth, row * buttonHeight + 50, buttonWidth, buttonHeight - 50);
 			}
 		}
-    };
+	};
 
 private:
-    juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
+	juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
 
-    std::unique_ptr <juce::Viewport> mViewportPtr;
-    std::unique_ptr <juce::Component> mContainerPtr;
+	std::unique_ptr <juce::Viewport> mViewportPtr;
+	std::unique_ptr <juce::Component> mContainerPtr;
 
-    juce::OwnedArray<juce::OwnedArray<juce::Component>> mComponentRows;
+	juce::OwnedArray<juce::OwnedArray<juce::Component>> mComponentRows;
 
-    juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> mButtonAttachments;
-    juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;
-    juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> mComboBoxAttachments;
+	juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> mButtonAttachments;
+	juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;
+	juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> mComboBoxAttachments;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PedalsComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PedalsComponent)
 };

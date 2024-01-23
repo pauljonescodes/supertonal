@@ -28,11 +28,11 @@ bool PluginUtils::isToggleId(const std::string& str)
     }
 }
 
-bool PluginUtils::isModeId(const std::string& str)
+bool PluginUtils::isStageModeId(const std::string& str)
 {
-    if (str.length() >= apvts::modeComponentId.length())
+    if (str.length() >= apvts::stageModeComponentId.length())
     {
-        return (0 == str.compare(str.length() - apvts::modeComponentId.length(), apvts::modeComponentId.length(), apvts::modeComponentId));
+        return (0 == str.compare(str.length() - apvts::stageModeComponentId.length(), apvts::stageModeComponentId.length(), apvts::stageModeComponentId));
     }
     else
     {

@@ -58,6 +58,8 @@ private:
 
     bool mStagesAreParallel = false;
 
+    bool mBypassIsOn = false;
+
     bool mStage1IsOn = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage1Buffer;
     std::unique_ptr<juce::dsp::Gain<float>> mStage1InputGainPtr;
@@ -91,16 +93,9 @@ private:
     std::unique_ptr<juce::dsp::Compressor<float>> mPostCompressorPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mCompressorGainPtr;
 
-    bool mHighPassFilterIsOn = false;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighPassFilterPtr;
-   
-    bool mMidPeakFilterIsOn = false;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mMidPeakFilterPtr;
-   
-    bool mHighShelfFilterIsOn = false;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighShelfFilterPtr;
-    
-    bool mLowPassFilterIsOn = false;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mLowPassFilterPtr;
     
     float mDelayFeedback = 0.5f;
@@ -114,12 +109,13 @@ private:
     std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;
     std::unique_ptr<juce::dsp::Convolution> mCabinetImpulseResponseConvolutionPtr;
 
+    bool mReverbOn = false;
     std::unique_ptr<juce::dsp::Reverb> mReverb;
     
-    std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
-    std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
+    std::unique_ptr<juce::dsp::Gain<float>> mCabinetGainPtr;
 
-    bool mNoiseGateIsOn = false;
+    bool mLimiterOn = true;
+    std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessor)
 };

@@ -13,12 +13,14 @@ public:
     void processBlock(AudioBuffer<float>& buffer);
     void reset();
 
-    void setGain(float newGain);
+    void setDrive(float newGain);
+    void setLevel(float newLevel);
     void setDiodeType(int newDiodeType); // 0, 1, or 2
     void setDiodeCount(int newDiodeCount);
 
 private:
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> mGainSmoothedValue;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> mDriveGainSmoothedValue;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> mLevelGainSmoothedValue;
     
     int mDiodeType = 0;
     int mDiodeCount = 1;
@@ -26,7 +28,6 @@ private:
     std::unique_ptr<netlist::CircuitQuantityList> mNetlistCircuitQuantities{};
 
     TubeScreamerWDF wdf[2];
-    juce::dsp::Gain<float> mGain;
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> mDirectCurrentBlockerHighPassFilter;
 
     float getDiodeIs(int diodeType);

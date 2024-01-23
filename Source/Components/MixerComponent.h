@@ -20,16 +20,19 @@ public:
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
-	apvts::reverbRoomSize,
-	apvts::reverbDamping,
-	apvts::reverbWetLevel,
-	apvts::reverbDryLevel,
-	apvts::reverbWidth,
+	apvts::reverbOnId,
+	apvts::reverbSizeId,
+	apvts::reverbDampingId,
+	apvts::reverbMixId,
+	apvts::reverbWidthId,
 },
 {
-	apvts::outputGainId,
+	apvts::limiterOnId,
 	apvts::limiterThresholdId,
-	apvts::limiterReleaseId,
+	apvts::limiterReleaseId
+},
+{
+	apvts::bypassId,
 }
 		};
 
@@ -56,7 +59,7 @@ public:
 					));
 					mContainerPtr->addAndMakeVisible(button);
 				}
-				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isModeId(parameterId))
+				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isStageModeId(parameterId))
 				{
 					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
 					if (PluginUtils::isWaveshaperId(parameterId))
@@ -65,10 +68,10 @@ public:
 							comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
 						}
 					}
-					else if (PluginUtils::isModeId(parameterId))
+					else if (PluginUtils::isStageModeId(parameterId))
 					{
-						for (int modeIndex = 0; modeIndex < apvts::modeIds.size(); modeIndex++) {
-							comboBox->addItem(apvts::modeIds.at(modeIndex), modeIndex + 1);
+						for (int modeIndex = 0; modeIndex < apvts::stageModeIds.size(); modeIndex++) {
+							comboBox->addItem(apvts::stageModeIds.at(modeIndex), modeIndex + 1);
 						}
 					}
 					mComponentRows[row]->add(comboBox);
@@ -103,9 +106,11 @@ public:
 
 	~MixerComponent()
 	{
+
 		mSliderAttachments.clear();
 		mButtonAttachments.clear();
 		mComboBoxAttachments.clear();
+
 		mComponentRows.clear();
 		mViewportPtr.reset();
 		mContainerPtr.reset();

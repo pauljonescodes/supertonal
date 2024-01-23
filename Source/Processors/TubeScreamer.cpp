@@ -50,9 +50,9 @@ TubeScreamer::TubeScreamer () :
 
 void TubeScreamer::prepare (juce::dsp::ProcessSpec& spec)
 {
-    const auto gainValue = mGainSmoothedValue.getCurrentValue();
+    const auto driveGainValue = mDriveGainSmoothedValue.getCurrentValue();
 
-    auto gainParamSkew = (std::pow(10.0f, gainValue) - 1.0f) / 9.0f;
+    auto gainParamSkew = (std::pow(10.0f, driveGainValue) - 1.0f) / 9.0f;
     for (auto& wdfProc : wdf)
     {
         wdfProc.prepare (spec);
@@ -81,12 +81,13 @@ void TubeScreamer::processBlock(AudioBuffer<float>& buffer)
     const int numChannels = buffer.getNumChannels();
     const int numSamples = buffer.getNumSamples();
 
-    const auto gainValue = mGainSmoothedValue.skip(numSamples);
+    const auto driveGainValue = mDriveGainSmoothedValue.skip(numSamples);
+    const auto levelGainValue = mLevelGainSmoothedValue.skip(numSamples);
     
-    auto gainParamSkew = (std::pow (10.0f, gainValue) - 1.0f) / 9.0f;
+    auto driveGainParamSkew = (std::pow (10.0f, driveGainValue) - 1.0f) / 9.0f;
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch].setParameters (gainParamSkew, getDiodeIs (mDiodeType), mDiodeCount);
+        wdf[ch].setParameters (driveGainParamSkew, getDiodeIs (mDiodeType), mDiodeCount);
         wdf[ch].process (buffer.getWritePointer (ch), buffer.getNumSamples());
     }
 
@@ -94,12 +95,11 @@ void TubeScreamer::processBlock(AudioBuffer<float>& buffer)
     auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
     mDirectCurrentBlockerHighPassFilter.process (processContext);
 
-    buffer.applyGain (Decibels::decibelsToGain (-6.0f));
+    buffer.applyGain (Decibels::decibelsToGain (levelGainValue));
 }
 
 void TubeScreamer::reset()
 {
-    mGain.reset();
     mDirectCurrentBlockerHighPassFilter.reset();
 }
 
@@ -131,7 +131,12 @@ void TubeScreamer::setDiodeCount(int newDiodeCount)
     mDiodeCount = newDiodeCount;
 }
 
-void TubeScreamer::setGain(float newGain)
+void TubeScreamer::setDrive(float newGain)
 {
-    mGainSmoothedValue.setTargetValue(newGain);
+    mDriveGainSmoothedValue.setTargetValue(newGain);
+}
+
+void TubeScreamer::setLevel(float newGain)
+{
+    mLevelGainSmoothedValue.setTargetValue(newGain);
 }

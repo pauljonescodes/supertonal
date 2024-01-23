@@ -1,5 +1,12 @@
 # Notes
 
+## Monday, January 22, 2024 10:55:35 AM
+
+- Sync BPM
+- Select IR
+- Reverb/Chorus/Phaser wet/dry
+- EQ parameters
+
 ## Sunday, January 21, 2024 6:57:15 PM
 
 - **Pre-amp Stage**
