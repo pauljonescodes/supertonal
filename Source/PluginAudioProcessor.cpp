@@ -766,6 +766,28 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	}
 
 	mOutputGainPtr->process(processContext);
+    
+#ifdef JUCE_DEBUG
+    checkForInvalidSamples(audioBlock);
+#endif
+}
+
+void PluginAudioProcessor::checkForInvalidSamples (const juce::dsp::AudioBlock<float>& blockToCheck)
+{
+    auto numChans = blockToCheck.getNumChannels();
+    auto numSamps = blockToCheck.getNumSamples();
+
+    for (auto c = 0; c < numChans; ++c)
+    {
+        for (auto s = 0; s < numSamps; ++s)
+        {
+            auto sample = blockToCheck.getSample (c, s);
+            jassert (!std::isnan (sample));
+            // Probably also this ones
+            jassert (sample <= 1.0f);
+            jassert (sample >= -1.0f);
+        }
+    }
 }
 
 void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceString, float newValue)

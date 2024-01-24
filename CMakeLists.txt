@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
+set(CMAKE_CXX_STANDARD 17)
+
 project(Blueprint VERSION 0.0.1)
 
 add_subdirectory(modules)
@@ -32,12 +34,16 @@ juce_add_plugin(Blueprint
     PLUGIN_CODE Bpcb                            # A unique four-character plugin id with exactly one upper-case character
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
     FORMATS AU VST3 Standalone AAX              # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
-    PRODUCT_NAME "Blueprint"     # The name of the final executable, which can differ from the target name
+    PRODUCT_NAME "Blueprint Cory Bergeron"     # The name of the final executable, which can differ from the target name
     
     VST3_CATEGORIES Fx Distortion
     AU_MAIN_TYPE kAudioUnitType_Effect
     AAX_CATEGORY AAX_ePlugInCategory_Harmonic
+    AAX_IDENTIFIER "com.supertonaldsp.blueprintcb.aax"
     HARDENED_RUNTIME_ENABLED ${HARDENED_RUNTIME_ENABLED}
+    HARDENED_RUNTIME_OPTIONS "com.apple.security.device.audio-input"
+    AU_SANDBOX_SAFE TRUE
+    APP_SANDBOX_ENABLED TRUE
     )        
 
 juce_generate_juce_header(Blueprint)

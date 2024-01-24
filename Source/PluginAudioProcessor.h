@@ -122,6 +122,7 @@ private:
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
 
     void loadImpulseResponseFromState();
+    void checkForInvalidSamples (const juce::dsp::AudioBlock<float>& blockToCheck);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessor)
 };

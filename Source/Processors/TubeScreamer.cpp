@@ -63,15 +63,15 @@ void TubeScreamer::prepare (juce::dsp::ProcessSpec& spec)
     *mDirectCurrentBlockerHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
         spec.sampleRate,
         15.0f,
-        0.70710678118654752440L);
+        0.70710678118654752440f);
 
     // pre-buffering
-    AudioBuffer<float> buffer (2, spec.maximumBlockSize);
-    for (int i = 0; i < 10000; i += spec.maximumBlockSize)
-    {
-        buffer.clear();
-        processBlock(buffer);
-    }
+//    AudioBuffer<float> buffer (2, spec.maximumBlockSize);
+//    for (int i = 0; i < 10000; i += spec.maximumBlockSize)
+//    {
+//        buffer.clear();
+//        processBlock(buffer);
+//    }
 }
 
 void TubeScreamer::processBlock(AudioBuffer<float>& buffer)
@@ -85,7 +85,7 @@ void TubeScreamer::processBlock(AudioBuffer<float>& buffer)
     const auto levelGainValue = mLevelGainSmoothedValue.skip(numSamples);
     
     auto driveGainParamSkew = (std::pow (10.0f, driveGainValue) - 1.0f) / 9.0f;
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+    for (int ch = 0; ch < numChannels; ++ch)
     {
         wdf[ch].setParameters (driveGainParamSkew, getDiodeIs (mDiodeType), mDiodeCount);
         wdf[ch].process (buffer.getWritePointer (ch), buffer.getNumSamples());

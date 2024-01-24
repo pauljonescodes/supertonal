@@ -142,15 +142,15 @@ void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
     *mDirectCurrentBlockerHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
         spec.sampleRate,
         15.0f,
-        0.70710678118654752440L);
+        0.70710678118654752440f);
 
     // pre-buffering
-    AudioBuffer<float> buffer(2, spec.maximumBlockSize);
-    for (int i = 0; i < 40000; i += spec.maximumBlockSize)
-    {
-        buffer.clear();
-        processBlock(buffer);
-    }
+//    AudioBuffer<float> buffer(2, spec.maximumBlockSize);
+//    for (int i = 0; i < 40000; i += spec.maximumBlockSize)
+//    {
+//        buffer.clear();
+//        processBlock(buffer);
+//    }
 }
 
 void MouseDrive::reset()
