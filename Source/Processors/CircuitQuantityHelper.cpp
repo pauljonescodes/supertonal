@@ -30,20 +30,6 @@ CircuitQuantity::CircuitQuantity (float defaultVal,
 {
 }
 
-static juce::String getPostFixForQuantity (CircuitQuantity::Type type)
-{
-    switch (type)
-    {
-        case CircuitQuantity::Resistance:
-            return juce::String::fromUTF8 ("Ω");
-        case CircuitQuantity::Capacitance:
-            return "F";
-        case CircuitQuantity::Inductance:
-            return "H";
-    }
-    return {};
-}
-
 float fromString (const juce::String& str, const CircuitQuantity& q)
 {
     juce::String justTheNumbers {};

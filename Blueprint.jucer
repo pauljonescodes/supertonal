@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="gKYDzO" name="Blueprint" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              version="0.1.3" companyName="Supertonal DSP" companyCopyright="2024"
-              pluginFormats="buildAAX,buildAU,buildStandalone,buildVST3" pluginAAXCategory="8192">
-  <MAINGROUP id="Pdzbsi" name="Blueprint">
+<JUCERPROJECT id="gKYDzO" name="Blueprint Cory Bergeron2" projectType="audioplug"
+              useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
+              jucerFormatVersion="1" version="0.2.1" companyName="Supertonal DSP"
+              companyCopyright="2024" pluginFormats="buildAAX,buildAU,buildStandalone,buildVST3"
+              pluginAAXCategory="8192" headerPath="../../Modules/math_approx/include&#10;../../Modules/chowdsp_wdf/include/chowdsp_wdf">
+  <MAINGROUP id="Pdzbsi" name="Blueprint Cory Bergeron2">
     <GROUP id="{2ED2996E-C3B4-16E6-D794-2D6A2D1A240A}" name="Assets">
       <FILE id="NiXqDL" name="cory_bread_and_butter_normalized.wav" compile="0"
             resource="1" file="Assets/cory_bread_and_butter_normalized.wav"/>
@@ -27,10 +28,19 @@
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
       <GROUP id="{DEDDA15C-1DE5-7D7A-FDED-908468144E16}" name="Processors">
-        <FILE id="xAwsNC" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/MouseDrive.cpp"/>
-        <FILE id="afdB2G" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/MouseDrive.h"/>
-        <FILE id="dyZAt4" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/MouseDriveWDF.h"/>
-        <FILE id="bMafEb" name="OmegaProvider.h" compile="0" resource="0" file="Source/Processors/OmegaProvider.h"/>
+        <FILE id="lPEM6L" name="CircuitQuantityHelper.cpp" compile="1" resource="0"
+              file="Source/Processors/CircuitQuantityHelper.cpp"/>
+        <FILE id="Apt5ZJ" name="CircuitQuantityHelper.h" compile="0" resource="0"
+              file="Source/Processors/CircuitQuantityHelper.h"/>
+        <FILE id="VTRb6A" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/MouseDrive.cpp"/>
+        <FILE id="b3ou1p" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/MouseDrive.h"/>
+        <FILE id="rcNVYV" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/MouseDriveWDF.h"/>
+        <FILE id="LXpnkn" name="OmegaProvider.h" compile="0" resource="0" file="Source/Processors/OmegaProvider.h"/>
+        <FILE id="Vg4uMN" name="TubeScreamer.cpp" compile="1" resource="0"
+              file="Source/Processors/TubeScreamer.cpp"/>
+        <FILE id="XSd2NB" name="TubeScreamer.h" compile="0" resource="0" file="Source/Processors/TubeScreamer.h"/>
+        <FILE id="b1rRnG" name="TubeScreamerWDF.h" compile="0" resource="0"
+              file="Source/Processors/TubeScreamerWDF.h"/>
       </GROUP>
       <GROUP id="{4158DADA-03E3-DF91-81E4-7F16E37B44DD}" name="Components">
         <FILE id="d4eaVE" name="AmpComponent.h" compile="0" resource="0" file="Source/Components/AmpComponent.h"/>

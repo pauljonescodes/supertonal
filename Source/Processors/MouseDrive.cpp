@@ -159,7 +159,7 @@ void MouseDrive::reset()
     mDirectCurrentBlockerHighPassFilter.reset();
 }
 
-void MouseDrive::processBlock(AudioBuffer<float>& buffer)
+void MouseDrive::processBlock(juce::AudioBuffer<float>& buffer)
 {
     const int numChannels = buffer.getNumChannels();
     const int numSamples = buffer.getNumSamples();

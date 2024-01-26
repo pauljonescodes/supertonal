@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 #include "OmegaProvider.h"
-#include "chowdsp_wdf/chowdsp_wdf.h"
+#include "chowdsp_wdf.h"
 
 class MouseDriveWDF
 {

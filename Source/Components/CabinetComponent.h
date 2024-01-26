@@ -8,16 +8,16 @@
 class CabinetComponent : public juce::Component, private juce::Button::Listener, private juce::ValueTree::Listener
 {
 public:
-	CabinetComponent(
-		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState,
-		std::function<void()> onClickedSelectFile
-		) :
-		mAudioProcessorValueTreeState(audioProcessorValueTreeState),
-		mOnClickedSelectFile(onClickedSelectFile),
-		mViewportPtr(std::make_unique<juce::Viewport>()),
-		mContainerPtr(std::make_unique<juce::Component>()),
-		mImpulseResponseFileLabelPtr(std::make_unique<juce::Label>())
-	{
+    CabinetComponent(
+                     juce::AudioProcessorValueTreeState& audioProcessorValueTreeState,
+                     std::function<void()> onClickedSelectFile
+                     ) :
+    mAudioProcessorValueTreeState(audioProcessorValueTreeState),
+    mImpulseResponseFileLabelPtr(std::make_unique<juce::Label>()),
+    mViewportPtr(std::make_unique<juce::Viewport>()),
+    mContainerPtr(std::make_unique<juce::Component>()),
+    mOnClickedSelectFile(onClickedSelectFile)
+    {
 		 
 		addAndMakeVisible(mViewportPtr.get());
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);

@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 #include "OmegaProvider.h"
-#include "chowdsp_wdf/chowdsp_wdf.h"
+#include "chowdsp_wdf.h"
 
 class TubeScreamerWDF
 {
@@ -112,8 +112,8 @@ public:
 
     chowdsp::wdft::DiodePairT<float, decltype (P3), chowdsp::wdft::DiodeQuality::Best, OmegaProvider> dp { P3, 4.352e-9f, Vt, 1.906f }; // 1N4148
 
-    SmoothedValue<float, ValueSmoothingTypes::Linear> nDiodesSmooth;
-    SmoothedValue<float, ValueSmoothingTypes::Linear> gainSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> nDiodesSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gainSmooth;
     float curDiodeIs = 1.0e-9f;
 
 private:

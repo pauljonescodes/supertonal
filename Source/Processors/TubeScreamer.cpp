@@ -74,9 +74,9 @@ void TubeScreamer::prepare (juce::dsp::ProcessSpec& spec)
 //    }
 }
 
-void TubeScreamer::processBlock(AudioBuffer<float>& buffer)
+void TubeScreamer::processBlock(juce::AudioBuffer<float>& buffer)
 {
-    buffer.applyGain (Decibels::decibelsToGain (-6.0f));
+    buffer.applyGain (juce::Decibels::decibelsToGain (-6.0f));
 
     const int numChannels = buffer.getNumChannels();
     const int numSamples = buffer.getNumSamples();
@@ -95,7 +95,7 @@ void TubeScreamer::processBlock(AudioBuffer<float>& buffer)
     auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
     mDirectCurrentBlockerHighPassFilter.process (processContext);
 
-    buffer.applyGain (Decibels::decibelsToGain (levelGainValue));
+    buffer.applyGain (juce::Decibels::decibelsToGain (levelGainValue));
 }
 
 void TubeScreamer::reset()

@@ -10,7 +10,7 @@ public:
     explicit TubeScreamer ();
 
     void prepare(juce::dsp::ProcessSpec& spec);
-    void processBlock(AudioBuffer<float>& buffer);
+    void processBlock(juce::AudioBuffer<float>& buffer);
     void reset();
 
     void setDrive(float newGain);

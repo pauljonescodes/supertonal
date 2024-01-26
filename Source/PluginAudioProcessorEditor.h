@@ -27,7 +27,7 @@ private:
 
     PluginLookAndFeel mLookAndFeel;
 
-    std::unique_ptr<FileChooser> mFileChooser;
+    std::unique_ptr<juce::FileChooser> mFileChooser;
 
     juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
 

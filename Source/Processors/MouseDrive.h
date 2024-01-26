@@ -11,7 +11,7 @@ public:
     MouseDrive();
 
     void prepare(juce::dsp::ProcessSpec& spec);
-    void processBlock(AudioBuffer<float>& buffer);
+    void processBlock(juce::AudioBuffer<float>& buffer);
     void reset();
     void setDistortion(float targetValue);
     void setVolume(float targetValue);
