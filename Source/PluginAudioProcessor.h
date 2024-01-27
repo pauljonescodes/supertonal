@@ -5,6 +5,7 @@
 #include "PluginPresetManager.h"
 #include "Processors/MouseDrive.h"
 #include "Processors/TubeScreamer.h"
+#include "Processors/ParametricEqualiser.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -48,14 +49,22 @@ private:
     std::unique_ptr<PluginPresetManager> mPresetManagerPtr;
     std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
 
+    std::unique_ptr<juce::dsp::Gain<float>> mInputGainPtr;
+
     std::unique_ptr<juce::dsp::NoiseGate<float>> mNoiseGate;
+
+    bool mPreCompressorIsOn = false;
     std::unique_ptr<juce::dsp::Compressor<float>> mPreCompressorPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mPreCompressorGainPtr;
 
     bool mTubeScreamerIsOn = false;
     std::unique_ptr<TubeScreamer> mTubeScreamerPtr;
 
     bool mMouseDriveIsOn = false;
     std::unique_ptr<MouseDrive> mMouseDrivePtr;
+
+    bool mParametricEqualiserIsOn = false;
+    std::unique_ptr<ParametricEqualiser> mParametricEqualiser;
 
     bool mStagesAreParallel = false;
 
@@ -99,12 +108,16 @@ private:
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighShelfFilterPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mLowPassFilterPtr;
     
+    bool mDelayOn = false;
     float mDelayFeedback = 0.5f;
     juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
     std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLinePtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mDelayLineDryWetMixerPtr;
 
+    bool mChorusOn = false;
     std::unique_ptr<juce::dsp::Chorus<float>> mChorusPtr;
+
+    bool mPhaserOn = false;
     std::unique_ptr<juce::dsp::Phaser<float>> mPhaserPtr;
 
     bool mCabImpulseResponseConvolutionIsOn = true;

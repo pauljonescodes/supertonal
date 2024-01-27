@@ -32,6 +32,10 @@
               file="Source/Processors/CircuitQuantityHelper.cpp"/>
         <FILE id="Apt5ZJ" name="CircuitQuantityHelper.h" compile="0" resource="0"
               file="Source/Processors/CircuitQuantityHelper.h"/>
+        <FILE id="lohpDI" name="ParametricEqualiser.cpp" compile="1" resource="0"
+              file="Source/Processors/ParametricEqualiser.cpp"/>
+        <FILE id="c8r1AO" name="ParametricEqualiser.h" compile="0" resource="0"
+              file="Source/Processors/ParametricEqualiser.h"/>
         <FILE id="VTRb6A" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/MouseDrive.cpp"/>
         <FILE id="b3ou1p" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/MouseDrive.h"/>
         <FILE id="rcNVYV" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/MouseDriveWDF.h"/>
@@ -52,6 +56,7 @@
               file="Source/Components/PreAmpComponent.h"/>
         <FILE id="g3k9OM" name="PresetComponent.h" compile="0" resource="0"
               file="Source/Components/PresetComponent.h"/>
+        <FILE id="JJ02wX" name="TopComponent.h" compile="0" resource="0" file="Source/Components/TopComponent.h"/>
       </GROUP>
       <FILE id="v6KLmT" name="PluginLookAndFeel.cpp" compile="1" resource="0"
             file="Source/PluginLookAndFeel.cpp"/>

@@ -5,10 +5,10 @@
 #include "../PluginAudioParameters.h"
 #include "../PluginUtils.h"
 
-class PedalsComponent : public juce::Component
+class TopComponent : public juce::Component
 {
 public:
-	PedalsComponent(
+	TopComponent(
 		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) :
 		mAudioProcessorValueTreeState(audioProcessorValueTreeState)
 	{
@@ -20,57 +20,10 @@ public:
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
-	apvts::preCompressorOnId,
-	apvts::preCompressorGainId,
-	apvts::preCompressorThresholdId,
-},
-{
-	apvts::preCompressorAttackId,
-	apvts::preCompressorRatioId,
-	apvts::preCompressorReleaseId,
-},
-{
-	apvts::tubeScreamerOnId,
-	apvts::tubeScreamerDriveId,
-	apvts::tubeScreamerLevelId,
-},
-{
-	apvts::mouseDriveOnId,
-	apvts::mouseDriveDistortionId,
-	apvts::mouseDriveVolumeId
-},
-{
-	apvts::preEqualiserOnId,
-	apvts::preEqualiser100GainId,
-	apvts::preEqualiser200GainId,
-	apvts::preEqualiser400GainId,
-},
-{
-	apvts::preEqualiser800GainId,
-	apvts::preEqualiser1600GainId,
-	apvts::preEqualiser3200GainId,
-	apvts::preEqualiser6400GainId,
-	apvts::preEqualiserLevelId,
-},
-{
-	apvts::delayOnId,
-	apvts::delayTimeFractionalDenominatorId,
-	apvts::delayFeedbackId,
-	apvts::delayDryWetId,
-},
-{
-	apvts::chorusOnId,
-	apvts::chorusFractionOfBeatId,
-	apvts::chorusDepthId,
-	apvts::chorusCenterDelayFractionOfBeatId,
-	apvts::chorusFeedbackId,
-},
-{
-	apvts::phaserOnId,
-	apvts::phaserRateFractionOfBeatId,
-	apvts::phaserDepthId,
-	apvts::phaserCenterFrequencyId,
-	apvts::phaserFeedbackId,
+	apvts::inputGainId,
+	apvts::noiseGateThresholdId,
+	apvts::outputGainId,
+	apvts::bypassId,
 }
 		};
 
@@ -142,11 +95,13 @@ public:
 		}
 	};
 
-	~PedalsComponent()
+	~TopComponent()
 	{
+
 		mSliderAttachments.clear();
 		mButtonAttachments.clear();
 		mComboBoxAttachments.clear();
+
 		mComponentRows.clear();
 		mViewportPtr.reset();
 		mContainerPtr.reset();
@@ -174,11 +129,10 @@ public:
 		}
 
 		int buttonWidth = localBounds.getWidth() / numCols;
-		int buttonHeight = buttonWidth;
+		int buttonHeight = 125;
 
 		int totalHeight = ((buttonHeight + 12.5) * numRows);
 		mContainerPtr->setBounds(0, 0, mViewportPtr->getMaximumVisibleWidth() - 8, totalHeight);
-
 
 		for (int row = 0; row < mComponentRows.size(); ++row)
 		{
@@ -201,5 +155,5 @@ private:
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> mComboBoxAttachments;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PedalsComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TopComponent)
 };

@@ -149,6 +149,11 @@ namespace apvts
 		gainDeciblesDefaultValue,
 		defaultIntervalValue);
 
+	static const juce::NormalisableRange<float> parametricEqualiserDecibelGainNormalisableRange = makeDecibelRange(
+		-15.0f,
+		15.0f,
+		defaultIntervalValue);
+
 	// COMPRESSION
 
 	static constexpr float ratioMinimumValue = 1.0f;
@@ -274,17 +279,19 @@ namespace apvts
 		tubeScreamerDiodeCountInterval);
 
 	enum class ParameterEnum {
-		BYPASS_ON,
+		INPUT_GAIN,
 
 		NOISE_GATE_THRESHOLD,
 		NOISE_GATE_ATTACK,
 		NOISE_GATE_RATIO,
 		NOISE_GATE_RELEASE,
 
+		PRE_COMPRESSOR_ON,
 		PRE_COMPRESSOR_THRESHOLD,
 		PRE_COMPRESSOR_ATTACK,
 		PRE_COMPRESSOR_RATIO,
 		PRE_COMPRESSOR_RELEASE,
+		PRE_COMPRESSOR_GAIN,
 
 		TUBE_SCREAMER_ON,
 		TUBE_SCREAMER_DRIVE,
@@ -329,6 +336,16 @@ namespace apvts
 		POST_COMPRESSOR_RATIO,
 		POST_COMPRESSOR_RELEASE,
 		POST_COMPRESSOR_GAIN,
+
+		PRE_EQUALISER_ON,
+		PRE_EQUALISER_100_GAIN,
+		PRE_EQUALISER_200_GAIN,
+		PRE_EQUALISER_400_GAIN,
+		PRE_EQUALISER_800_GAIN,
+		PRE_EQUALISER_1600_GAIN,
+		PRE_EQUALISER_3200_GAIN,
+		PRE_EQUALISER_6400_GAIN,
+		PRE_EQUALISER_LEVEL_GAIN,
 		
 		HIGH_PASS_FREQUENCY,
 		HIGH_PASS_Q,
@@ -344,16 +361,19 @@ namespace apvts
 		LOW_PASS_FREQUENCY,
 		LOW_PASS_Q,
 		
+		DELAY_ON,
 		DELAY_TIME_FRACTIONAL_DENOMINATOR,
 		DELAY_FEEDBACK,
 		DELAY_DRY_WET,
 
+		CHORUS_ON,
 		CHORUS_FRACTION_OF_BEAT,
 		CHORUS_DEPTH,
 		CHORUS_CENTER_DELAY_FRACTION_OF_BEAT,
 		CHORUS_FEEDBACK,
 		CHORUS_MIX,
 		
+		PHASER_ON,
 		PHASER_RATE_FRACTION_OF_BEAT,
 		PHASER_DEPTH,
 		PHASER_CENTER_FREQUENCY,
@@ -373,10 +393,13 @@ namespace apvts
 		LIMITER_THRESHOLD,
 		LIMITER_RELEASE,
 
-		OUTPUT_GAIN
+		OUTPUT_GAIN,
+		BYPASS_ON
 	};
 
 	static const std::string bypassId = "bypass_on";
+
+	static const std::string inputGainId = "input_gain";
 
 	static const std::string noiseGateThresholdId = "noise_gate_threshold";
 	static const std::string noiseGateAttackId = "noise_gate_attack";
@@ -384,10 +407,12 @@ namespace apvts
 	static const std::string noiseGateReleaseId = "noise_gate_release";
 	static const std::string noiseGateGainId = "noise_gate_gain";
 
+	static const std::string preCompressorOnId = "pre_compressor_on";
 	static const std::string preCompressorThresholdId = "pre_comp_thresh";
 	static const std::string preCompressorAttackId = "pre_comp_attack";
 	static const std::string preCompressorRatioId = "pre_comp_ratio";
 	static const std::string preCompressorReleaseId = "pre_comp_release";
+	static const std::string preCompressorGainId = "pre_comp_gain";
 
 	static const std::string tubeScreamerOnId = "tube_screamer_on";
 	static const std::string tubeScreamerDriveId = "tube_screamer_drive";
@@ -398,6 +423,16 @@ namespace apvts
 	static const std::string mouseDriveOnId = "mouse_drive_on";
 	static const std::string mouseDriveDistortionId = "mouse_drive_distortion";
 	static const std::string mouseDriveVolumeId = "mouse_drive_volume";
+
+	static const std::string preEqualiserOnId = "pre_eq_on";
+	static const std::string preEqualiser100GainId = "pre_eq_100_gain";
+	static const std::string preEqualiser200GainId = "pre_eq_200_gain";
+	static const std::string preEqualiser400GainId = "pre_eq_400_gain";
+	static const std::string preEqualiser800GainId = "pre_eq_800_gain";
+	static const std::string preEqualiser1600GainId = "pre_eq_1600_gain";
+	static const std::string preEqualiser3200GainId = "pre_eq_3200_gain";
+	static const std::string preEqualiser6400GainId = "pre_eq_6400_gain";
+	static const std::string preEqualiserLevelId = "pre_eq_level_gain";
 
 	static const std::string stageModeId = "mode";
 
@@ -445,16 +480,19 @@ namespace apvts
 	static const std::string lowPassFrequencyId = "low-pass_frequency";
 	static const std::string lowPassQId = "low-pass_q";
 
+	static const std::string delayOnId = "delay_on";
 	static const std::string delayTimeFractionalDenominatorId = "delay_per_beat";
 	static const std::string delayFeedbackId = "delay_feedback";
 	static const std::string delayDryWetId = "delay_mix";
 
+	static const std::string chorusOnId = "chorus_on";
 	static const std::string chorusFractionOfBeatId = "chorus_per_beat";
 	static const std::string chorusDepthId = "chorus_depth";
 	static const std::string chorusCenterDelayFractionOfBeatId = "chorus_delay_per_beat";
 	static const std::string chorusFeedbackId = "chorus_feedback";
 	static const std::string chorusMixId = "chorus_mix";
 
+	static const std::string phaserOnId = "phaser_on";
 	static const std::string phaserRateFractionOfBeatId = "phaser_per_beat";
 	static const std::string phaserDepthId = "phaser_depth";
 	static const std::string phaserCenterFrequencyId = "phaser_center_freq";
@@ -478,17 +516,19 @@ namespace apvts
 	static const std::string outputGainId = "output_gain";
 
 	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap {
-		{bypassId, ParameterEnum::BYPASS_ON},
+		{inputGainId, ParameterEnum::INPUT_GAIN},
 
 		{noiseGateThresholdId, ParameterEnum::NOISE_GATE_THRESHOLD},
 		{noiseGateAttackId, ParameterEnum::NOISE_GATE_ATTACK},
 		{noiseGateRatioId, ParameterEnum::NOISE_GATE_RATIO},
 		{noiseGateReleaseId, ParameterEnum::NOISE_GATE_RELEASE},
 		
+		{preCompressorOnId, ParameterEnum::PRE_COMPRESSOR_ON},
 		{preCompressorThresholdId, ParameterEnum::PRE_COMPRESSOR_THRESHOLD},
 		{preCompressorAttackId, ParameterEnum::PRE_COMPRESSOR_ATTACK},
 		{preCompressorRatioId, ParameterEnum::PRE_COMPRESSOR_RATIO},
 		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
+		{preCompressorGainId, ParameterEnum::PRE_COMPRESSOR_GAIN},
 
 		{tubeScreamerOnId, ParameterEnum::TUBE_SCREAMER_ON},
 		{tubeScreamerDriveId, ParameterEnum::TUBE_SCREAMER_DRIVE},
@@ -499,6 +539,16 @@ namespace apvts
 		{mouseDriveOnId, ParameterEnum::MOUSE_DRIVE_ON},
 		{mouseDriveDistortionId, ParameterEnum::MOUSE_DRIVE_DISTORTION},
 		{mouseDriveVolumeId, ParameterEnum::MOUSE_DRIVE_VOLUME},
+
+		{preEqualiserOnId, ParameterEnum::PRE_EQUALISER_ON},
+		{preEqualiser100GainId, ParameterEnum::PRE_EQUALISER_100_GAIN},
+		{preEqualiser200GainId, ParameterEnum::PRE_EQUALISER_200_GAIN},
+		{preEqualiser400GainId, ParameterEnum::PRE_EQUALISER_400_GAIN},
+		{preEqualiser800GainId, ParameterEnum::PRE_EQUALISER_800_GAIN},
+		{preEqualiser1600GainId, ParameterEnum::PRE_EQUALISER_1600_GAIN},
+		{preEqualiser3200GainId, ParameterEnum::PRE_EQUALISER_3200_GAIN},
+		{preEqualiser6400GainId, ParameterEnum::PRE_EQUALISER_6400_GAIN},
+		{preEqualiserLevelId, ParameterEnum::PRE_EQUALISER_LEVEL_GAIN},
 
 		{stageModeId, ParameterEnum::STAGE_MODE},
 		
@@ -556,16 +606,19 @@ namespace apvts
 		{limiterThresholdId, ParameterEnum::LIMITER_THRESHOLD},
 		{limiterReleaseId, ParameterEnum::LIMITER_RELEASE},
 
+		{delayOnId, ParameterEnum::DELAY_ON},
 		{delayTimeFractionalDenominatorId, ParameterEnum::DELAY_TIME_FRACTIONAL_DENOMINATOR},
 		{delayFeedbackId, ParameterEnum::DELAY_FEEDBACK},
 		{delayDryWetId, ParameterEnum::DELAY_DRY_WET},
 
+		{chorusOnId, ParameterEnum::CHORUS_ON},
 		{chorusFractionOfBeatId, ParameterEnum::CHORUS_FRACTION_OF_BEAT},
 		{chorusDepthId, ParameterEnum::CHORUS_DEPTH},
 		{chorusCenterDelayFractionOfBeatId, ParameterEnum::CHORUS_CENTER_DELAY_FRACTION_OF_BEAT},
 		{chorusFeedbackId, ParameterEnum::CHORUS_FEEDBACK},
 		{chorusMixId, ParameterEnum::CHORUS_MIX},
 
+		{phaserOnId, ParameterEnum::PHASER_ON},
 		{phaserRateFractionOfBeatId, ParameterEnum::PHASER_RATE_FRACTION_OF_BEAT},
 		{phaserDepthId, ParameterEnum::PHASER_DEPTH},
 		{phaserCenterFrequencyId, ParameterEnum::PHASER_CENTER_FREQUENCY},
@@ -579,6 +632,7 @@ namespace apvts
 		{reverbWidthId, ParameterEnum::REVERB_WIDTH},
 
 		{ outputGainId, ParameterEnum::OUTPUT_GAIN},
+		{ bypassId, ParameterEnum::BYPASS_ON },
 	};
 
 	static const std::map<std::string, float> defaults = {

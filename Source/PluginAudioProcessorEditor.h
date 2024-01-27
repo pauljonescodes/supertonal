@@ -7,6 +7,7 @@
 #include "Components/AmpComponent.h"
 #include "Components/CabinetComponent.h"
 #include "Components/MixerComponent.h"
+#include "Components/TopComponent.h"
 
 class PluginAudioProcessorEditor : public juce::AudioProcessorEditor
 {
@@ -32,6 +33,7 @@ private:
     juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
 
     std::unique_ptr<PresetComponent> mPresetComponentPtr;
+    std::unique_ptr<TopComponent> mTopComponent;
 
     std::unique_ptr<juce::TabbedComponent> mTabbedComponentPtr;
     std::unique_ptr<PedalsComponent> mPedalsComponentPtr;

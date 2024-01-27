@@ -10,6 +10,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	AudioProcessorEditor(&processorRef),
 	mProcessorRef(processorRef),
 	mAudioProcessorValueTreeState(apvts),
+	mTopComponent(std::make_unique<TopComponent>(mAudioProcessorValueTreeState)),
 	mTabbedComponentPtr(std::make_unique<juce::TabbedComponent>(juce::TabbedButtonBar::Orientation::TabsAtTop)),
 	mPresetComponentPtr(std::make_unique<PresetComponent>(presetManager)),
 	mPedalsComponentPtr(std::make_unique<PedalsComponent>(mAudioProcessorValueTreeState)),
@@ -23,6 +24,8 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	setLookAndFeel(&mLookAndFeel);
 
 	addAndMakeVisible(mPresetComponentPtr.get());
+
+	addAndMakeVisible(mTopComponent.get());
 
 	addAndMakeVisible(mTabbedComponentPtr.get());
 
@@ -62,6 +65,6 @@ void PluginAudioProcessorEditor::resized()
 	auto localBounds = getLocalBounds();
 
 	mPresetComponentPtr->setBounds(localBounds.removeFromTop(50));
-	localBounds.removeFromTop(5);
+	mTopComponent->setBounds(localBounds.removeFromTop(150));
 	mTabbedComponentPtr->setBounds(localBounds);
 }

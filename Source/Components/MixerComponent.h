@@ -30,10 +30,6 @@ public:
 	apvts::limiterOnId,
 	apvts::limiterThresholdId,
 	apvts::limiterReleaseId
-},
-{
-	apvts::outputGainId,
-	apvts::bypassId,
 }
 		};
 
