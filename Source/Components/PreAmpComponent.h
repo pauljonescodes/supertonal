@@ -26,9 +26,10 @@ public:
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::preCompressorThresholdId, "Threshold", "dB"},
 				{ apvts::preCompressorAttackId, "Attack", "ms" },
-				{ apvts::preCompressorRatioId, "Ratio", "ms" },
+				{ apvts::preCompressorRatioId, "Ratio", " : 1" },
 				{ apvts::preCompressorReleaseId, "Release", "ms" },
-				{ apvts::preCompressorGainId, "Makeup", "dB" }
+				{ apvts::preCompressorGainId, "Makeup", "dB" },
+				{ apvts::preCompressorBlendId, "Blend", "" }
 		},
 			apvts::preCompressorOnId));
 

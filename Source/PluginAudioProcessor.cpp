@@ -28,6 +28,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mNoiseGate(std::make_unique<juce::dsp::NoiseGate<float>>()),
 	mPreCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
 	mPreCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
+	mPreCompressorDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
 
 	mTubeScreamerPtr(std::make_unique<TubeScreamer>()),
 	mMouseDrivePtr(std::make_unique<MouseDrive>()),
@@ -141,11 +142,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::PHASER_DEPTH:
 		case apvts::ParameterEnum::CHORUS_FEEDBACK:
 		case apvts::ParameterEnum::PHASER_FEEDBACK:
-		case apvts::ParameterEnum::DELAY_FEEDBACK:
-		case apvts::ParameterEnum::STAGE1_DRY_WET:
-		case apvts::ParameterEnum::STAGE2_DRY_WET:
-		case apvts::ParameterEnum::STAGE3_DRY_WET:
-		case apvts::ParameterEnum::STAGE4_DRY_WET:		
+		case apvts::ParameterEnum::DELAY_FEEDBACK:		
 		case apvts::ParameterEnum::REVERB_MIX:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -191,8 +188,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_THRESHOLD:
 		case apvts::ParameterEnum::POST_COMPRESSOR_THRESHOLD:
-		case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
-		case apvts::ParameterEnum::TUBE_SCREAMER_LEVEL:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
@@ -200,10 +195,32 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::gainDeciblesDefaultValue
 				));
 			break;
+		case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::gainDecibelsNegativeNormalisableRange,
+				MouseDrive::sVolumeDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::TUBE_SCREAMER_LEVEL:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::gainDecibelsNegativeNormalisableRange,
+				TubeScreamer::sLevelDefaultValue
+				));
+			break;
 		case apvts::ParameterEnum::REVERB_WIDTH:
 		case apvts::ParameterEnum::CHORUS_MIX:
 		case apvts::ParameterEnum::PHASER_MIX:
+		case apvts::ParameterEnum::STAGE1_DRY_WET:
+		case apvts::ParameterEnum::STAGE2_DRY_WET:
+		case apvts::ParameterEnum::STAGE3_DRY_WET:
+		case apvts::ParameterEnum::STAGE4_DRY_WET:
+		case apvts::ParameterEnum::PRE_COMPRESSOR_BLEND:
 		case apvts::ParameterEnum::TUBE_SCREAMER_TONE:
+		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
@@ -329,7 +346,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::qualityDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
 		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -435,6 +451,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mNoiseGate->prepare(spec);
 	mPreCompressorPtr->prepare(spec);
 	mPreCompressorGainPtr->prepare(spec);
+	mPreCompressorDryWetMixerPtr->prepare(spec);
 
 	mGraphicEqualiser->prepare(spec);
 
@@ -507,6 +524,7 @@ void PluginAudioProcessor::reset()
 	mNoiseGate->reset();
 	mPreCompressorPtr->reset();
 	mPreCompressorGainPtr->reset();
+	mPreCompressorDryWetMixerPtr->reset();
 
 	mTubeScreamerPtr->reset();
 	mMouseDrivePtr->reset();
@@ -586,8 +604,10 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	if (mPreCompressorIsOn)
 	{
+		mPreCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
 		mPreCompressorPtr->process(processContext);
 		mPreCompressorGainPtr->process(processContext);
+		mPreCompressorDryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 	
 	if (mGraphicEqualiserIsOn)
@@ -1001,6 +1021,9 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::PRE_COMPRESSOR_GAIN:
 		mPreCompressorGainPtr->setGainDecibels(newValue);
+		break;
+	case apvts::ParameterEnum::PRE_COMPRESSOR_BLEND:
+		mPreCompressorDryWetMixerPtr->setWetMixProportion(newValue);
 		break;
 	case apvts::ParameterEnum::POST_COMPRESSOR_GAIN:
 		mCompressorGainPtr->setGainDecibels(newValue);

@@ -10,6 +10,8 @@ class TubeScreamer
 public:
     explicit TubeScreamer ();
 
+    inline static const float sLevelDefaultValue = -18.0f;
+
     void prepare(juce::dsp::ProcessSpec& spec);
     void processBlock(juce::AudioBuffer<float>& buffer);
     void reset();

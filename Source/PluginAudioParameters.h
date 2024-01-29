@@ -289,6 +289,7 @@ namespace apvts
 		PRE_COMPRESSOR_ATTACK,
 		PRE_COMPRESSOR_RATIO,
 		PRE_COMPRESSOR_RELEASE,
+		PRE_COMPRESSOR_BLEND,
 		PRE_COMPRESSOR_GAIN,
 
 		PRE_EQUALISER_ON,
@@ -411,6 +412,7 @@ namespace apvts
 	static const std::string preCompressorAttackId = "pre_comp_attack";
 	static const std::string preCompressorRatioId = "pre_comp_ratio";
 	static const std::string preCompressorReleaseId = "pre_comp_release";
+	static const std::string preCompressorBlendId = "pre_comp_blend";
 	static const std::string preCompressorGainId = "pre_comp_gain";
 
 	static const std::string tubeScreamerOnId = "tube_screamer_on";
@@ -528,6 +530,7 @@ namespace apvts
 		{preCompressorAttackId, ParameterEnum::PRE_COMPRESSOR_ATTACK},
 		{preCompressorRatioId, ParameterEnum::PRE_COMPRESSOR_RATIO},
 		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
+		{preCompressorBlendId, ParameterEnum::PRE_COMPRESSOR_BLEND},
 		{preCompressorGainId, ParameterEnum::PRE_COMPRESSOR_GAIN},
 
 		{tubeScreamerOnId, ParameterEnum::TUBE_SCREAMER_ON},

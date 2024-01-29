@@ -56,6 +56,7 @@ private:
     bool mPreCompressorIsOn = false;
     std::unique_ptr<juce::dsp::Compressor<float>> mPreCompressorPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mPreCompressorGainPtr;
+    std::unique_ptr<juce::dsp::DryWetMixer<float>> mPreCompressorDryWetMixerPtr;
 
     bool mTubeScreamerIsOn = false;
     std::unique_ptr<TubeScreamer> mTubeScreamerPtr;
