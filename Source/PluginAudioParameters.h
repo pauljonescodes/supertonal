@@ -164,7 +164,7 @@ namespace apvts
 
 	static constexpr float attackMsMinimumValue = 0.0f;
 	static constexpr float attackMsMaximumValue = 1000.0f;
-	static constexpr float attackMsDefaultValue = 3.0f;
+	static constexpr float attackMsDefaultValue = 5.0f;
 	static const juce::NormalisableRange<float> attackNormalisableRange = makeLogarithmicRange(
 		attackMsMinimumValue, 
 		attackMsMaximumValue, 

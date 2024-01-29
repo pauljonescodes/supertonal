@@ -316,12 +316,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_RATIO:
 		case apvts::ParameterEnum::POST_COMPRESSOR_RATIO:
-		case apvts::ParameterEnum::NOISE_GATE_RATIO:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::ratioNormalizableRange,
 				apvts::ratioDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::NOISE_GATE_RATIO:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::ratioNormalizableRange,
+				FLT_MAX
 				));
 			break;
 		case apvts::ParameterEnum::HIGH_PASS_FREQUENCY:
