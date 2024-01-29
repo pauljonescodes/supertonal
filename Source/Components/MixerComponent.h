@@ -140,7 +140,6 @@ public:
 		int totalHeight = ((buttonHeight + 12.5) * numRows);
 		mContainerPtr->setBounds(0, 0, mViewportPtr->getMaximumVisibleWidth() - 8, totalHeight);
 
-
 		for (int row = 0; row < mComponentRows.size(); ++row)
 		{
 			for (int col = 0; col < mComponentRows[row]->size(); ++col)

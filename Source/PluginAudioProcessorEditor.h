@@ -36,7 +36,7 @@ private:
     std::unique_ptr<TopComponent> mTopComponent;
 
     std::unique_ptr<juce::TabbedComponent> mTabbedComponentPtr;
-    std::unique_ptr<PedalsComponent> mPedalsComponentPtr;
+    std::unique_ptr<PreAmpComponent> mPedalsComponentPtr;
     std::unique_ptr<AmpComponent> mAmpComponentPtr;
     std::unique_ptr<CabinetComponent> mCabinetComponentPtr;
     std::unique_ptr<MixerComponent> mMixerComponentPtr;

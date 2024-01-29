@@ -52,6 +52,8 @@
               file="Source/Components/CabinetComponent.h"/>
         <FILE id="cwTZnW" name="MixerComponent.h" compile="0" resource="0"
               file="Source/Components/MixerComponent.h"/>
+        <FILE id="lbtVDn" name="PedalComponent.h" compile="0" resource="0"
+              file="Source/Components/PedalComponent.h"/>
         <FILE id="YfBmGp" name="PreAmpComponent.h" compile="0" resource="0"
               file="Source/Components/PreAmpComponent.h"/>
         <FILE id="g3k9OM" name="PresetComponent.h" compile="0" resource="0"

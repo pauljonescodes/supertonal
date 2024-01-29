@@ -4,11 +4,12 @@
 #include "../PluginPresetManager.h"
 #include "../PluginAudioParameters.h"
 #include "../PluginUtils.h"
+#include "PedalComponent.h"
 
-class PedalsComponent : public juce::Component
+class PreAmpComponent : public juce::Component
 {
 public:
-	PedalsComponent(
+	PreAmpComponent(
 		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) :
 		mAudioProcessorValueTreeState(audioProcessorValueTreeState)
 	{
@@ -18,136 +19,88 @@ public:
 		addAndMakeVisible(mViewportPtr.get());
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
 
-		static const std::vector<std::vector<std::string>> apvtsIdRows = {
-{
-	apvts::preCompressorOnId,
-	apvts::preCompressorGainId,
-	apvts::preCompressorThresholdId,
-},
-{
-	apvts::preCompressorAttackId,
-	apvts::preCompressorRatioId,
-	apvts::preCompressorReleaseId,
-},
-{
-	apvts::tubeScreamerOnId,
-	apvts::tubeScreamerDriveId,
-	apvts::tubeScreamerLevelId,
-},
-{
-	apvts::mouseDriveOnId,
-	apvts::mouseDriveDistortionId,
-	apvts::mouseDriveVolumeId
-},
-{
-	apvts::preEqualiserOnId,
-	apvts::preEqualiser100GainId,
-	apvts::preEqualiser200GainId,
-	apvts::preEqualiser400GainId,
-},
-{
-	apvts::preEqualiser800GainId,
-	apvts::preEqualiser1600GainId,
-	apvts::preEqualiser3200GainId,
-	apvts::preEqualiser6400GainId,
-	apvts::preEqualiserLevelId,
-},
-{
-	apvts::delayOnId,
-	apvts::delayTimeFractionalDenominatorId,
-	apvts::delayFeedbackId,
-	apvts::delayDryWetId,
-},
-{
-	apvts::chorusOnId,
-	apvts::chorusFractionOfBeatId,
-	apvts::chorusDepthId,
-	apvts::chorusCenterDelayFractionOfBeatId,
-	apvts::chorusFeedbackId,
-},
-{
-	apvts::phaserOnId,
-	apvts::phaserRateFractionOfBeatId,
-	apvts::phaserDepthId,
-	apvts::phaserCenterFrequencyId,
-	apvts::phaserFeedbackId,
-}
-		};
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Compressor",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::preCompressorThresholdId, "Threshold", "dB"},
+				{ apvts::preCompressorAttackId, "Attack", "ms" },
+				{ apvts::preCompressorRatioId, "Ratio", "ms" },
+				{ apvts::preCompressorReleaseId, "Release", "ms" },
+				{ apvts::preCompressorGainId, "Makeup", "dB" }
+		},
+			apvts::preCompressorOnId));
 
-		for (int row = 0; row < apvtsIdRows.size(); ++row)
-		{
-			const auto& colIds = apvtsIdRows[row];
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Compressor",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::preEqualiser100GainId, "100hz", "dB"},
+				{ apvts::preEqualiser200GainId, "2000hz", "dB" },
+				{ apvts::preEqualiser400GainId, "400hz", "dB" },
+				{ apvts::preEqualiser800GainId, "800z", "dB" },
+				{ apvts::preEqualiser1600GainId, "1600hz", "dB" },
+				{ apvts::preEqualiser3200GainId, "3200hz", "dB" },
+				{ apvts::preEqualiser6400GainId, "6400hz", "dB" },
+				{ apvts::preEqualiserLevelId, "Level", "dB" },
+		},
+			apvts::preEqualiserOnId));
 
-			for (const auto& parameterId : colIds)
-			{
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Screamer",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::tubeScreamerDriveId, "Drive", ""},
+				{ apvts::tubeScreamerLevelId, "Level", "" }
+		},
+			apvts::tubeScreamerOnId));
 
-				if (mComponentRows.size() < row + 1)
-				{
-					mComponentRows.add(new juce::OwnedArray<juce::Component>());
-				}
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Mouse Drive",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::mouseDriveDistortionId, "Distortion", ""},
+				{ apvts::mouseDriveVolumeId, "Volume", "" }
+		},
+			apvts::mouseDriveOnId));
 
-				if (PluginUtils::isToggleId(parameterId))
-				{
-					auto* button = new juce::ToggleButton(PluginUtils::toTitleCase(parameterId));
-					mComponentRows[row]->add(button);
-					mButtonAttachments.add(new juce::AudioProcessorValueTreeState::ButtonAttachment(
-						mAudioProcessorValueTreeState,
-						parameterId,
-						*button
-					));
-					mContainerPtr->addAndMakeVisible(button);
-				}
-				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isStageModeId(parameterId))
-				{
-					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
-					if (PluginUtils::isWaveshaperId(parameterId))
-					{
-						for (int waveshaperIndex = 0; waveshaperIndex < apvts::waveShaperIds.size(); waveshaperIndex++) {
-							comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
-						}
-					}
-					else if (PluginUtils::isStageModeId(parameterId))
-					{
-						for (int modeIndex = 0; modeIndex < apvts::stageModeIds.size(); modeIndex++) {
-							comboBox->addItem(apvts::stageModeIds.at(modeIndex), modeIndex + 1);
-						}
-					}
-					mComponentRows[row]->add(comboBox);
-					mComboBoxAttachments.add(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(
-						mAudioProcessorValueTreeState,
-						parameterId,
-						*comboBox
-					));
-					mContainerPtr->addAndMakeVisible(comboBox);
-				}
-				else
-				{
-					auto* slider = new juce::Slider(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
-					slider->setTitle(PluginUtils::toTitleCase(parameterId));
-					slider->setScrollWheelEnabled(false);
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Delay",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::delayTimeFractionalDenominatorId, "Time", " / beat"},
+				{ apvts::delayFeedbackId, "Feedback", "" },
+				{ apvts::delayDryWetId, "Mix", "" },
+		},
+			apvts::delayOnId ));
 
-					auto* label = new juce::Label(parameterId, PluginUtils::toTitleCase(parameterId));
-					label->attachToComponent(slider, false);
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Delay",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::chorusFractionOfBeatId, "Time", " / beat"},
+				{ apvts::chorusDepthId, "Depth", "" },
+				{ apvts::chorusFeedbackId, "Feedback", "" },
+				{ apvts::chorusCenterDelayFractionOfBeatId, "Delay", " / beat" },
+		},
+			apvts::chorusOnId));
 
-					mComponentRows[row]->add(slider);
-					mSliderAttachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(
-						mAudioProcessorValueTreeState,
-						parameterId,
-						*slider
-					));
-					mContainerPtr->addAndMakeVisible(slider);
-				}
-			}
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Delay",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::phaserRateFractionOfBeatId, "Time", " / beat"},
+				{ apvts::phaserDepthId, "Depth", "" },
+				{ apvts::phaserCenterFrequencyId, "Center", "" },
+				{ apvts::phaserFeedbackId, "Feedback", ""},
+		},
+			apvts::phaserOnId));
 
-		}
+		resized();
 	};
 
-	~PedalsComponent()
+	~PreAmpComponent()
 	{
-		mSliderAttachments.clear();
-		mButtonAttachments.clear();
-		mComboBoxAttachments.clear();
-		mComponentRows.clear();
 		mViewportPtr.reset();
 		mContainerPtr.reset();
 	};
@@ -157,37 +110,18 @@ public:
 		g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 	};
 
-	void resized() override
-	{
+	void resized() override {
 		const auto localBounds = getLocalBounds();
 		mViewportPtr->setBounds(localBounds);
 
-		int numRows = mComponentRows.size();
-		int numCols = 0;
-
-		for (int i = 0; i < mComponentRows.size(); ++i) {
-			int currentSize = mComponentRows[i]->size();
-
-			if (currentSize > numCols) {
-				numCols = currentSize;
-			}
+		int xPosition = 5; // Start position for the first pedal
+		for (auto* comp : mContainerPtr->getChildren()) {
+			comp->setBounds(xPosition, 10, 320, localBounds.getHeight() - 20);
+			xPosition += comp->getWidth(); // 10 is the margin
 		}
 
-		int buttonWidth = localBounds.getWidth() / numCols;
-		int buttonHeight = buttonWidth;
-
-		int totalHeight = ((buttonHeight + 12.5) * numRows);
-		mContainerPtr->setBounds(0, 0, mViewportPtr->getMaximumVisibleWidth() - 8, totalHeight);
-
-
-		for (int row = 0; row < mComponentRows.size(); ++row)
-		{
-			for (int col = 0; col < mComponentRows[row]->size(); ++col)
-			{
-				(*mComponentRows[row])[col]->setBounds(col * buttonWidth, row * buttonHeight + 50, buttonWidth, buttonHeight - 50);
-			}
-		}
-	};
+		mContainerPtr->setBounds(0, 0, xPosition, mViewportPtr->getMaximumVisibleHeight() - 8);
+	}
 
 private:
 	juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
@@ -195,11 +129,5 @@ private:
 	std::unique_ptr <juce::Viewport> mViewportPtr;
 	std::unique_ptr <juce::Component> mContainerPtr;
 
-	juce::OwnedArray<juce::OwnedArray<juce::Component>> mComponentRows;
-
-	juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> mButtonAttachments;
-	juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;
-	juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> mComboBoxAttachments;
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PedalsComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PreAmpComponent)
 };

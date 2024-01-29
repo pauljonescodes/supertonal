@@ -13,7 +13,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	mTopComponent(std::make_unique<TopComponent>(mAudioProcessorValueTreeState)),
 	mTabbedComponentPtr(std::make_unique<juce::TabbedComponent>(juce::TabbedButtonBar::Orientation::TabsAtTop)),
 	mPresetComponentPtr(std::make_unique<PresetComponent>(presetManager)),
-	mPedalsComponentPtr(std::make_unique<PedalsComponent>(mAudioProcessorValueTreeState)),
+	mPedalsComponentPtr(std::make_unique<PreAmpComponent>(mAudioProcessorValueTreeState)),
 	mAmpComponentPtr(std::make_unique<AmpComponent>(mAudioProcessorValueTreeState)),
 	mFileChooser(std::make_unique<juce::FileChooser>("Select an Impulse Response File", juce::File{}, "*.wav;*.aiff;*.flac")),
 	mCabinetComponentPtr(std::make_unique<CabinetComponent>(mAudioProcessorValueTreeState, [this]() {
