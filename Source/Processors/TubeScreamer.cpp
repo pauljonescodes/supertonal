@@ -9,7 +9,7 @@ TubeScreamer::TubeScreamer () :
         "R4",
         [this] (const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : wdf)
+            for (auto& wdfModel : mWdf)
                 wdfModel.R4_ser_C3.setResistanceValue (self.value.load());
         },
         100.0f,
@@ -18,7 +18,7 @@ TubeScreamer::TubeScreamer () :
                                            "R5",
                                            [this] (const netlist::CircuitQuantity& self)
                                            {
-                                               for (auto& wdfModel : wdf)
+                                               for (auto& wdfModel : mWdf)
                                                    wdfModel.R5.setResistanceValue (self.value.load());
                                            });
     mNetlistCircuitQuantities->addCapacitor (
@@ -26,7 +26,7 @@ TubeScreamer::TubeScreamer () :
         "C2",
         [this] (const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : wdf)
+            for (auto& wdfModel : mWdf)
                 wdfModel.Vin_C2.setCapacitanceValue (self.value.load());
         },
         100.0e-12f);
@@ -35,7 +35,7 @@ TubeScreamer::TubeScreamer () :
         "C3",
         [this] (const netlist::CircuitQuantity& self)
         {
-            for (auto& wdfModel : wdf)
+            for (auto& wdfModel : mWdf)
                 wdfModel.R4_ser_C3.setCapacitanceValue (self.value.load());
         },
         1.0e-9f);
@@ -43,7 +43,7 @@ TubeScreamer::TubeScreamer () :
                                             "C4",
                                             [this] (const netlist::CircuitQuantity& self)
                                             {
-                                                for (auto& wdfModel : wdf)
+                                                for (auto& wdfModel : mWdf)
                                                     wdfModel.R6_P1_par_C4.setCapacitanceValue (self.value.load());
                                             });
 }
@@ -52,8 +52,10 @@ void TubeScreamer::prepare (juce::dsp::ProcessSpec& spec)
 {
     const auto driveGainValue = mDriveGainSmoothedValue.getCurrentValue();
 
+    mTone.setSampleRate(spec.sampleRate);
+
     auto gainParamSkew = (std::pow(10.0f, driveGainValue) - 1.0f) / 9.0f;
-    for (auto& wdfProc : wdf)
+    for (auto& wdfProc : mWdf)
     {
         wdfProc.prepare (spec);
         wdfProc.setParameters (gainParamSkew, getDiodeIs(mDiodeType), mDiodeCount, true);
@@ -87,12 +89,14 @@ void TubeScreamer::processBlock(juce::AudioBuffer<float>& buffer)
     auto driveGainParamSkew = (std::pow (10.0f, driveGainValue) - 1.0f) / 9.0f;
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        wdf[ch].setParameters (driveGainParamSkew, getDiodeIs (mDiodeType), mDiodeCount);
-        wdf[ch].process (buffer.getWritePointer (ch), buffer.getNumSamples());
+        mWdf[ch].setParameters (driveGainParamSkew, getDiodeIs (mDiodeType), mDiodeCount);
+        mWdf[ch].process (buffer.getWritePointer (ch), buffer.getNumSamples());
+        mTone.processBlock(buffer.getWritePointer(ch), buffer.getNumSamples());
     }
 
     auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
     auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
+
     mDirectCurrentBlockerHighPassFilter.process (processContext);
 
     buffer.applyGain (juce::Decibels::decibelsToGain (levelGainValue));
@@ -139,4 +143,9 @@ void TubeScreamer::setDrive(float newGain)
 void TubeScreamer::setLevel(float newGain)
 {
     mLevelGainSmoothedValue.setTargetValue(newGain);
+}
+
+void TubeScreamer::setTone(float newValue)
+{
+    mTone.setTone(newValue);
 }

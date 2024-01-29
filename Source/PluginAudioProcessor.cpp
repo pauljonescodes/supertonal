@@ -203,6 +203,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::REVERB_WIDTH:
 		case apvts::ParameterEnum::CHORUS_MIX:
 		case apvts::ParameterEnum::PHASER_MIX:
+		case apvts::ParameterEnum::TUBE_SCREAMER_TONE:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
@@ -1240,6 +1241,9 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::TUBE_SCREAMER_LEVEL:
 		mTubeScreamerPtr->setLevel(newValue);
+		break;
+	case apvts::ParameterEnum::TUBE_SCREAMER_TONE:
+		mTubeScreamerPtr->setTone(newValue);
 		break;
 	case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_TYPE:
 		mTubeScreamerPtr->setDiodeType(newValue);

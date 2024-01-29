@@ -306,6 +306,7 @@ namespace apvts
 		TUBE_SCREAMER_LEVEL,
 		TUBE_SCREAMER_DIODE_TYPE,
 		TUBE_SCREAMER_DIODE_COUNT,
+		TUBE_SCREAMER_TONE,
 
 		MOUSE_DRIVE_ON,
 		MOUSE_DRIVE_DISTORTION,
@@ -417,6 +418,7 @@ namespace apvts
 	static const std::string tubeScreamerLevelId = "tube_screamer_level";
 	static const std::string tubeScreamerDiodeTypeId = "tube_screamer_diode_type";
 	static const std::string tubeScreamerDiodeCountId = "tube_screamer_diode_count";
+	static const std::string tubeScreamerToneId = "tube_screamer_tone";
 
 	static const std::string mouseDriveOnId = "mouse_drive_on";
 	static const std::string mouseDriveDistortionId = "mouse_drive_distortion";
@@ -533,6 +535,7 @@ namespace apvts
 		{tubeScreamerLevelId, ParameterEnum::TUBE_SCREAMER_LEVEL},
 		{tubeScreamerDiodeTypeId, ParameterEnum::TUBE_SCREAMER_DIODE_TYPE},
 		{tubeScreamerDiodeCountId, ParameterEnum::TUBE_SCREAMER_DIODE_COUNT},
+		{tubeScreamerToneId, ParameterEnum::TUBE_SCREAMER_TONE},
 
 		{mouseDriveOnId, ParameterEnum::MOUSE_DRIVE_ON},
 		{mouseDriveDistortionId, ParameterEnum::MOUSE_DRIVE_DISTORTION},

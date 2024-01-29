@@ -52,6 +52,7 @@ public:
 			"Screamer",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::tubeScreamerDriveId, "Drive", ""},
+				{ apvts::tubeScreamerToneId, "Tone", "" },
 				{ apvts::tubeScreamerLevelId, "Level", "" }
 		},
 			apvts::tubeScreamerOnId));

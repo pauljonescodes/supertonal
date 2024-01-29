@@ -43,6 +43,8 @@
         <FILE id="Vg4uMN" name="TubeScreamer.cpp" compile="1" resource="0"
               file="Source/Processors/TubeScreamer.cpp"/>
         <FILE id="XSd2NB" name="TubeScreamer.h" compile="0" resource="0" file="Source/Processors/TubeScreamer.h"/>
+        <FILE id="ZM1xZr" name="TubeScreamerTone.h" compile="0" resource="0"
+              file="Source/Processors/TubeScreamerTone.h"/>
         <FILE id="b1rRnG" name="TubeScreamerWDF.h" compile="0" resource="0"
               file="Source/Processors/TubeScreamerWDF.h"/>
       </GROUP>

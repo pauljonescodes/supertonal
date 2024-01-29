@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "TubeScreamerWDF.h"
 #include "CircuitQuantityHelper.h"
+#include "TubeScreamerTone.h"
 
 class TubeScreamer
 {
@@ -17,6 +18,7 @@ public:
     void setLevel(float newLevel);
     void setDiodeType(int newDiodeType); // 0, 1, or 2
     void setDiodeCount(int newDiodeCount);
+	void setTone(float tone);
 
 private:
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> mDriveGainSmoothedValue;
@@ -27,7 +29,8 @@ private:
 
     std::unique_ptr<netlist::CircuitQuantityList> mNetlistCircuitQuantities{};
 
-    TubeScreamerWDF wdf[2];
+    TubeScreamerWDF mWdf[2];
+	TubeScreamerTone mTone;
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> mDirectCurrentBlockerHighPassFilter;
 
     float getDiodeIs(int diodeType);
