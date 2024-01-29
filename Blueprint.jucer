@@ -32,10 +32,10 @@
               file="Source/Processors/CircuitQuantityHelper.cpp"/>
         <FILE id="Apt5ZJ" name="CircuitQuantityHelper.h" compile="0" resource="0"
               file="Source/Processors/CircuitQuantityHelper.h"/>
-        <FILE id="lohpDI" name="ParametricEqualiser.cpp" compile="1" resource="0"
-              file="Source/Processors/ParametricEqualiser.cpp"/>
-        <FILE id="c8r1AO" name="ParametricEqualiser.h" compile="0" resource="0"
-              file="Source/Processors/ParametricEqualiser.h"/>
+        <FILE id="lohpDI" name="GraphicEqualiser.cpp" compile="1" resource="0"
+              file="Source/Processors/GraphicEqualiser.cpp"/>
+        <FILE id="c8r1AO" name="GraphicEqualiser.h" compile="0" resource="0"
+              file="Source/Processors/GraphicEqualiser.h"/>
         <FILE id="VTRb6A" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/MouseDrive.cpp"/>
         <FILE id="b3ou1p" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/MouseDrive.h"/>
         <FILE id="rcNVYV" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/MouseDriveWDF.h"/>
@@ -50,6 +50,8 @@
         <FILE id="d4eaVE" name="AmpComponent.h" compile="0" resource="0" file="Source/Components/AmpComponent.h"/>
         <FILE id="qVRro4" name="CabinetComponent.h" compile="0" resource="0"
               file="Source/Components/CabinetComponent.h"/>
+        <FILE id="sxvdYw" name="EquiliserComponent.h" compile="0" resource="0"
+              file="Source/Components/EquiliserComponent.h"/>
         <FILE id="cwTZnW" name="MixerComponent.h" compile="0" resource="0"
               file="Source/Components/MixerComponent.h"/>
         <FILE id="lbtVDn" name="PedalComponent.h" compile="0" resource="0"

@@ -47,7 +47,8 @@ namespace apvts
 			[=](float min, float max, float unnormalised) // convertTo0to1
 			{
 				return (unnormalised - min) / (max - min); 
-			} };
+			} 
+		};
 		range.interval = rangeInterval; // Setting the interval for the range
 		return range;
 	}
@@ -57,9 +58,11 @@ namespace apvts
 
 	static const std::string impulseResponseFileFullPathNameId = "ir_full_path";
 
+	static constexpr float sampleRateAssumption = 441000.0f;
+
 	// Defaults
 
-	static const float defaultIntervalValue = 0.001;
+	static const float defaultIntervalValue = 0.01;
 	static const float defaultValueOff = 0.0f;
 	static const float defaultValueHalf = 0.5f;
 	static const float defaultValueOn = 1.0f;
@@ -147,11 +150,6 @@ namespace apvts
 	static const juce::NormalisableRange<float> gainDecibelsNegativeNormalisableRange = makeDecibelRange(
 		gainDecibelsMinimumValue,
 		gainDeciblesDefaultValue,
-		defaultIntervalValue);
-
-	static const juce::NormalisableRange<float> parametricEqualiserDecibelGainNormalisableRange = makeDecibelRange(
-		-15.0f,
-		15.0f,
 		defaultIntervalValue);
 
 	// COMPRESSION
@@ -293,6 +291,16 @@ namespace apvts
 		PRE_COMPRESSOR_RELEASE,
 		PRE_COMPRESSOR_GAIN,
 
+		PRE_EQUALISER_ON,
+		PRE_EQUALISER_100_GAIN,
+		PRE_EQUALISER_200_GAIN,
+		PRE_EQUALISER_400_GAIN,
+		PRE_EQUALISER_800_GAIN,
+		PRE_EQUALISER_1600_GAIN,
+		PRE_EQUALISER_3200_GAIN,
+		PRE_EQUALISER_6400_GAIN,
+		PRE_EQUALISER_LEVEL_GAIN,
+
 		TUBE_SCREAMER_ON,
 		TUBE_SCREAMER_DRIVE,
 		TUBE_SCREAMER_LEVEL,
@@ -336,16 +344,6 @@ namespace apvts
 		POST_COMPRESSOR_RATIO,
 		POST_COMPRESSOR_RELEASE,
 		POST_COMPRESSOR_GAIN,
-
-		PRE_EQUALISER_ON,
-		PRE_EQUALISER_100_GAIN,
-		PRE_EQUALISER_200_GAIN,
-		PRE_EQUALISER_400_GAIN,
-		PRE_EQUALISER_800_GAIN,
-		PRE_EQUALISER_1600_GAIN,
-		PRE_EQUALISER_3200_GAIN,
-		PRE_EQUALISER_6400_GAIN,
-		PRE_EQUALISER_LEVEL_GAIN,
 		
 		HIGH_PASS_FREQUENCY,
 		HIGH_PASS_Q,

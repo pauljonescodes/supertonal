@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    PedalComponent.h
-    Created: 28 Jan 2024 4:31:28pm
+    EquiliserComponent.h
+    Created: 29 Jan 2024 12:15:58pm
     Author:  paulm
 
   ==============================================================================
@@ -12,7 +12,7 @@
 
 #include <JuceHeader.h>
 
-class PedalComponent : public juce::Component
+class EquiliserComponent : public juce::Component
 {
 public:
     struct ParameterSetting {
@@ -21,7 +21,7 @@ public:
         std::string suffix;
     };
 
-    explicit PedalComponent(
+    explicit EquiliserComponent(
         juce::AudioProcessorValueTreeState& apvts,
         const std::string& title,
         const std::vector<ParameterSetting>& parameterSettings,
@@ -31,7 +31,7 @@ public:
         addAndMakeVisible(mGroupComponentPtr.get());
 
         for (const auto& setting : parameterSettings) {
-            auto sliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
+            auto sliderPtr = std::make_unique<juce::Slider>(juce::Slider::LinearVertical, juce::Slider::TextBoxBelow);
             sliderPtr->setTitle(setting.title);
             sliderPtr->setTextValueSuffix(setting.suffix);
             sliderPtr->setScrollWheelEnabled(false);
@@ -58,7 +58,7 @@ public:
         addAndMakeVisible(mToggleButtonPtr.get());
     }
 
-    ~PedalComponent()
+    ~EquiliserComponent()
     {
         mSliderPtrs.clear();
         mLabelPtrs.clear();
@@ -80,7 +80,7 @@ public:
         mainFlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
 
         mainFlexBox.items.add(juce::FlexItem().withFlex(0.3));
-        
+
         juce::FlexBox row1FlexBox;
         row1FlexBox.flexDirection = juce::FlexBox::Direction::row;
         row1FlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
@@ -89,36 +89,16 @@ public:
         row1FlexBox.flexWrap = juce::FlexBox::Wrap::wrap;
 
         int row1Count = 0;
-        for (auto row1Index = 0; row1Index < mSliderPtrs.size(); ++row1Index) 
-        {           
+        for (auto row1Index = 0; row1Index < mSliderPtrs.size(); ++row1Index)
+        {
             auto& sliderPtr = mSliderPtrs[row1Index];
 
-            row1FlexBox.items.add(juce::FlexItem(*sliderPtr).withFlex(1).withMaxHeight(128));
-            
+            row1FlexBox.items.add(juce::FlexItem(*sliderPtr).withFlex(1));
+
             row1Count++;
-
-            if (mSliderPtrs.size() == 4 && row1Count == 2 || mSliderPtrs.size() > 4 && row1Count >= 3)
-            {
-                break;
-            }
         }
 
-        mainFlexBox.items.add(juce::FlexItem(row1FlexBox).withFlex(1));
-        mainFlexBox.items.add(juce::FlexItem().withFlex(0.1));
-
-        juce::FlexBox row2FlexBox;
-        row2FlexBox.flexDirection = juce::FlexBox::Direction::row;
-        row2FlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
-        row2FlexBox.alignItems = juce::FlexBox::AlignItems::stretch;
-        row2FlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
-        row2FlexBox.flexWrap = juce::FlexBox::Wrap::wrap;
-
-        for (auto row2Index = row1Count; row2Index < mSliderPtrs.size(); ++row2Index)
-        {
-            row2FlexBox.items.add(juce::FlexItem(*mSliderPtrs[row2Index]).withFlex(1).withMaxHeight(128));
-        }
-
-        mainFlexBox.items.add(juce::FlexItem(row2FlexBox).withFlex(1)); // 2/3 of space
+        mainFlexBox.items.add(juce::FlexItem(row1FlexBox).withFlex(2));
 
         // FlexBox for the bottom 1/3 where toggle button will be
         juce::FlexBox row3FlexBox;

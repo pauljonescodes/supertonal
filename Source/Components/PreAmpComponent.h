@@ -5,6 +5,7 @@
 #include "../PluginAudioParameters.h"
 #include "../PluginUtils.h"
 #include "PedalComponent.h"
+#include "EquiliserComponent.h"
 
 class PreAmpComponent : public juce::Component
 {
@@ -31,10 +32,10 @@ public:
 		},
 			apvts::preCompressorOnId));
 
-		mContainerPtr->addAndMakeVisible(new PedalComponent(
+		mContainerPtr->addAndMakeVisible(new EquiliserComponent(
 			audioProcessorValueTreeState,
-			"Compressor",
-			std::vector<PedalComponent::ParameterSetting>{
+			"Equaliser",
+			std::vector<EquiliserComponent::ParameterSetting>{
 				{ apvts::preEqualiser100GainId, "100hz", "dB"},
 				{ apvts::preEqualiser200GainId, "2000hz", "dB" },
 				{ apvts::preEqualiser400GainId, "400hz", "dB" },
@@ -57,7 +58,7 @@ public:
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
 			audioProcessorValueTreeState,
-			"Mouse Drive",
+			"Driver",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::mouseDriveDistortionId, "Distortion", ""},
 				{ apvts::mouseDriveVolumeId, "Volume", "" }
@@ -76,7 +77,7 @@ public:
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
 			audioProcessorValueTreeState,
-			"Delay",
+			"Chorus",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::chorusFractionOfBeatId, "Time", " / beat"},
 				{ apvts::chorusDepthId, "Depth", "" },
@@ -87,7 +88,7 @@ public:
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
 			audioProcessorValueTreeState,
-			"Delay",
+			"Phaser",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::phaserRateFractionOfBeatId, "Time", " / beat"},
 				{ apvts::phaserDepthId, "Depth", "" },
@@ -114,10 +115,19 @@ public:
 		const auto localBounds = getLocalBounds();
 		mViewportPtr->setBounds(localBounds);
 
-		int xPosition = 5; // Start position for the first pedal
+		int xPosition = 0; 
+		int index = 0;
 		for (auto* comp : mContainerPtr->getChildren()) {
-			comp->setBounds(xPosition, 10, 320, localBounds.getHeight() - 20);
+			if (index == 1)
+			{
+				comp->setBounds(xPosition, 10, 480, localBounds.getHeight() - 20);
+			}
+			else
+			{
+				comp->setBounds(xPosition, 10, 320, localBounds.getHeight() - 20);
+			}
 			xPosition += comp->getWidth(); // 10 is the margin
+			index++;
 		}
 
 		mContainerPtr->setBounds(0, 0, xPosition, mViewportPtr->getMaximumVisibleHeight() - 8);

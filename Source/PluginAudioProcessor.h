@@ -5,7 +5,7 @@
 #include "PluginPresetManager.h"
 #include "Processors/MouseDrive.h"
 #include "Processors/TubeScreamer.h"
-#include "Processors/ParametricEqualiser.h"
+#include "Processors/GraphicEqualiser.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -63,8 +63,8 @@ private:
     bool mMouseDriveIsOn = false;
     std::unique_ptr<MouseDrive> mMouseDrivePtr;
 
-    bool mParametricEqualiserIsOn = false;
-    std::unique_ptr<ParametricEqualiser> mParametricEqualiser;
+    bool mGraphicEqualiserIsOn = false;
+    std::unique_ptr<GraphicEqualiser> mGraphicEqualiser;
 
     bool mStagesAreParallel = false;
 

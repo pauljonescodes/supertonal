@@ -31,7 +31,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 
 	mTubeScreamerPtr(std::make_unique<TubeScreamer>()),
 	mMouseDrivePtr(std::make_unique<MouseDrive>()),
-	mParametricEqualiser(std::make_unique<ParametricEqualiser>()),
+	mGraphicEqualiser(std::make_unique<GraphicEqualiser>()),
 
 	mStage1Buffer(std::make_unique<juce::AudioBuffer<float>>()),
 	mStage1InputGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
@@ -66,7 +66,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mHighShelfFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 	mLowPassFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 
-	mDelayLinePtr(std::make_unique<juce::dsp::DelayLine<float>>()),
+	mDelayLinePtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue * (apvts::sampleRateAssumption / 1000))),
 	mDelayLineDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
 
 	mChorusPtr(std::make_unique<juce::dsp::Chorus<float>>()),
@@ -165,7 +165,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::parametricEqualiserDecibelGainNormalisableRange,
+				GraphicEqualiser::sDecibelGainNormalisableRange,
 				apvts::defaultValueOff
 				));
 			break;
@@ -435,6 +435,8 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mPreCompressorPtr->prepare(spec);
 	mPreCompressorGainPtr->prepare(spec);
 
+	mGraphicEqualiser->prepare(spec);
+
 	mTubeScreamerPtr->prepare(spec);
 	mMouseDrivePtr->prepare(spec);
 
@@ -472,8 +474,9 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mHighShelfFilterPtr->prepare(spec);
 	mLowPassFilterPtr->prepare(spec);
 
+	const auto maximumDelayInSamples = apvts::delayTimeMsMaximumValue * (spec.sampleRate / 1000);
+	mDelayLinePtr->setMaximumDelayInSamples(maximumDelayInSamples);
 	mDelayLinePtr->prepare(spec);
-	mDelayLinePtr->setMaximumDelayInSamples(apvts::delayTimeMsMaximumValue * (spec.sampleRate / 1000));
 	mDelayLineDryWetMixerPtr->prepare(spec);
 
 	mChorusPtr->prepare(spec);
@@ -586,9 +589,9 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mPreCompressorGainPtr->process(processContext);
 	}
 	
-	if (mParametricEqualiserIsOn)
+	if (mGraphicEqualiserIsOn)
 	{
-		mParametricEqualiser->processBlock(buffer);
+		mGraphicEqualiser->processBlock(buffer);
 	}
 
 	if (mTubeScreamerIsOn)
@@ -888,31 +891,31 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mStage4IsOn = newValue;
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_ON:
-		mParametricEqualiserIsOn = newValue;
+		mGraphicEqualiserIsOn = newValue;
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_100_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 0);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 0);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_200_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 1);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 1);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_400_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 2);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 2);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_800_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 3);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 3);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_1600_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 4);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 4);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_3200_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 5);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 5);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_6400_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 6);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 6);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_LEVEL_GAIN:
-		mParametricEqualiser->setGainDbAtIndex(newValue, 7);
+		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 7);
 		break;
 	case apvts::ParameterEnum::PRE_COMPRESSOR_ON:
 		mPreCompressorIsOn = newValue;
