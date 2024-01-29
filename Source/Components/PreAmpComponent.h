@@ -63,6 +63,7 @@ public:
 			"Driver",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::mouseDriveDistortionId, "Distortion", ""},
+				{ apvts::mouseDriveFilterId, "Filter", ""},
 				{ apvts::mouseDriveVolumeId, "Volume", "" }
 		},
 			apvts::mouseDriveOnId));

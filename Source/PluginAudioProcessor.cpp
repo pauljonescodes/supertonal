@@ -335,6 +335,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::equalizationTypeIdToDefaultFrequencyMap.at(parts[0])
 				));
 			break;
+		case apvts::ParameterEnum::MOUSE_DRIVE_FILTER:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::frequencyNormalisableRange,
+				apvts::lowPassFrequencyDefaultValue
+				));
+			break;
 		case apvts::ParameterEnum::HIGH_PASS_Q:
 		case apvts::ParameterEnum::MID_PEAK_Q:
 		case apvts::ParameterEnum::HIGH_SHELF_Q:
@@ -1249,6 +1257,9 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
 		mMouseDrivePtr->setDistortion(newValue);
+		break;
+	case apvts::ParameterEnum::MOUSE_DRIVE_FILTER:
+		mMouseDrivePtr->setLowPassFrequency(newValue);
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
 		mMouseDrivePtr->setVolume(newValue);

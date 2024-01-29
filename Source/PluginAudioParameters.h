@@ -312,6 +312,7 @@ namespace apvts
 		MOUSE_DRIVE_ON,
 		MOUSE_DRIVE_DISTORTION,
 		MOUSE_DRIVE_VOLUME,
+		MOUSE_DRIVE_FILTER,
 
 		STAGE_MODE,
 
@@ -425,6 +426,7 @@ namespace apvts
 	static const std::string mouseDriveOnId = "mouse_drive_on";
 	static const std::string mouseDriveDistortionId = "mouse_drive_distortion";
 	static const std::string mouseDriveVolumeId = "mouse_drive_volume";
+	static const std::string mouseDriveFilterId = "mouse_drive_filter";
 
 	static const std::string preEqualiserOnId = "pre_eq_on";
 	static const std::string preEqualiser100GainId = "pre_eq_100_gain";
@@ -543,6 +545,7 @@ namespace apvts
 		{mouseDriveOnId, ParameterEnum::MOUSE_DRIVE_ON},
 		{mouseDriveDistortionId, ParameterEnum::MOUSE_DRIVE_DISTORTION},
 		{mouseDriveVolumeId, ParameterEnum::MOUSE_DRIVE_VOLUME},
+		{mouseDriveFilterId, ParameterEnum::MOUSE_DRIVE_FILTER},
 
 		{preEqualiserOnId, ParameterEnum::PRE_EQUALISER_ON},
 		{preEqualiser100GainId, ParameterEnum::PRE_EQUALISER_100_GAIN},

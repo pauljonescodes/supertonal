@@ -126,12 +126,23 @@ void MouseDrive::setVolume(float targetValue)
     mVolumeSmoothedValue.setTargetValue(targetValue);
 };
 
+void MouseDrive::setLowPassFrequency(float newValue)
+{
+    mCurrentLowPassFrequency = newValue;
+    *mLowPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(
+        mCurrentSampleRate,
+        mCurrentLowPassFrequency,
+        0.70710678118654752440f);
+};
+
 void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
 {
     for (auto& model : mWaveDesignFilter)
     {
         model.prepare(spec);
     }
+
+    mCurrentSampleRate = spec.sampleRate;
 
     mGain.setGainLinear(0.0f);
     mGain.prepare(spec);
@@ -142,6 +153,13 @@ void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
     *mDirectCurrentBlockerHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
         spec.sampleRate,
         15.0f,
+        0.70710678118654752440f);
+
+    mLowPassFilter.prepare(spec);
+
+    *mLowPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(
+        spec.sampleRate,
+        mCurrentLowPassFrequency,
         0.70710678118654752440f);
 
     // pre-buffering
@@ -184,5 +202,8 @@ void MouseDrive::processBlock(juce::AudioBuffer<float>& buffer)
     auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
 
     mGain.process(processContext);
+
+    mLowPassFilter.process(processContext);
+
     mDirectCurrentBlockerHighPassFilter.process(processContext);
 }
