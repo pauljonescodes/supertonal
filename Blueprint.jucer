@@ -28,6 +28,10 @@
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
       <GROUP id="{DEDDA15C-1DE5-7D7A-FDED-908468144E16}" name="Processors">
+        <FILE id="KsiAJx" name="AmplifierEqualiser.cpp" compile="1" resource="0"
+              file="Source/Processors/AmplifierEqualiser.cpp"/>
+        <FILE id="xPBCPw" name="AmplifierEqualiser.h" compile="0" resource="0"
+              file="Source/Processors/AmplifierEqualiser.h"/>
         <FILE id="lPEM6L" name="CircuitQuantityHelper.cpp" compile="1" resource="0"
               file="Source/Processors/CircuitQuantityHelper.cpp"/>
         <FILE id="Apt5ZJ" name="CircuitQuantityHelper.h" compile="0" resource="0"

@@ -1,18 +1,8 @@
-/*
-  ==============================================================================
-
-    EquiliserComponent.h
-    Created: 29 Jan 2024 12:15:58pm
-    Author:  paulm
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
 
-class EquiliserComponent : public juce::Component
+class EqualiserComponent : public juce::Component
 {
 public:
     struct ParameterSetting {
@@ -21,7 +11,7 @@ public:
         std::string suffix;
     };
 
-    explicit EquiliserComponent(
+    explicit EqualiserComponent(
         juce::AudioProcessorValueTreeState& apvts,
         const std::string& title,
         const std::vector<ParameterSetting>& parameterSettings,
@@ -58,7 +48,7 @@ public:
         addAndMakeVisible(mToggleButtonPtr.get());
     }
 
-    ~EquiliserComponent()
+    ~EqualiserComponent()
     {
         mSliderPtrs.clear();
         mLabelPtrs.clear();

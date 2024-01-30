@@ -59,13 +59,10 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mStage4DryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
 
 	mBiasPtr(std::make_unique<juce::dsp::Bias<float>>()),
+	mAmplifierEqualiser(std::make_unique<AmplifierEqualiser>()),
+	
 	mPostCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
 	mCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
-	
-	mHighPassFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
-	mMidPeakFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
-	mHighShelfFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
-	mLowPassFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>()),
 
 	mDelayLinePtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue * (apvts::sampleRateAssumption / 1000))),
 	mDelayLineDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
@@ -165,6 +162,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				GraphicEqualiser::sDecibelGainNormalisableRange,
 				apvts::defaultValueOff
 				));
+			break;
+		case apvts::ParameterEnum::AMP_RESONANCE_DB:
+		case apvts::ParameterEnum::AMP_BASS_DB:
+		case apvts::ParameterEnum::AMP_MIDDLE_DB:
+		case apvts::ParameterEnum::AMP_TREBLE_DB:
+		case apvts::ParameterEnum::AMP_PRESENCE_DB:
+		{
+			juce::NormalisableRange<float> normalisableRange = AmplifierEqualiser::sDecibelsNormalisableRange;
+			normalisableRange.interval = apvts::defaultIntervalValue;
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				normalisableRange,
+				apvts::defaultValueOff
+				));
+		}
 			break;
 		case apvts::ParameterEnum::STAGE1_INPUT_GAIN:
 		case apvts::ParameterEnum::STAGE1_OUTPUT_GAIN:
@@ -331,34 +344,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				FLT_MAX
 				));
 			break;
-		case apvts::ParameterEnum::HIGH_PASS_FREQUENCY:
-		case apvts::ParameterEnum::MID_PEAK_FREQUENCY:
-		case apvts::ParameterEnum::HIGH_SHELF_FREQUENCY:
-		case apvts::ParameterEnum::LOW_PASS_FREQUENCY:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				PluginUtils::toTitleCase(parameterId),
-				apvts::frequencyNormalisableRange,
-				apvts::equalizationTypeIdToDefaultFrequencyMap.at(parts[0])
-				));
-			break;
 		case apvts::ParameterEnum::MOUSE_DRIVE_FILTER:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::frequencyNormalisableRange,
 				apvts::lowPassFrequencyDefaultValue
-				));
-			break;
-		case apvts::ParameterEnum::HIGH_PASS_Q:
-		case apvts::ParameterEnum::MID_PEAK_Q:
-		case apvts::ParameterEnum::HIGH_SHELF_Q:
-		case apvts::ParameterEnum::LOW_PASS_Q:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				PluginUtils::toTitleCase(parameterId),
-				apvts::qualityNormalisableRange,
-				apvts::qualityDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
@@ -383,15 +374,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				PluginUtils::toTitleCase(parameterId),
 				apvts::fractionalTimeNormalizableRange,
 				apvts::fractionalTimeDefaultValue
-				));
-			break;
-		case apvts::ParameterEnum::MID_PEAK_GAIN:
-		case apvts::ParameterEnum::HIGH_SHELF_GAIN:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				PluginUtils::toTitleCase(parameterId),
-				apvts::gainLinearNormalisableRange,
-				apvts::gainLinearDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::LIMITER_RELEASE:
@@ -498,14 +480,10 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mStage4DryWetMixerPtr->prepare(spec);
 
 	mBiasPtr->prepare(spec);
+	mAmplifierEqualiser->prepare(spec);
 
 	mPostCompressorPtr->prepare(spec);
 	mCompressorGainPtr->prepare(spec);
-
-	mHighPassFilterPtr->prepare(spec);
-	mMidPeakFilterPtr->prepare(spec);
-	mHighShelfFilterPtr->prepare(spec);
-	mLowPassFilterPtr->prepare(spec);
 
 	const auto maximumDelayInSamples = apvts::delayTimeMsMaximumValue * (spec.sampleRate / 1000);
 	mDelayLinePtr->setMaximumDelayInSamples(maximumDelayInSamples);
@@ -565,12 +543,8 @@ void PluginAudioProcessor::reset()
 	mStage4DryWetMixerPtr->reset();
 
 	mBiasPtr->reset();
+	mAmplifierEqualiser->reset();
 	mPostCompressorPtr->reset();
-	
-	mHighPassFilterPtr->reset();
-	mMidPeakFilterPtr->reset();
-	mHighShelfFilterPtr->reset();
-	mLowPassFilterPtr->reset();
 	
 	mCompressorGainPtr->reset();
 
@@ -778,14 +752,12 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		audioBlock.add(stage4Block);
 	}
 
+	mAmplifierEqualiser->processBlock(buffer);
 	mBiasPtr->process(processContext);
 
 	mPostCompressorPtr->process(processContext);
 	mCompressorGainPtr->process(processContext);
-	mHighPassFilterPtr->process(processContext);
-	mMidPeakFilterPtr->process(processContext);
-	mHighShelfFilterPtr->process(processContext);
-	mLowPassFilterPtr->process(processContext);
+
 
 	if (mDelayFeedback > 0.0f && mDelayOn)
 	{
@@ -953,6 +925,21 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::PRE_EQUALISER_LEVEL_GAIN:
 		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 7);
 		break;
+	case apvts::ParameterEnum::AMP_RESONANCE_DB:
+		mAmplifierEqualiser->setResonanceDecibels(newValue);
+		break;
+	case apvts::ParameterEnum::AMP_BASS_DB:
+		mAmplifierEqualiser->setBassDecibels(newValue);
+		break;
+	case apvts::ParameterEnum::AMP_MIDDLE_DB:
+		mAmplifierEqualiser->setMiddleDecibels(newValue);
+		break;
+	case apvts::ParameterEnum::AMP_TREBLE_DB:
+		mAmplifierEqualiser->setTrebleDecibels(newValue);
+		break;
+	case apvts::ParameterEnum::AMP_PRESENCE_DB:
+		mAmplifierEqualiser->setPresenceDecibels(newValue);
+		break;
 	case apvts::ParameterEnum::PRE_COMPRESSOR_ON:
 		mPreCompressorIsOn = newValue;
 		break;
@@ -1043,108 +1030,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::POST_COMPRESSOR_GAIN:
 		mCompressorGainPtr->setGainDecibels(newValue);
 		break;
-	case apvts::ParameterEnum::HIGH_PASS_FREQUENCY:
-	{
-		const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highPassQId).getValue();
-		*mHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
-			sampleRate,
-			std::max(newValue, apvts::frequencyMinimumValue),
-			std::max(quality, apvts::qualityMinimumValue));
-	}
-	break;
-	case apvts::ParameterEnum::HIGH_PASS_Q:
-	{
-		const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highPassFrequencyId).getValue();
-		*mHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
-			sampleRate,
-			std::max(frequency, apvts::frequencyMinimumValue),
-			std::max(newValue, apvts::qualityMinimumValue));
-	}
-	break;
-	case apvts::ParameterEnum::LOW_PASS_FREQUENCY:
-	{
-		const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::lowPassQId).getValue();
-		*mLowPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(
-			sampleRate,
-			std::max(newValue, apvts::frequencyMinimumValue),
-			std::max(quality, apvts::qualityMinimumValue));
-	}
-	break;
-	case apvts::ParameterEnum::LOW_PASS_Q:
-	{
-		const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::lowPassFrequencyId).getValue();
-		*mLowPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(
-			sampleRate,
-			std::max(frequency, apvts::frequencyMinimumValue),
-			std::max(newValue, apvts::qualityMinimumValue));
-	}
-	break;
-	case apvts::ParameterEnum::MID_PEAK_FREQUENCY:
-	{
-		const float gain = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::midPeakGainId).getValue();
-		const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::midPeakQId).getValue();
-		*mMidPeakFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-			sampleRate,
-			std::max(newValue, apvts::frequencyMinimumValue),
-			std::max(quality, apvts::qualityMinimumValue),
-			std::max(gain, apvts::gainLinearMinimumValue));
-	}
-	break;
-	case apvts::ParameterEnum::MID_PEAK_Q:
-	{
-		const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::midPeakFrequencyId).getValue();
-		const float gain = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::midPeakGainId).getValue();
-		*mMidPeakFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-			sampleRate,
-			std::max(frequency, apvts::frequencyMinimumValue),
-			std::max(newValue, apvts::qualityMinimumValue),
-			std::max(gain, apvts::gainLinearMinimumValue));
-	}
-	break;
-	case apvts::ParameterEnum::MID_PEAK_GAIN:
-	{
-		const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::midPeakFrequencyId).getValue();
-		const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::midPeakQId).getValue();
-		*mMidPeakFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-			sampleRate,
-			std::max(frequency, apvts::frequencyMinimumValue),
-			std::max(quality, apvts::qualityMinimumValue),
-			newValue);
-	}
-	break;
-	case apvts::ParameterEnum::HIGH_SHELF_FREQUENCY:
-	{
-		const float gain = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highShelfGainId).getValue();
-		const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highShelfQId).getValue();
-		*mHighShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
-			sampleRate,
-			std::max(newValue, apvts::frequencyMinimumValue),
-			std::max(quality, apvts::qualityMinimumValue),
-			gain);
-	}
-	break;
-	case apvts::ParameterEnum::HIGH_SHELF_Q:
-	{
-		const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highShelfFrequencyId).getValue();
-		const float gain = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highShelfGainId).getValue();
-		*mHighShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
-			sampleRate,
-			std::max(frequency, apvts::frequencyMinimumValue),
-			std::max(newValue, apvts::qualityMinimumValue),
-			gain);
-	}
-	break;
-	case apvts::ParameterEnum::HIGH_SHELF_GAIN:
-	{
-		const float frequency = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highShelfFrequencyId).getValue();
-		const float quality = mAudioProcessorValueTreeStatePtr->getParameterAsValue(apvts::highShelfQId).getValue();
-		*mHighShelfFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
-			sampleRate,
-			std::max(frequency, apvts::frequencyMinimumValue),
-			std::max(quality, apvts::qualityMinimumValue),
-			newValue);
-	}
-	break;
 	case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
 		mCabImpulseResponseConvolutionIsOn = newValue;
 		break;

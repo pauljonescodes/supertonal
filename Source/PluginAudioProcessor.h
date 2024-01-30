@@ -6,6 +6,7 @@
 #include "Processors/MouseDrive.h"
 #include "Processors/TubeScreamer.h"
 #include "Processors/GraphicEqualiser.h"
+#include "Processors/AmplifierEqualiser.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -69,8 +70,6 @@ private:
 
     bool mStagesAreParallel = false;
 
-    bool mBypassIsOn = false;
-
     bool mStage1IsOn = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage1Buffer;
     std::unique_ptr<juce::dsp::Gain<float>> mStage1InputGainPtr;
@@ -100,14 +99,10 @@ private:
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage4DryWetMixerPtr;
 
     std::unique_ptr<juce::dsp::Bias<float>> mBiasPtr;
+    std::unique_ptr<AmplifierEqualiser> mAmplifierEqualiser;
     
     std::unique_ptr<juce::dsp::Compressor<float>> mPostCompressorPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mCompressorGainPtr;
-
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighPassFilterPtr;
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mMidPeakFilterPtr;
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mHighShelfFilterPtr;
-    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mLowPassFilterPtr;
     
     bool mDelayOn = false;
     float mDelayFeedback = 0.5f;
@@ -134,6 +129,8 @@ private:
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
 
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
+
+    bool mBypassIsOn = false;
 
     void loadImpulseResponseFromState();
     void checkForInvalidSamples (const juce::dsp::AudioBlock<float>& blockToCheck);

@@ -19,7 +19,13 @@ public:
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
-
+{
+	apvts::ampResonanceDbId,
+	apvts::ampBassDbId,
+	apvts::ampMiddleDbId,
+	apvts::ampTrebleDbId,
+	apvts::ampPresenceDbId,
+},
 {
 	apvts::stage1OnId,
 	apvts::stage1InputGainId,
@@ -51,24 +57,6 @@ public:
 {
 	apvts::stageModeId,
 	apvts::biasId,
-},
-{
-	apvts::highPassFrequencyId,
-	apvts::highPassQId,
-},
-{
-	apvts::midPeakFrequencyId,
-	apvts::midPeakQId,
-	apvts::midPeakGainId,
-},
-{
-	apvts::highShelfFrequencyId,
-	apvts::highShelfQId,
-	apvts::highShelfGainId,
-},
-{
-	apvts::lowPassFrequencyId,
-	apvts::lowPassQId,
 },
 {
 	apvts::postCompressorThresholdId,

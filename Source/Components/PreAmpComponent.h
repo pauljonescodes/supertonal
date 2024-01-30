@@ -33,10 +33,10 @@ public:
 		},
 			apvts::preCompressorOnId));
 
-		mContainerPtr->addAndMakeVisible(new EquiliserComponent(
+		mContainerPtr->addAndMakeVisible(new EqualiserComponent(
 			audioProcessorValueTreeState,
 			"Equaliser",
-			std::vector<EquiliserComponent::ParameterSetting>{
+			std::vector<EqualiserComponent::ParameterSetting>{
 				{ apvts::preEqualiser100GainId, "100hz", "dB"},
 				{ apvts::preEqualiser200GainId, "2000hz", "dB" },
 				{ apvts::preEqualiser400GainId, "400hz", "dB" },

@@ -172,7 +172,7 @@ namespace apvts
 
 	static constexpr float releaseMsMinimumValue = 0.0f;
 	static constexpr float releaseMsMaximumValue = 10000.0f;
-	static constexpr float releaseMsDefaultValue = 500.0f;
+	static constexpr float releaseMsDefaultValue = 100.0f;
 	static const juce::NormalisableRange<float> releaseMsNormalisableRange = makeLogarithmicRange(
 		releaseMsMinimumValue, 
 		releaseMsMaximumValue, 
@@ -348,19 +348,11 @@ namespace apvts
 		POST_COMPRESSOR_RELEASE,
 		POST_COMPRESSOR_GAIN,
 		
-		HIGH_PASS_FREQUENCY,
-		HIGH_PASS_Q,
-		
-		MID_PEAK_FREQUENCY,
-		MID_PEAK_Q,
-		MID_PEAK_GAIN,
-		
-		HIGH_SHELF_FREQUENCY,
-		HIGH_SHELF_Q,
-		HIGH_SHELF_GAIN,
-
-		LOW_PASS_FREQUENCY,
-		LOW_PASS_Q,
+		AMP_RESONANCE_DB,
+		AMP_BASS_DB,
+		AMP_MIDDLE_DB,
+		AMP_TREBLE_DB,
+		AMP_PRESENCE_DB,
 		
 		DELAY_ON,
 		DELAY_TIME_FRACTIONAL_DENOMINATOR,
@@ -470,19 +462,11 @@ namespace apvts
 	static const std::string postCompressorReleaseId = "post_comp_release";
 	static const std::string postCompressorGainId = "post_comp_gain";
 
-	static const std::string highPassFrequencyId = "high-pass_frequency";
-	static const std::string highPassQId = "high-pass_q";
-
-	static const std::string midPeakFrequencyId = "mid-peak_frequency";
-	static const std::string midPeakQId = "mid-peak_q";
-	static const std::string midPeakGainId = "mid-peak_gain";
-
-	static const std::string highShelfFrequencyId = "high-shelf_frequency";
-	static const std::string highShelfQId = "high-shelf_q";
-	static const std::string highShelfGainId = "high-shelf_gain";
-
-	static const std::string lowPassFrequencyId = "low-pass_frequency";
-	static const std::string lowPassQId = "low-pass_q";
+	static const std::string ampResonanceDbId = "amp_resonance";
+	static const std::string ampBassDbId = "amp_bass";
+	static const std::string ampMiddleDbId = "amp_middle";
+	static const std::string ampTrebleDbId = "amp_treble";
+	static const std::string ampPresenceDbId = "amp_presence";
 
 	static const std::string delayOnId = "delay_on";
 	static const std::string delayTimeFractionalDenominatorId = "delay_per_beat";
@@ -591,19 +575,11 @@ namespace apvts
 		{postCompressorReleaseId, ParameterEnum::POST_COMPRESSOR_RELEASE},
 		{postCompressorGainId, ParameterEnum::POST_COMPRESSOR_GAIN},
 		
-		{highPassFrequencyId, ParameterEnum::HIGH_PASS_FREQUENCY},
-		{highPassQId, ParameterEnum::HIGH_PASS_Q},
-		
-		{midPeakFrequencyId, ParameterEnum::MID_PEAK_FREQUENCY},
-		{midPeakQId, ParameterEnum::MID_PEAK_Q},
-		{midPeakGainId, ParameterEnum::MID_PEAK_GAIN},
-		
-		{highShelfFrequencyId, ParameterEnum::HIGH_SHELF_FREQUENCY},
-		{highShelfQId, ParameterEnum::HIGH_SHELF_Q},
-		{highShelfGainId, ParameterEnum::HIGH_SHELF_GAIN},
-
-		{lowPassFrequencyId, ParameterEnum::LOW_PASS_FREQUENCY},
-		{lowPassQId, ParameterEnum::LOW_PASS_Q},
+		{ampResonanceDbId, ParameterEnum::AMP_RESONANCE_DB},
+		{ampBassDbId, ParameterEnum::AMP_BASS_DB},
+		{ampMiddleDbId, ParameterEnum::AMP_MIDDLE_DB},
+		{ampTrebleDbId, ParameterEnum::AMP_TREBLE_DB},
+		{ampPresenceDbId, ParameterEnum::AMP_PRESENCE_DB},
 		
 		{cabinetImpulseResponseConvolutionOnId, ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON},
 		
