@@ -40,6 +40,10 @@
               file="Source/Processors/GraphicEqualiser.cpp"/>
         <FILE id="c8r1AO" name="GraphicEqualiser.h" compile="0" resource="0"
               file="Source/Processors/GraphicEqualiser.h"/>
+        <FILE id="FqBnRX" name="InstrumentEqualiser.cpp" compile="1" resource="0"
+              file="Source/Processors/InstrumentEqualiser.cpp"/>
+        <FILE id="attHtB" name="InstrumentEqualiser.h" compile="0" resource="0"
+              file="Source/Processors/InstrumentEqualiser.h"/>
         <FILE id="VTRb6A" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/MouseDrive.cpp"/>
         <FILE id="b3ou1p" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/MouseDrive.h"/>
         <FILE id="rcNVYV" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/MouseDriveWDF.h"/>

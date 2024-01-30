@@ -7,6 +7,7 @@
 #include "Processors/TubeScreamer.h"
 #include "Processors/GraphicEqualiser.h"
 #include "Processors/AmplifierEqualiser.h"
+#include "Processors/InstrumentEqualiser.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -124,6 +125,8 @@ private:
     std::unique_ptr<juce::dsp::Reverb> mReverb;
     
     std::unique_ptr<juce::dsp::Gain<float>> mCabinetGainPtr;
+
+    std::unique_ptr<InstrumentEqualiser> mInstrumentEqualiser;
 
     bool mLimiterOn = true;
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;

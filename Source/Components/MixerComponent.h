@@ -20,18 +20,41 @@ public:
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
+	apvts::instrumentEqualiserLowPassOnId,
+	apvts::instrumentEqualiserLowPassFrequencyId,
+	apvts::instrumentEqualiserHighPassFrequencyId,
+	apvts::instrumentEqualiserHighPassOnId,
+},
+{
+	apvts::instrumentEqualiserLowPeakOnId,
+	apvts::instrumentEqualiserLowMidPeakOnId,
+	apvts::instrumentEqualiserHighMidPeakOnId,
+	apvts::instrumentEqualiserHighPeakOnId,
+},
+{
+	apvts::instrumentEqualiserLowPeakFrequencyId,
+	apvts::instrumentEqualiserLowMidPeakFrequencyId,
+	apvts::instrumentEqualiserHighMidPeakFrequencyId,
+	apvts::instrumentEqualiserHighPeakFrequencyId,
+},
+{
+	apvts::instrumentEqualiserLowPeakQualityId,
+	apvts::instrumentEqualiserLowMidPeakQualityId,
+	apvts::instrumentEqualiserHighMidPeakQualityId,
+	apvts::instrumentEqualiserHighPeakQualityId,
+},
+{
+	apvts::instrumentEqualiserLowPeakGainId,
+	apvts::instrumentEqualiserLowMidPeakGainId,
+	apvts::instrumentEqualiserHighMidPeakGainId,
+	apvts::instrumentEqualiserHighPeakGainId,
+},
+{
 	apvts::postCompressorThresholdId,
 	apvts::postCompressorAttackId,
 	apvts::postCompressorRatioId,
 	apvts::postCompressorReleaseId,
 	apvts::postCompressorGainId,
-},
-{
-	apvts::reverbOnId,
-	apvts::reverbSizeId,
-	apvts::reverbDampingId,
-	apvts::reverbMixId,
-	apvts::reverbWidthId,
 },
 {
 	apvts::limiterOnId,

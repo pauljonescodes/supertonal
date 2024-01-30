@@ -7,15 +7,7 @@ class GraphicEqualiser
 public:
     inline static const juce::NormalisableRange<float> sDecibelGainNormalisableRange = {
             -15.0f,
-            15.0f,
-            [=](float min, float max, float normalised) 
-            {
-                return normalised * (max - min) + min;
-            },
-            [=](float min, float max, float unnormalised)
-            {
-                return (unnormalised - min) / (max - min);
-            }
+            15.0f
     };
 
     // https://www.youtube.com/watch?v=RKyx-qKb7to

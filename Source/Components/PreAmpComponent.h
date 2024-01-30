@@ -100,6 +100,17 @@ public:
 		},
 			apvts::phaserOnId));
 
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Reverb",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::roomSizeId, "Size", ""},
+				{ apvts::roomDampingId, "Damping", "" },
+				{ apvts::roomWidthId, "Width", "" },
+				{ apvts::roomMixId, "Mix", "" },
+		},
+			apvts::roomOnId));
+
 		resized();
 	};
 
