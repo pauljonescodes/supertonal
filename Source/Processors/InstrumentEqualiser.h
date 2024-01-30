@@ -36,11 +36,11 @@ public:
 	inline static const juce::NormalisableRange<float> sQualityNormalisableRange = {
 			0.001f,
 			10.0f,
-	[=](float start, float end, float normalised)
+	[](float start, float end, float normalised)
 	{
 		return start + (std::log2(normalised + 1) / std::log2(end - start + 1)) * (end - start);
 	},
-	[=](float start, float end, float unnormalised)
+	[](float start, float end, float unnormalised)
 	{
 		return (std::exp2((unnormalised - start) / (end - start) * std::log2(end - start + 1)) - 1);
 	}

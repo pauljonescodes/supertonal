@@ -6,15 +6,7 @@ class AmplifierEqualiser
 public:
     inline static const juce::NormalisableRange<float> sDecibelsNormalisableRange = {
             -6.0f,
-            6.0f,
-            [=](float min, float max, float normalised)
-            {
-                return normalised * (max - min) + min;
-            },
-            [=](float min, float max, float unnormalised)
-            {
-                return (unnormalised - min) / (max - min);
-            }
+            6.0f
     };
 
     explicit AmplifierEqualiser();

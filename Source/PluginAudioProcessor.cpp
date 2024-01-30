@@ -453,7 +453,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::ratioNormalizableRange,
-				FLT_MAX
+				100.0f
 				));
 			break;
 		case apvts::ParameterEnum::MOUSE_DRIVE_FILTER:
