@@ -20,6 +20,13 @@ public:
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
+	apvts::postCompressorThresholdId,
+	apvts::postCompressorAttackId,
+	apvts::postCompressorRatioId,
+	apvts::postCompressorReleaseId,
+	apvts::postCompressorGainId,
+},
+{
 	apvts::reverbOnId,
 	apvts::reverbSizeId,
 	apvts::reverbDampingId,

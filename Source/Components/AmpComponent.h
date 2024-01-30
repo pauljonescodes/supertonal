@@ -57,14 +57,7 @@ public:
 {
 	apvts::stageModeId,
 	apvts::biasId,
-},
-{
-	apvts::postCompressorThresholdId,
-	apvts::postCompressorAttackId,
-	apvts::postCompressorRatioId,
-	apvts::postCompressorReleaseId,
-	apvts::postCompressorGainId,
-},
+}
 		};
 
 		for (int row = 0; row < apvtsIdRows.size(); ++row)

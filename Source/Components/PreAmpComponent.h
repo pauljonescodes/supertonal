@@ -123,7 +123,7 @@ public:
 		for (auto* comp : mContainerPtr->getChildren()) {
 			if (index == 1)
 			{
-				comp->setBounds(xPosition, 10, 480, localBounds.getHeight() - 20);
+				comp->setBounds(xPosition, 10, 560, localBounds.getHeight() - 20);
 			}
 			else
 			{

@@ -64,6 +64,7 @@ namespace apvts
 
 	static const float defaultIntervalValue = 0.01;
 	static const float defaultValueOff = 0.0f;
+	static const float defaultValueQuarter = 0.25f;
 	static const float defaultValueHalf = 0.5f;
 	static const float defaultValueOn = 1.0f;
 
@@ -182,7 +183,7 @@ namespace apvts
 
 	static constexpr float fractionalTimeMinimumValue = 0.001f;
 	static constexpr float fractionalTimeMaximumValue = 64.0f;
-	static constexpr float fractionalTimeDefaultValue = 1.0f;
+	static constexpr float fractionalTimeDefaultValue = 4.0f;
 	static const juce::NormalisableRange<float> fractionalTimeNormalizableRange = makeLogarithmicRange(
 		fractionalTimeMinimumValue,
 		fractionalTimeMaximumValue,

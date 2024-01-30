@@ -116,7 +116,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 
 		switch (parameterIdAndEnum.second)
 		{
-		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
 		case apvts::ParameterEnum::BYPASS_ON:
 		case apvts::ParameterEnum::TUBE_SCREAMER_ON:
 		case apvts::ParameterEnum::MOUSE_DRIVE_ON:
@@ -139,7 +138,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::PHASER_DEPTH:
 		case apvts::ParameterEnum::CHORUS_FEEDBACK:
 		case apvts::ParameterEnum::PHASER_FEEDBACK:
-		case apvts::ParameterEnum::DELAY_FEEDBACK:		
+		case apvts::ParameterEnum::DELAY_FEEDBACK:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::zeroToOneLinearNormalisableRange,
+				apvts::defaultValueQuarter
+				));
+			break;
 		case apvts::ParameterEnum::REVERB_MIX:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -156,12 +162,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::PRE_EQUALISER_3200_GAIN:
 		case apvts::ParameterEnum::PRE_EQUALISER_6400_GAIN:
 		case apvts::ParameterEnum::PRE_EQUALISER_LEVEL_GAIN:
+		{
+			juce::NormalisableRange<float> normalisableRange = GraphicEqualiser::sDecibelGainNormalisableRange;
+			normalisableRange.interval = apvts::defaultIntervalValue;
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				GraphicEqualiser::sDecibelGainNormalisableRange,
+				normalisableRange,
 				apvts::defaultValueOff
 				));
+		}
 			break;
 		case apvts::ParameterEnum::AMP_RESONANCE_DB:
 		case apvts::ParameterEnum::AMP_BASS_DB:
@@ -189,7 +199,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::STAGE4_OUTPUT_GAIN:
 		case apvts::ParameterEnum::INPUT_GAIN:
 		case apvts::ParameterEnum::POST_COMPRESSOR_GAIN:
-		case apvts::ParameterEnum::CABINET_OUTPUT_GAIN:
+		
 		case apvts::ParameterEnum::OUTPUT_GAIN:
 		case apvts::ParameterEnum::PRE_COMPRESSOR_GAIN:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
@@ -197,6 +207,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				PluginUtils::toTitleCase(parameterId),
 				apvts::gainDecibelsNormalisableRange,
 				apvts::gainDeciblesDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::CABINET_OUTPUT_GAIN:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::gainDecibelsNormalisableRange,
+				10.0f
 				));
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_THRESHOLD:
@@ -252,6 +270,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			break;
 		case apvts::ParameterEnum::STAGE1_ON:
 		case apvts::ParameterEnum::LIMITER_ON:
+		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
