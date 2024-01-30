@@ -52,7 +52,10 @@ void TubeScreamer::prepare (juce::dsp::ProcessSpec& spec)
 {
     const auto driveGainValue = mDriveGainSmoothedValue.getCurrentValue();
 
-    mTone.setSampleRate(spec.sampleRate);
+    for (auto& toneProcessor : mTone)
+    {
+        toneProcessor.setSampleRate(spec.sampleRate);
+    }
 
     auto gainParamSkew = (std::pow(10.0f, driveGainValue) - 1.0f) / 9.0f;
     for (auto& wdfProc : mWdf)
@@ -91,7 +94,7 @@ void TubeScreamer::processBlock(juce::AudioBuffer<float>& buffer)
     {
         mWdf[ch].setParameters (driveGainParamSkew, getDiodeIs (mDiodeType), mDiodeCount);
         mWdf[ch].process (buffer.getWritePointer (ch), buffer.getNumSamples());
-        mTone.processBlock(buffer.getWritePointer(ch), buffer.getNumSamples());
+        mTone[ch].processBlock(buffer.getWritePointer(ch), buffer.getNumSamples());
     }
 
     auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
@@ -147,5 +150,8 @@ void TubeScreamer::setLevel(float newGain)
 
 void TubeScreamer::setTone(float newValue)
 {
-    mTone.setTone(newValue);
+    for (auto& toneProcessor : mTone)
+    {
+        toneProcessor.setTone(newValue);
+    }
 }

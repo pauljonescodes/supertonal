@@ -10,7 +10,7 @@ class TubeScreamer
 public:
     explicit TubeScreamer ();
 
-    inline static const float sLevelDefaultValue = -18.0f;
+    inline static const float sLevelDefaultValue = -10.0f;
 
     void prepare(juce::dsp::ProcessSpec& spec);
     void processBlock(juce::AudioBuffer<float>& buffer);
@@ -32,7 +32,7 @@ private:
     std::unique_ptr<netlist::CircuitQuantityList> mNetlistCircuitQuantities{};
 
     TubeScreamerWDF mWdf[2];
-	TubeScreamerTone mTone;
+	TubeScreamerTone mTone[2];
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> mDirectCurrentBlockerHighPassFilter;
 
     float getDiodeIs(int diodeType);

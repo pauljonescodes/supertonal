@@ -9,25 +9,9 @@
 
 - Meter
   - https://github.com/ffAudio/ff_meters/blob/master/LevelMeter/LevelMeterSource.h
-
-  - Amp
-    - Gain (input gain to fun
-    ction, boost)
-    - Resonance (low shelf, 100hz, -6 to 6)
-    - Bass (low notch, 200hz, 1.5Q, -6 to 6)
-    - Middle (mid notch, 1000hz, 1.5Q, -6 to 6)
-    - Treble (high notch, 5000hz, 1.5Q, -6 to 6)
-    - Prescence (high shelf, 10000hz, -6 to 6 )
-    - Master (output gain from function, cut)
   
   - Post mixer
     - Comp (unit) + meter + pre/post + https://github.com/p-hlp/CTAGDRC/blob/master/Source/PluginEditor.cpp
-    - HPF + bypass
-    - 20 -> 500 + Q + Gain + bypass
-    - 125 -> 4k + Q + Gain + bypass
-    - 500 - 8k + Q + Gain + bypass
-    - 2k -> 20k + Q + Gain + bypass
-    - LPF + bypass
 
 ## Monday, January 22, 2024 10:55:35 AM
 

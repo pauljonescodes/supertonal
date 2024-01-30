@@ -8,10 +8,6 @@ class TubeScreamerTone
 {
 public:
 
-	TubeScreamerTone()
-	{
-	};
-
 	/*Set sample rate in Hz*/
 	void setSampleRate(float sampleRate)
 	{

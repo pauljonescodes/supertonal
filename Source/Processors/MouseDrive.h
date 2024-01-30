@@ -8,7 +8,7 @@ class MouseDrive
 {
 public:
 
-    inline static const float sVolumeDefaultValue = -32.0f;
+    inline static const float sVolumeDefaultValue = -20.0f;
 
     MouseDrive();
 

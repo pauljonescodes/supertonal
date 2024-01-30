@@ -16,7 +16,7 @@ class InstrumentEqualiser
 public:
 
 	static constexpr float sLowPassFrequencyDefaultValue = 20.0f;
-	inline static const juce::NormalisableRange<float> sLowPassFrequencyNormalisableRange = { 20.0f, 180.0f };
+	inline static const juce::NormalisableRange<float> sLowPassFrequencyNormalisableRange = { 20.0f, 2000.0f };
 
 	static constexpr float sLowPeakFrequencyDefaultValue = 120.0f;
 	inline static const juce::NormalisableRange<float> sLowPeakFrequencyNormalisableRange = { 20.0f, 500.0f };
@@ -35,7 +35,7 @@ public:
 
 	inline static const juce::NormalisableRange<float> sQualityNormalisableRange = {
 			0.001f,
-			1.0f,
+			10.0f,
 	[=](float start, float end, float normalised)
 	{
 		return start + (std::log2(normalised + 1) / std::log2(end - start + 1)) * (end - start);

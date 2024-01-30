@@ -280,12 +280,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_QUALITY:
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY:
 		{
-			juce::NormalisableRange<float> normalisableRange = InstrumentEqualiser::sQualityNormalisableRange;
-			normalisableRange.interval = apvts::defaultIntervalValue;
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				normalisableRange,
+				apvts::qualityNormalisableRange,
 				apvts::qualityDefaultValue
 				));
 		}
@@ -371,6 +369,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				true
 				));
 			break;
+		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
 		case apvts::ParameterEnum::DELAY_DRY_WET:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -465,14 +464,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::lowPassFrequencyDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				PluginUtils::toTitleCase(parameterId),
-				apvts::zeroToOneLinearNormalisableRange,
-				apvts::defaultValueOff
-				));
-			break;
 		case apvts::ParameterEnum::CHORUS_FRACTION_OF_BEAT:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -518,7 +509,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::fractionalTimeNormalizableRange,
-				apvts::fractionalTimeDefaultValue
+				2.0f
 				));
 			break;
 		case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_TYPE:
