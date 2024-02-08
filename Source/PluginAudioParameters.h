@@ -63,7 +63,7 @@ namespace apvts
 
 	// Defaults
 
-	static const float defaultIntervalValue = 0.01;
+	static const float defaultIntervalValue = 0.001;
 	static const float defaultValueOff = 0.0f;
 	static const float defaultValueQuarter = 0.25f;
 	static const float defaultValueHalf = 0.5f;
@@ -219,7 +219,7 @@ namespace apvts
 		{lowPassEqualizationComponentId,lowPassFrequencyDefaultValue},
 	};
 
-	static constexpr float qualityDefaultValue = 0.70710678118654752440L; // 1 / sqrt(2)
+	static constexpr float qualityDefaultValue = 0.001; // 1 / sqrt(2)
 	static constexpr float qualityMinimumValue = 0.001f;
 	static constexpr float qualityMaximumValue = 10.f;
 	static const juce::NormalisableRange<float> qualityNormalisableRange = makeLogarithmicRange(
