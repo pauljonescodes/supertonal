@@ -38,7 +38,7 @@ public:
 			"Equaliser",
 			std::vector<EqualiserComponent::ParameterSetting>{
 				{ apvts::preEqualiser100GainId, "100hz", "dB"},
-				{ apvts::preEqualiser200GainId, "2000hz", "dB" },
+				{ apvts::preEqualiser200GainId, "200hz", "dB" },
 				{ apvts::preEqualiser400GainId, "400hz", "dB" },
 				{ apvts::preEqualiser800GainId, "800z", "dB" },
 				{ apvts::preEqualiser1600GainId, "1600hz", "dB" },
