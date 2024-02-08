@@ -5,11 +5,12 @@
 #include "../PluginAudioParameters.h"
 #include "../PluginUtils.h"
 
-class MixerComponent : public juce::Component
+class ApvtsIdComponent : public juce::Component
 {
 public:
-	MixerComponent(
-		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) :
+	ApvtsIdComponent(
+		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState,
+		const std::vector<std::vector<std::string>> apvtsIdRows) :
 		mAudioProcessorValueTreeState(audioProcessorValueTreeState)
 	{
 		mViewportPtr = std::make_unique<juce::Viewport>();
@@ -17,51 +18,6 @@ public:
 
 		addAndMakeVisible(mViewportPtr.get());
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
-
-		static const std::vector<std::vector<std::string>> apvtsIdRows = {
-{
-	apvts::instrumentEqualiserLowPassOnId,
-	apvts::instrumentEqualiserLowPassFrequencyId,
-	apvts::instrumentEqualiserHighPassFrequencyId,
-	apvts::instrumentEqualiserHighPassOnId,
-},
-{
-	apvts::instrumentEqualiserLowPeakOnId,
-	apvts::instrumentEqualiserLowMidPeakOnId,
-	apvts::instrumentEqualiserHighMidPeakOnId,
-	apvts::instrumentEqualiserHighPeakOnId,
-},
-{
-	apvts::instrumentEqualiserLowPeakFrequencyId,
-	apvts::instrumentEqualiserLowMidPeakFrequencyId,
-	apvts::instrumentEqualiserHighMidPeakFrequencyId,
-	apvts::instrumentEqualiserHighPeakFrequencyId,
-},
-{
-	apvts::instrumentEqualiserLowPeakQualityId,
-	apvts::instrumentEqualiserLowMidPeakQualityId,
-	apvts::instrumentEqualiserHighMidPeakQualityId,
-	apvts::instrumentEqualiserHighPeakQualityId,
-},
-{
-	apvts::instrumentEqualiserLowPeakGainId,
-	apvts::instrumentEqualiserLowMidPeakGainId,
-	apvts::instrumentEqualiserHighMidPeakGainId,
-	apvts::instrumentEqualiserHighPeakGainId,
-},
-{
-	apvts::postCompressorThresholdId,
-	apvts::postCompressorAttackId,
-	apvts::postCompressorRatioId,
-	apvts::postCompressorReleaseId,
-	apvts::postCompressorGainId,
-},
-{
-	apvts::limiterOnId,
-	apvts::limiterThresholdId,
-	apvts::limiterReleaseId
-}
-		};
 
 		for (int row = 0; row < apvtsIdRows.size(); ++row)
 		{
@@ -131,7 +87,7 @@ public:
 		}
 	};
 
-	~MixerComponent()
+	~ApvtsIdComponent()
 	{
 
 		mSliderAttachments.clear();
@@ -191,5 +147,5 @@ private:
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> mComboBoxAttachments;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MixerComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ApvtsIdComponent)
 };

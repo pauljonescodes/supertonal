@@ -128,11 +128,14 @@ void MouseDrive::setVolume(float targetValue)
 
 void MouseDrive::setLowPassFrequency(float newValue)
 {
-    mCurrentLowPassFrequency = newValue;
-    *mLowPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(
-        mCurrentSampleRate,
-        mCurrentLowPassFrequency,
-        0.70710678118654752440f);
+    if (newValue != 0)
+    {
+        mCurrentLowPassFrequency = newValue;
+        *mLowPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(
+            mCurrentSampleRate,
+            mCurrentLowPassFrequency,
+            0.70710678118654752440f);
+    }
 };
 
 void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)

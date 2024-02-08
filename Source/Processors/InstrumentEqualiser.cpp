@@ -62,7 +62,7 @@ void InstrumentEqualiser::setOnAtIndex(bool newValue, int index)
 
 void InstrumentEqualiser::setFrequencyAtIndex(float newValue, int index)
 {
-    if (index >= 0 && index < mFilters.size())
+    if (index >= 0 && index < mFilters.size() && newValue != 0.0)
     {
         mFrequencies[index] = newValue;
         auto& filter = mFilters[index];
@@ -77,7 +77,7 @@ void InstrumentEqualiser::setFrequencyAtIndex(float newValue, int index)
         {
             *filter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(mCurrentSampleRate, newValue, quality);
         }
-        else
+        else 
         {
             *filter.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(mCurrentSampleRate, newValue, quality, juce::Decibels::decibelsToGain(gain));
         }
@@ -107,7 +107,7 @@ void InstrumentEqualiser::setGainAtIndex(float newValue, int index)
 
 void InstrumentEqualiser::setQualityAtIndex(float newValue, int index)
 {
-    if (index >= 0 && index < mFilters.size())
+    if (index >= 0 && index < mFilters.size() && newValue != 0.0)
     {
         mQualities[index] = newValue;
         auto& filter = mFilters[index];

@@ -39,7 +39,8 @@ private:
     std::unique_ptr<PreAmpComponent> mPedalsComponentPtr;
     std::unique_ptr<AmpComponent> mAmpComponentPtr;
     std::unique_ptr<CabinetComponent> mCabinetComponentPtr;
-    std::unique_ptr<MixerComponent> mMixerComponentPtr;
+    std::unique_ptr<ApvtsIdComponent> mMixerApvtsIdComponentPtr;
+    std::unique_ptr<ApvtsIdComponent> mHiddenApvtsIdComponentPtr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessorEditor)
 };
