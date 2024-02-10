@@ -64,8 +64,15 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mPostCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
 	mCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
 
-	mDelayLinePtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue* (apvts::sampleRateAssumption / 1000))),
+	mDelayLineLeftPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue * (apvts::sampleRateAssumption / 1000))),
+	mDelayLineRightPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue * (apvts::sampleRateAssumption / 1000))),
 	mDelayLineDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
+	mDelayHighPassFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>(
+		juce::dsp::IIR::Coefficients<float>::makeHighPass(apvts::sampleRateAssumption, InstrumentEqualiser::sHighPassFrequencyNormalisableRange.start)
+		)),
+	mDelayLowPassFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>(
+		juce::dsp::IIR::Coefficients<float>::makeLowPass(apvts::sampleRateAssumption, InstrumentEqualiser::sLowPassFrequencyNormalisableRange.start)
+		)),
 
 	mChorusPtr(std::make_unique<juce::dsp::Chorus<float>>()),
 	mPhaserPtr(std::make_unique<juce::dsp::Phaser<float>>()),
@@ -135,6 +142,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::PHASER_ON:
 		case apvts::ParameterEnum::CHORUS_ON:
 		case apvts::ParameterEnum::PRE_EQUALISER_ON:
+		case apvts::ParameterEnum::DELAY_IS_SYNCED:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
@@ -289,6 +297,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		}
 		break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY:
+		case apvts::ParameterEnum::DELAY_LOW_PASS_FREQUENCY:
 		{
 			juce::NormalisableRange<float> normalisableRange = InstrumentEqualiser::sLowPassFrequencyNormalisableRange;
 			normalisableRange.interval = apvts::defaultIntervalValue;
@@ -349,6 +358,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		}
 			break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY:
+		case apvts::ParameterEnum::DELAY_HIGH_PASS_FREQUENCY:
 		{
 			juce::NormalisableRange<float> normalisableRange = InstrumentEqualiser::sHighPassFrequencyNormalisableRange;
 			normalisableRange.interval = apvts::defaultIntervalValue;
@@ -504,7 +514,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::phaserCenterFrequencyDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::DELAY_TIME_FRACTIONAL_DENOMINATOR:
+		case apvts::ParameterEnum::DELAY_RIGHT_MS:
+		case apvts::ParameterEnum::DELAY_LEFT_MS:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::delayTimeMsNormalisableRange,
+				apvts::delayTimeMsDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::DELAY_LEFT_PER_BEAT:
+		case apvts::ParameterEnum::DELAY_RIGHT_PER_BEAT:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
@@ -590,9 +610,14 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mCompressorGainPtr->prepare(spec);
 
 	const auto maximumDelayInSamples = apvts::delayTimeMsMaximumValue * (spec.sampleRate / 1000);
-	mDelayLinePtr->setMaximumDelayInSamples(maximumDelayInSamples);
-	mDelayLinePtr->prepare(spec);
+	mDelayLineLeftPtr->setMaximumDelayInSamples(maximumDelayInSamples);
+	mDelayLineLeftPtr->prepare(spec);
+	mDelayLineRightPtr->setMaximumDelayInSamples(maximumDelayInSamples);
+	mDelayLineRightPtr->prepare(spec);
 	mDelayLineDryWetMixerPtr->prepare(spec);
+
+	mDelayLowPassFilterPtr->prepare(spec);
+	mDelayHighPassFilterPtr->prepare(spec);
 
 	mChorusPtr->prepare(spec);
 	mPhaserPtr->prepare(spec);
@@ -654,8 +679,11 @@ void PluginAudioProcessor::reset()
 
 	mCompressorGainPtr->reset();
 
-	mDelayLinePtr->reset();
+	mDelayLineLeftPtr->reset();
+	mDelayLineRightPtr->reset();
 	mDelayLineDryWetMixerPtr->reset();
+	mDelayLowPassFilterPtr->reset();
+	mDelayHighPassFilterPtr->reset();
 
 	mChorusPtr->reset();
 	mPhaserPtr->reset();
@@ -869,32 +897,61 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	{
 		mDelayLineDryWetMixerPtr->pushDrySamples(audioBlock);
 
-		float fractionOfWholeBeat = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::delayTimeFractionalDenominatorId);
-		const auto nextDelaySamples = apvts::calculateSamplesForBpmFractionAndRate(smoothedBeatsPerMinute, fractionOfWholeBeat, samplesPerSecond);
-
-		if (mDelayLinePtr->getDelay() != nextDelaySamples)
+		auto* leftChannelData = audioBlock.getChannelPointer(0);
+		if (leftChannelData)
 		{
-			mDelayLinePtr->setDelay(nextDelaySamples);
-		}
+			float fractionOfWholeBeatLeft = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::delayLeftPerBeatId);
+			const auto nextDelayLeftSamples = mDelayBpmSynced ?
+				PluginUtils::calculateSamplesForBpmFractionAndRate(smoothedBeatsPerMinute, fractionOfWholeBeatLeft, samplesPerSecond) :
+				PluginUtils::calculateSamplesForMilliseconds(samplesPerSecond, mDelayLeftMilliseconds);
 
-		for (int channelIndex = 0; channelIndex < getTotalNumInputChannels(); ++channelIndex)
-		{
-			auto* channelData = audioBlock.getChannelPointer(channelIndex);
-
-			if (channelData)
+			if (mDelayLineLeftPtr->getDelay() != nextDelayLeftSamples)
 			{
-				for (int i = 0; i < numSamples; ++i)
-				{
-					const float delayedSample = mDelayLinePtr->popSample(channelIndex, mDelayLinePtr->getDelay());
+				mDelayLineLeftPtr->setDelay(nextDelayLeftSamples);
+			}
 
-					if (i < audioBlock.getNumSamples())
-					{
-						mDelayLinePtr->pushSample(channelIndex, channelData[i] + mDelayFeedback * delayedSample);
-						channelData[i] += delayedSample;
-					}
+
+			for (int i = 0; i < numSamples; ++i)
+			{
+				const float delayedSample = mDelayLineLeftPtr->popSample(0, mDelayLineLeftPtr->getDelay());
+
+				if (i < audioBlock.getNumSamples())
+				{
+					mDelayLineLeftPtr->pushSample(0, leftChannelData[i] + mDelayFeedback * delayedSample);
+					leftChannelData[i] += delayedSample;
 				}
 			}
 		}
+
+		auto* rightChannelData = audioBlock.getChannelPointer(1);
+		if (rightChannelData)
+		{
+			float fractionOfWholeBeatRight = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::delayRightPerBeatId);
+			const auto nextDelayRightSamples = mDelayBpmSynced ?
+				PluginUtils::calculateSamplesForBpmFractionAndRate(smoothedBeatsPerMinute, fractionOfWholeBeatRight, samplesPerSecond) :
+				PluginUtils::calculateSamplesForMilliseconds(samplesPerSecond, mDelayRightMilliseconds);
+
+			if (mDelayLineLeftPtr->getDelay() != nextDelayRightSamples)
+			{
+				mDelayLineLeftPtr->setDelay(nextDelayRightSamples);
+			}
+
+			for (int i = 0; i < numSamples; ++i)
+			{
+				const float delayedSample = mDelayLineRightPtr->popSample(0, mDelayLineRightPtr->getDelay());
+
+				if (i < audioBlock.getNumSamples())
+				{
+					mDelayLineRightPtr->pushSample(0, rightChannelData[i] + mDelayFeedback * delayedSample);
+					rightChannelData[i] += delayedSample;
+				}
+			}
+		}
+
+		juce::dsp::ProcessContextReplacing<float> wetContext(audioBlock);
+
+		mDelayLowPassFilterPtr->process(wetContext);
+		mDelayHighPassFilterPtr->process(wetContext);
 
 		mDelayLineDryWetMixerPtr->mixWetSamples(audioBlock);
 	}
@@ -1234,8 +1291,26 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::DELAY_FEEDBACK:
 		mDelayFeedback = newValue;
 		break;
-	case apvts::ParameterEnum::DELAY_TIME_FRACTIONAL_DENOMINATOR:
-		mDelayLinePtr->setDelay(apvts::calculateSamplesForBpmFractionAndRate(beatsPerMinute, newValue, sampleRate));
+	case apvts::ParameterEnum::DELAY_LOW_PASS_FREQUENCY:
+		*mDelayLowPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, newValue, 0.7);
+		break;
+	case apvts::ParameterEnum::DELAY_HIGH_PASS_FREQUENCY:
+		*mDelayHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, newValue, 0.7);
+		break;
+	case apvts::ParameterEnum::DELAY_LEFT_MS:
+		mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, newValue));
+		break;
+	case apvts::ParameterEnum::DELAY_RIGHT_MS:
+		mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, newValue));
+		break;
+	case apvts::ParameterEnum::DELAY_LEFT_PER_BEAT:
+		mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, newValue, sampleRate));
+		break;
+	case apvts::ParameterEnum::DELAY_RIGHT_PER_BEAT:
+		mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, newValue, sampleRate));
+		break;
+	case apvts::ParameterEnum::DELAY_IS_SYNCED:
+		mDelayBpmSynced = newValue;
 		break;
 	case apvts::ParameterEnum::NOISE_GATE_THRESHOLD:
 		mNoiseGate->setThreshold(newValue);

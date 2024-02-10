@@ -106,9 +106,17 @@ private:
     std::unique_ptr<juce::dsp::Gain<float>> mCompressorGainPtr;
     
     bool mDelayOn = false;
+    bool mDelayBpmSynced = false;
+    float mDelayLeftMilliseconds = 30;
+    float mDelayRightMilliseconds = 30;
     float mDelayFeedback = 0.5f;
     juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
-    std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLinePtr;
+    std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLineLeftPtr;
+    std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLineRightPtr;
+
+    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mDelayLowPassFilterPtr;
+    std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mDelayHighPassFilterPtr;
+    
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mDelayLineDryWetMixerPtr;
 
     bool mChorusOn = false;

@@ -182,23 +182,14 @@ namespace apvts
 
 	// TIME
 
-	static constexpr float fractionalTimeMinimumValue = 0.001f;
+	static constexpr float fractionalTimeMinimumValue = 0.25f;
 	static constexpr float fractionalTimeMaximumValue = 64.0f;
 	static constexpr float fractionalTimeDefaultValue = 4.0f;
+	static constexpr float fractionalTimeIntervalValue = 0.25f;
 	static const juce::NormalisableRange<float> fractionalTimeNormalizableRange = makeLogarithmicRange(
 		fractionalTimeMinimumValue,
 		fractionalTimeMaximumValue,
-		defaultIntervalValue);
-
-	static float calculateSamplesForBpmFractionAndRate(
-		float beatsPerMinute, // ex. 120
-		float fractionOfBeat, // ex. 4.0f
-		const float samplesPerSecond // ex. 48,000
-	) {
-		float beatDurationSeconds = (60.0f / beatsPerMinute); // 0.5
-		float samplesPerBeat = beatDurationSeconds * samplesPerSecond; // 24,000
-		return samplesPerBeat / fractionOfBeat; // 200;
-	}
+		fractionalTimeIntervalValue);
 
 	// EQ
 
@@ -219,7 +210,7 @@ namespace apvts
 		{lowPassEqualizationComponentId,lowPassFrequencyDefaultValue},
 	};
 
-	static constexpr float qualityDefaultValue = 0.001; // 1 / sqrt(2)
+	static constexpr float qualityDefaultValue = 0.001; 
 	static constexpr float qualityMinimumValue = 0.001f;
 	static constexpr float qualityMaximumValue = 10.f;
 	static const juce::NormalisableRange<float> qualityNormalisableRange = makeLogarithmicRange(
@@ -241,7 +232,13 @@ namespace apvts
 
 	// DELAY
 
+	static constexpr float delayTimeMsDefaultValue = 100.0f;
 	static constexpr float delayTimeMsMaximumValue = 10000.0f;
+	static constexpr float delayTimeMsMinimumValue = 1.0f;
+	static const juce::NormalisableRange<float> delayTimeMsNormalisableRange = makeLogarithmicRange(
+		delayTimeMsMinimumValue,
+		delayTimeMsMaximumValue,
+		defaultIntervalValue);
 
 	// PHASER
 
@@ -357,7 +354,13 @@ namespace apvts
 		AMP_PRESENCE_DB,
 		
 		DELAY_ON,
-		DELAY_TIME_FRACTIONAL_DENOMINATOR,
+		DELAY_IS_SYNCED,
+		DELAY_LEFT_PER_BEAT,
+		DELAY_RIGHT_PER_BEAT,
+		DELAY_LEFT_MS,
+		DELAY_RIGHT_MS,
+		DELAY_LOW_PASS_FREQUENCY,
+		DELAY_HIGH_PASS_FREQUENCY,
 		DELAY_FEEDBACK,
 		DELAY_DRY_WET,
 
@@ -497,7 +500,13 @@ namespace apvts
 	static const std::string ampPresenceDbId = "amp_presence";
 
 	static const std::string delayOnId = "delay_on";
-	static const std::string delayTimeFractionalDenominatorId = "delay_per_beat";
+	static const std::string delayIsSyncedId = "delay_is_synced";
+	static const std::string delayLeftPerBeatId = "delay_left_per_beat";
+	static const std::string delayRightPerBeatId = "delay_right_per_beat";
+	static const std::string delayLeftMillisecondId = "delay_left_millisecond";
+	static const std::string delayRightMillisecondId = "delay_right_millisecond";
+	static const std::string delayHighPassFrequencyId = "delay_high_pass_freq";
+	static const std::string delayLowPassFrequencyId = "delay_low_pass_freq";
 	static const std::string delayFeedbackId = "delay_feedback";
 	static const std::string delayDryWetId = "delay_mix";
 
@@ -644,7 +653,13 @@ namespace apvts
 		{limiterReleaseId, ParameterEnum::LIMITER_RELEASE},
 
 		{delayOnId, ParameterEnum::DELAY_ON},
-		{delayTimeFractionalDenominatorId, ParameterEnum::DELAY_TIME_FRACTIONAL_DENOMINATOR},
+		{delayIsSyncedId, ParameterEnum::DELAY_IS_SYNCED},
+		{delayLeftPerBeatId, ParameterEnum::DELAY_LEFT_PER_BEAT},
+		{delayRightPerBeatId, ParameterEnum::DELAY_RIGHT_PER_BEAT},
+		{delayLeftMillisecondId, ParameterEnum::DELAY_LEFT_MS},
+		{delayRightMillisecondId, ParameterEnum::DELAY_RIGHT_MS},
+		{delayHighPassFrequencyId, ParameterEnum::DELAY_HIGH_PASS_FREQUENCY},
+		{delayLowPassFrequencyId, ParameterEnum::DELAY_LOW_PASS_FREQUENCY},
 		{delayFeedbackId, ParameterEnum::DELAY_FEEDBACK},
 		{delayDryWetId, ParameterEnum::DELAY_DRY_WET},
 

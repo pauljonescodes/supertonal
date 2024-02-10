@@ -93,7 +93,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	mTabbedComponentPtr->addTab("Mixer", juce::Colours::transparentBlack, mMixerApvtsIdComponentPtr.get(), true);
 	mTabbedComponentPtr->addTab("Hidden", juce::Colours::transparentBlack, mHiddenApvtsIdComponentPtr.get(), true);
 
-	setSize(825, 750);
+	setSize(800, 800);
 	setResizable(true, true);
 }
 

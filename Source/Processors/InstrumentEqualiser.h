@@ -15,8 +15,8 @@ class InstrumentEqualiser
 {
 public:
 
-	static constexpr float sLowPassFrequencyDefaultValue = 20.0f;
-	inline static const juce::NormalisableRange<float> sLowPassFrequencyNormalisableRange = { 20.0f, 2000.0f };
+	static constexpr float sHighPassFrequencyDefaultValue = 20.0f;
+	inline static const juce::NormalisableRange<float> sHighPassFrequencyNormalisableRange = { 20.0f, 2000.0f };
 
 	static constexpr float sLowPeakFrequencyDefaultValue = 120.0f;
 	inline static const juce::NormalisableRange<float> sLowPeakFrequencyNormalisableRange = { 20.0f, 500.0f };
@@ -30,8 +30,8 @@ public:
 	static constexpr float sHighPeakFrequencyDefaultValue = 6400.0f;
 	inline static const juce::NormalisableRange<float> sHighPeakFrequencyNormalisableRange = { 2000.0f, 20000.0f };
 
-	static constexpr float sHighPassFrequencyDefaultValue = 20000.0f;
-	inline static const juce::NormalisableRange<float> sHighPassFrequencyNormalisableRange = { 6000.0f, 20000.0f };
+	static constexpr float sLowPassFrequencyDefaultValue = 20000.0f;
+	inline static const juce::NormalisableRange<float> sLowPassFrequencyNormalisableRange = { 6000.0f, 20000.0f };
 
 	inline static const juce::NormalisableRange<float> sQualityNormalisableRange = {
 			0.001f,
@@ -63,12 +63,12 @@ private:
 
 	std::array<bool, 6> mBypasses = { true, true, true, true, true, true };
 	std::array<float, 6> mFrequencies = {
-		sLowPassFrequencyDefaultValue,
+		sHighPassFrequencyDefaultValue,
 		sLowPeakFrequencyDefaultValue,
 		sLowMidPeakFrequencyDefaultValue,
 		sHighMidPeakFrequencyDefaultValue,
 		sHighPeakFrequencyDefaultValue,
-		sHighPassFrequencyDefaultValue
+		sLowPassFrequencyDefaultValue
 	};
 	std::array<float, 6> mDecibelGains = {
 	0.0f,

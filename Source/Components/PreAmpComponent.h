@@ -6,6 +6,7 @@
 #include "../PluginUtils.h"
 #include "PedalComponent.h"
 #include "EquiliserComponent.h"
+#include "DelayComponent.h"
 
 class PreAmpComponent : public juce::Component
 {
@@ -68,14 +69,18 @@ public:
 		},
 			apvts::mouseDriveOnId));
 
-		mContainerPtr->addAndMakeVisible(new PedalComponent(
+		mContainerPtr->addAndMakeVisible(new DelayComponent(
 			audioProcessorValueTreeState,
 			"Delay",
-			std::vector<PedalComponent::ParameterSetting>{
-				{ apvts::delayTimeFractionalDenominatorId, "Time", " / beat"},
-				{ apvts::delayFeedbackId, "Feedback", "" },
-				{ apvts::delayDryWetId, "Mix", "" },
-		},
+			apvts::delayLeftPerBeatId,
+			apvts::delayRightPerBeatId,
+			apvts::delayLeftMillisecondId,
+			apvts::delayRightMillisecondId,
+			apvts::delayHighPassFrequencyId,
+			apvts::delayLowPassFrequencyId,
+			apvts::delayFeedbackId,
+			apvts::delayDryWetId,
+			apvts::delayIsSyncedId,
 			apvts::delayOnId ));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(

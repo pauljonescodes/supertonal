@@ -13,12 +13,12 @@
 InstrumentEqualiser::InstrumentEqualiser()
 {
     // Initialize the filters with default values
-    *mFilters[0].state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(mCurrentSampleRate, sLowPassFrequencyNormalisableRange.start);
+    *mFilters[0].state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(mCurrentSampleRate, sHighPassFrequencyNormalisableRange.start);
     for (int i = 1; i <= 4; ++i)
     {
         *mFilters[i].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(mCurrentSampleRate, getDefaultValueForIndex(i), sQualityNormalisableRange.start, 1.0f);
     }
-    *mFilters[5].state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(mCurrentSampleRate, sHighPassFrequencyNormalisableRange.start);
+    *mFilters[5].state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(mCurrentSampleRate, sLowPassFrequencyNormalisableRange.start);
 }
 
 void InstrumentEqualiser::prepare(juce::dsp::ProcessSpec& spec)
@@ -147,12 +147,12 @@ const juce::NormalisableRange<float>& InstrumentEqualiser::getFrequencyNormalisa
 {
     switch (index)
     {
-    case 0: return sLowPassFrequencyNormalisableRange;
+    case 0: return sHighPassFrequencyNormalisableRange;
     case 1: return sLowPeakFrequencyNormalisableRange;
     case 2: return sLowMidPeakFrequencyNormalisableRange;
     case 3: return sHighMidPeakFrequencyNormalisableRange;
     case 4: return sHighPeakFrequencyNormalisableRange;
-    case 5: return sHighPassFrequencyNormalisableRange;
-    default: return sLowPassFrequencyNormalisableRange; // This shouldn't happen
+    case 5: return sLowPassFrequencyNormalisableRange;
+    default: return sHighPassFrequencyNormalisableRange; // This shouldn't happen
     }
 }

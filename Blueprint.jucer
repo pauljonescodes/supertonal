@@ -60,6 +60,8 @@
         <FILE id="d4eaVE" name="AmpComponent.h" compile="0" resource="0" file="Source/Components/AmpComponent.h"/>
         <FILE id="qVRro4" name="CabinetComponent.h" compile="0" resource="0"
               file="Source/Components/CabinetComponent.h"/>
+        <FILE id="cfgvhx" name="DelayComponent.h" compile="0" resource="0"
+              file="Source/Components/DelayComponent.h"/>
         <FILE id="sxvdYw" name="EquiliserComponent.h" compile="0" resource="0"
               file="Source/Components/EquiliserComponent.h"/>
         <FILE id="cwTZnW" name="MixerComponent.h" compile="0" resource="0"
