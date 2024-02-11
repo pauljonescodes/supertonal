@@ -4,6 +4,7 @@
 #include "PluginAudioParameters.h"
 #include <cassert>
 #include "PluginUtils.h"
+#include "SIMDMath.h"
 
 //==============================================================================
 PluginAudioProcessor::PluginAudioProcessor()
@@ -28,6 +29,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mNoiseGate(std::make_unique<juce::dsp::NoiseGate<float>>()),
 	mPreCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
 	mPreCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
+	
 	mPreCompressorDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
 
 	mTubeScreamerPtr(std::make_unique<TubeScreamer>()),
@@ -143,6 +145,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::CHORUS_ON:
 		case apvts::ParameterEnum::PRE_EQUALISER_ON:
 		case apvts::ParameterEnum::DELAY_IS_SYNCED:
+		case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKEUP:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
@@ -648,6 +651,7 @@ void PluginAudioProcessor::reset()
 	mNoiseGate->reset();
 	mPreCompressorPtr->reset();
 	mPreCompressorGainPtr->reset();
+	
 	mPreCompressorDryWetMixerPtr->reset();
 
 	mTubeScreamerPtr->reset();
@@ -716,9 +720,12 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		return;
 	}
 
-	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
+	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) 
+	{
 		buffer.clear(i, 0, numSamples);
 	}
+
+	float inputRMS = calculateRMS(buffer, totalNumInputChannels, numSamples);
 
 	auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
 	auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
@@ -730,6 +737,25 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	{
 		mPreCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
 		mPreCompressorPtr->process(processContext);
+
+		if (mPreCompressorAutoMakeup)
+		{
+			float compressedRMS = calculateRMS(buffer, totalNumInputChannels, numSamples);
+			float rawMakeupGain = inputRMS / (compressedRMS + 0.0001);
+			mPreCompressorGainSmoothedValue.setTargetValue(std::min(rawMakeupGain, 12.0f));
+
+			for (int sample = 0; sample < numSamples; ++sample)
+			{
+				float preCompressorGainSmoothedNextValue = mPreCompressorGainSmoothedValue.getNextValue();
+
+				for (int channel = 0; channel < totalNumInputChannels; ++channel)
+				{
+					auto* channelData = buffer.getWritePointer(channel);
+					channelData[sample] *= preCompressorGainSmoothedNextValue;
+				}
+			}
+		}
+
 		mPreCompressorGainPtr->process(processContext);
 		mPreCompressorDryWetMixerPtr->mixWetSamples(audioBlock);
 	}
@@ -1065,6 +1091,9 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_ON:
 		mGraphicEqualiserIsOn = newValue;
+		break;
+	case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKEUP:
+		mPreCompressorAutoMakeup = newValue;
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_100_GAIN:
 		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 0);
@@ -1596,4 +1625,21 @@ juce::AudioProcessorEditor* PluginAudioProcessor::createEditor()
 		*mAudioProcessorValueTreeStatePtr.get(),
 		*mPresetManagerPtr.get()
 	);
+}
+
+float PluginAudioProcessor::calculateRMS(juce::AudioBuffer<float>& buffer, int numChannels, int numSamples)
+{
+	float sum = 0.0f;
+
+	for (int channel = 0; channel < numChannels; ++channel) {
+		const float* channelData = buffer.getReadPointer(channel, 0);
+
+		for (int i = 0; i < numSamples; ++i) {
+			float sample = channelData[i];
+			sum += sample * sample; // Square the sample and add it to the sum.
+		}
+	}
+
+	float mean = sum / (numChannels * numSamples); // Calculate the mean of the squared sums.
+	return std::sqrt(mean); // Return the square root of the mean.
 }

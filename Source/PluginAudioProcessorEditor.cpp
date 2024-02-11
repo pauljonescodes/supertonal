@@ -4,10 +4,10 @@
 
 static const std::vector<std::vector<std::string>> sMixerIds = {
 {
-	apvts::instrumentEqualiserLowPassOnId,
-	apvts::instrumentEqualiserLowPassFrequencyId,
-	apvts::instrumentEqualiserHighPassFrequencyId,
 	apvts::instrumentEqualiserHighPassOnId,
+	apvts::instrumentEqualiserHighPassFrequencyId,
+	apvts::instrumentEqualiserLowPassFrequencyId,
+	apvts::instrumentEqualiserLowPassOnId,
 },
 {
 	apvts::instrumentEqualiserLowPeakOnId,

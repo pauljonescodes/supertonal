@@ -63,7 +63,7 @@ namespace apvts
 
 	// Defaults
 
-	static const float defaultIntervalValue = 0.001;
+	static const float defaultIntervalValue = 0.01;
 	static const float defaultValueOff = 0.0f;
 	static const float defaultValueQuarter = 0.25f;
 	static const float defaultValueHalf = 0.5f;
@@ -162,7 +162,7 @@ namespace apvts
 	static const juce::NormalisableRange<float> ratioNormalizableRange = makeLogarithmicRange(
 		ratioMinimumValue,
 		ratioMaximumValue,
-		defaultIntervalValue);
+		1.0f);
 
 	static constexpr float attackMsMinimumValue = 0.0f;
 	static constexpr float attackMsMaximumValue = 1000.0f;
@@ -290,6 +290,7 @@ namespace apvts
 		PRE_COMPRESSOR_RELEASE,
 		PRE_COMPRESSOR_BLEND,
 		PRE_COMPRESSOR_GAIN,
+		PRE_COMPRESSOR_AUTO_MAKEUP,
 
 		PRE_EQUALISER_ON,
 		PRE_EQUALISER_100_GAIN,
@@ -438,6 +439,7 @@ namespace apvts
 	static const std::string preCompressorReleaseId = "pre_comp_release";
 	static const std::string preCompressorBlendId = "pre_comp_blend";
 	static const std::string preCompressorGainId = "pre_comp_gain";
+	static const std::string preCompressorAutoMakeupOn = "pre_comp_autogain_on";
 
 	static const std::string tubeScreamerOnId = "tube_screamer_on";
 	static const std::string tubeScreamerDriveId = "tube_screamer_drive";
@@ -581,6 +583,7 @@ namespace apvts
 		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
 		{preCompressorBlendId, ParameterEnum::PRE_COMPRESSOR_BLEND},
 		{preCompressorGainId, ParameterEnum::PRE_COMPRESSOR_GAIN},
+		{preCompressorAutoMakeupOn, ParameterEnum::PRE_COMPRESSOR_AUTO_MAKEUP},
 
 		{tubeScreamerOnId, ParameterEnum::TUBE_SCREAMER_ON},
 		{tubeScreamerDriveId, ParameterEnum::TUBE_SCREAMER_DRIVE},

@@ -27,6 +27,24 @@
             file="Assets/WorkSans-Regular.ttf"/>
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
+      <GROUP id="{4158DADA-03E3-DF91-81E4-7F16E37B44DD}" name="Components">
+        <FILE id="d4eaVE" name="AmpComponent.h" compile="0" resource="0" file="Source/Components/AmpComponent.h"/>
+        <FILE id="qVRro4" name="CabinetComponent.h" compile="0" resource="0"
+              file="Source/Components/CabinetComponent.h"/>
+        <FILE id="cfgvhx" name="DelayComponent.h" compile="0" resource="0"
+              file="Source/Components/DelayComponent.h"/>
+        <FILE id="sxvdYw" name="EquiliserComponent.h" compile="0" resource="0"
+              file="Source/Components/EquiliserComponent.h"/>
+        <FILE id="cwTZnW" name="MixerComponent.h" compile="0" resource="0"
+              file="Source/Components/MixerComponent.h"/>
+        <FILE id="lbtVDn" name="PedalComponent.h" compile="0" resource="0"
+              file="Source/Components/PedalComponent.h"/>
+        <FILE id="YfBmGp" name="PreAmpComponent.h" compile="0" resource="0"
+              file="Source/Components/PreAmpComponent.h"/>
+        <FILE id="g3k9OM" name="PresetComponent.h" compile="0" resource="0"
+              file="Source/Components/PresetComponent.h"/>
+        <FILE id="JJ02wX" name="TopComponent.h" compile="0" resource="0" file="Source/Components/TopComponent.h"/>
+      </GROUP>
       <GROUP id="{DEDDA15C-1DE5-7D7A-FDED-908468144E16}" name="Processors">
         <FILE id="KsiAJx" name="AmplifierEqualiser.cpp" compile="1" resource="0"
               file="Source/Processors/AmplifierEqualiser.cpp"/>
@@ -56,34 +74,6 @@
         <FILE id="b1rRnG" name="TubeScreamerWDF.h" compile="0" resource="0"
               file="Source/Processors/TubeScreamerWDF.h"/>
       </GROUP>
-      <GROUP id="{4158DADA-03E3-DF91-81E4-7F16E37B44DD}" name="Components">
-        <FILE id="d4eaVE" name="AmpComponent.h" compile="0" resource="0" file="Source/Components/AmpComponent.h"/>
-        <FILE id="qVRro4" name="CabinetComponent.h" compile="0" resource="0"
-              file="Source/Components/CabinetComponent.h"/>
-        <FILE id="cfgvhx" name="DelayComponent.h" compile="0" resource="0"
-              file="Source/Components/DelayComponent.h"/>
-        <FILE id="sxvdYw" name="EquiliserComponent.h" compile="0" resource="0"
-              file="Source/Components/EquiliserComponent.h"/>
-        <FILE id="cwTZnW" name="MixerComponent.h" compile="0" resource="0"
-              file="Source/Components/MixerComponent.h"/>
-        <FILE id="lbtVDn" name="PedalComponent.h" compile="0" resource="0"
-              file="Source/Components/PedalComponent.h"/>
-        <FILE id="YfBmGp" name="PreAmpComponent.h" compile="0" resource="0"
-              file="Source/Components/PreAmpComponent.h"/>
-        <FILE id="g3k9OM" name="PresetComponent.h" compile="0" resource="0"
-              file="Source/Components/PresetComponent.h"/>
-        <FILE id="JJ02wX" name="TopComponent.h" compile="0" resource="0" file="Source/Components/TopComponent.h"/>
-      </GROUP>
-      <FILE id="v6KLmT" name="PluginLookAndFeel.cpp" compile="1" resource="0"
-            file="Source/PluginLookAndFeel.cpp"/>
-      <FILE id="bvxGLL" name="PluginLookAndFeel.h" compile="0" resource="0"
-            file="Source/PluginLookAndFeel.h"/>
-      <FILE id="PK9IlS" name="PluginPresetManager.cpp" compile="1" resource="0"
-            file="Source/PluginPresetManager.cpp"/>
-      <FILE id="CRW4DQ" name="PluginPresetManager.h" compile="0" resource="0"
-            file="Source/PluginPresetManager.h"/>
-      <FILE id="pYKXts" name="PluginUtils.cpp" compile="1" resource="0" file="Source/PluginUtils.cpp"/>
-      <FILE id="Zh0yDd" name="PluginUtils.h" compile="0" resource="0" file="Source/PluginUtils.h"/>
       <FILE id="PeiO2K" name="PluginAudioParameters.h" compile="0" resource="0"
             file="Source/PluginAudioParameters.h"/>
       <FILE id="cVoqrs" name="PluginAudioProcessor.cpp" compile="1" resource="0"
@@ -94,6 +84,17 @@
             resource="0" file="Source/PluginAudioProcessorEditor.cpp"/>
       <FILE id="WR4alz" name="PluginAudioProcessorEditor.h" compile="0" resource="0"
             file="Source/PluginAudioProcessorEditor.h"/>
+      <FILE id="v6KLmT" name="PluginLookAndFeel.cpp" compile="1" resource="0"
+            file="Source/PluginLookAndFeel.cpp"/>
+      <FILE id="bvxGLL" name="PluginLookAndFeel.h" compile="0" resource="0"
+            file="Source/PluginLookAndFeel.h"/>
+      <FILE id="PK9IlS" name="PluginPresetManager.cpp" compile="1" resource="0"
+            file="Source/PluginPresetManager.cpp"/>
+      <FILE id="CRW4DQ" name="PluginPresetManager.h" compile="0" resource="0"
+            file="Source/PluginPresetManager.h"/>
+      <FILE id="pYKXts" name="PluginUtils.cpp" compile="1" resource="0" file="Source/PluginUtils.cpp"/>
+      <FILE id="Zh0yDd" name="PluginUtils.h" compile="0" resource="0" file="Source/PluginUtils.h"/>
+      <FILE id="W76Low" name="SIMDMath.h" compile="0" resource="0" file="Source/SIMDMath.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>

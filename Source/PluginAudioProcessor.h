@@ -58,6 +58,8 @@ private:
     bool mPreCompressorIsOn = false;
     std::unique_ptr<juce::dsp::Compressor<float>> mPreCompressorPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mPreCompressorGainPtr;
+    juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mPreCompressorGainSmoothedValue;
+    bool mPreCompressorAutoMakeup = false;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mPreCompressorDryWetMixerPtr;
 
     bool mTubeScreamerIsOn = false;
@@ -145,6 +147,7 @@ private:
 
     void loadImpulseResponseFromState();
     void checkForInvalidSamples (const juce::dsp::AudioBlock<float>& blockToCheck);
+    float calculateRMS(juce::AudioBuffer<float>& buffer, int numChannels, int numSamples);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessor)
 };
