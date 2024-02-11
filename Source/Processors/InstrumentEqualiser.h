@@ -79,12 +79,12 @@ private:
 	0.0f
 	};
 	std::array<float, 6> mQualities = {
-0.70710678118654752440L,
-0.70710678118654752440L,
-0.70710678118654752440L,
-0.70710678118654752440L,
-0.70710678118654752440L,
-0.70710678118654752440L
+0.001L,
+0.001L,
+0.001L,
+0.001L,
+0.001L,
+0.001L
 	};
 	std::array<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>, 6> mFilters;
 

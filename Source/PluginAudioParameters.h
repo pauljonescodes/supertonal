@@ -64,6 +64,7 @@ namespace apvts
 	// Defaults
 
 	static const float defaultIntervalValue = 0.01;
+	static const float defaultEpsilon = 0.001;
 	static const float defaultValueOff = 0.0f;
 	static const float defaultValueQuarter = 0.25f;
 	static const float defaultValueHalf = 0.5f;
@@ -275,6 +276,43 @@ namespace apvts
 		tubeScreamerDiodeCountMaximumValue,
 		tubeScreamerDiodeCountInterval);
 
+	// CTAGDRC
+
+	namespace Ctagdrc
+	{
+		constexpr float inputStart = -30.0f;
+		constexpr float inputEnd = 30.0f;
+		constexpr float inputInterval = 0.1f;
+
+		constexpr float thresholdStart = -60.0f;
+		constexpr float thresholdEnd = 0.0f;
+		constexpr float thresholdInterval = 0.1f;
+
+		constexpr float ratioStart = 1.0f;
+		constexpr float ratioEnd = 24.0f;
+		constexpr float ratioInterval = 0.05f;
+
+		constexpr float kneeStart = 0.0f;
+		constexpr float kneeEnd = 24.0f;
+		constexpr float kneeInterval = 0.1f;
+
+		constexpr float attackStart = 0.0f;
+		constexpr float attackEnd = 100.0f;
+		constexpr float attackInterval = 0.01f;
+
+		constexpr float releaseStart = 5.0f;
+		constexpr float releaseEnd = 1500.0f;
+		constexpr float releaseInterval = 0.01f;
+
+		constexpr float makeupStart = -40.0f;
+		constexpr float makeupEnd = 40.0f;
+		constexpr float makeupInterval = 0.1f;
+
+		constexpr float mixStart = 0.0f;
+		constexpr float mixEnd = 1.0f;
+		constexpr float mixInterval = 0.001f;
+	}
+
 	enum class ParameterEnum {
 		INPUT_GAIN,
 
@@ -283,14 +321,14 @@ namespace apvts
 		NOISE_GATE_RATIO,
 		NOISE_GATE_RELEASE,
 
-		PRE_COMPRESSOR_ON,
+		PRE_COMPRESSOR_IS_ON,
 		PRE_COMPRESSOR_THRESHOLD,
 		PRE_COMPRESSOR_ATTACK,
 		PRE_COMPRESSOR_RATIO,
 		PRE_COMPRESSOR_RELEASE,
-		PRE_COMPRESSOR_BLEND,
+		PRE_COMPRESSOR_DRY_WET_MIX,
 		PRE_COMPRESSOR_GAIN,
-		PRE_COMPRESSOR_AUTO_MAKEUP,
+		PRE_COMPRESSOR_AUTO_MAKE_UP_ON,
 
 		PRE_EQUALISER_ON,
 		PRE_EQUALISER_100_GAIN,
@@ -320,33 +358,36 @@ namespace apvts
 		STAGE1_INPUT_GAIN,
 		STAGE1_WAVE_SHAPER,
 		STAGE1_OUTPUT_GAIN,
-		STAGE1_DRY_WET,
+		STAGE1_DRY_WET_MIX,
 		
 		STAGE2_ON,
 		STAGE2_INPUT_GAIN,
 		STAGE2_WAVE_SHAPER,
 		STAGE2_OUTPUT_GAIN,
-		STAGE2_DRY_WET,
+		STAGE2_DRY_WET_MIX,
 		
 		STAGE3_ON,
 		STAGE3_INPUT_GAIN,
 		STAGE3_WAVE_SHAPER,
 		STAGE3_OUTPUT_GAIN,
-		STAGE3_DRY_WET,
+		STAGE3_DRY_WET_MIX,
 		
 		STAGE4_ON,
 		STAGE4_INPUT_GAIN,
 		STAGE4_WAVE_SHAPER,
 		STAGE4_OUTPUT_GAIN,
-		STAGE4_DRY_WET,
+		STAGE4_DRY_WET_MIX,
 		
 		BIAS,
 		
+		POST_COMPRESSOR_IS_ON,
 		POST_COMPRESSOR_THRESHOLD,
 		POST_COMPRESSOR_ATTACK,
 		POST_COMPRESSOR_RATIO,
 		POST_COMPRESSOR_RELEASE,
 		POST_COMPRESSOR_GAIN,
+		POST_COMPRESSOR_AUTO_MAKE_UP_ON,
+		POST_COMPRESSOR_DRY_WET_MIX,
 		
 		AMP_RESONANCE_DB,
 		AMP_BASS_DB,
@@ -388,8 +429,24 @@ namespace apvts
 		CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON,
 		CABINET_OUTPUT_GAIN,
 
+		INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON,
+		INSTRUMENT_COMPRESSOR_IS_ON,
+		INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON,
+		INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON,
+		INSTRUMENT_COMPRESSOR_AUTO_ATTACK_ON,
+		INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON,
+		INSTRUMENT_COMPRESSOR_INPUT_GAIN,
+		INSTRUMENT_COMPRESSOR_MAKEUP_GAIN,
+		INSTRUMENT_COMPRESSOR_THRESHOLD,
+		INSTRUMENT_COMPRESSOR_RATIO,
+		INSTRUMENT_COMPRESSOR_KNEE,
+		INSTRUMENT_COMPRESSOR_ATTACK,
+		INSTRUMENT_COMPRESSOR_RELEASE,
+		INSTRUMENT_COMPRESSOR_MIX,
+
 		INSTRUMENT_EQUALISER_LOW_PASS_ON,
 		INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY,
+		INSTRUMENT_EQUALISER_LOW_PASS_QUALITY,
 
 		INSTRUMENT_EQUALISER_LOW_PEAK_ON,
 		INSTRUMENT_EQUALISER_LOW_PEAK_FREQUENCY,
@@ -413,6 +470,7 @@ namespace apvts
 
 		INSTRUMENT_EQUALISER_HIGH_PASS_ON,
 		INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY,
+		INSTRUMENT_EQUALISER_HIGH_PASS_QUALITY,
 
 		LIMITER_ON,
 		LIMITER_THRESHOLD,
@@ -437,9 +495,9 @@ namespace apvts
 	static const std::string preCompressorAttackId = "pre_comp_attack";
 	static const std::string preCompressorRatioId = "pre_comp_ratio";
 	static const std::string preCompressorReleaseId = "pre_comp_release";
-	static const std::string preCompressorBlendId = "pre_comp_blend";
+	static const std::string preCompressorDryWetMixId = "pre_comp_blend";
 	static const std::string preCompressorGainId = "pre_comp_gain";
-	static const std::string preCompressorAutoMakeupOn = "pre_comp_autogain_on";
+	static const std::string preCompressorAutoMakeUpOnId = "pre_comp_autogain_on";
 
 	static const std::string tubeScreamerOnId = "tube_screamer_on";
 	static const std::string tubeScreamerDriveId = "tube_screamer_drive";
@@ -489,11 +547,14 @@ namespace apvts
 	static const std::string stage4OutputGainId = "stage_4_output_gain";
 	static const std::string stage4DryWetId = "stage_4_mix";
 
+	static const std::string postCompressorIsOnId = "post_comp_on";
 	static const std::string postCompressorThresholdId = "post_comp_thresh";
 	static const std::string postCompressorAttackId = "post_comp_attack";
 	static const std::string postCompressorRatioId = "post_comp_ratio";
 	static const std::string postCompressorReleaseId = "post_comp_release";
 	static const std::string postCompressorGainId = "post_comp_gain";
+	static const std::string postCompressorDryWetMixId = "pre_comp_blend";
+	static const std::string postCompressorAutoMakeUpOnId = "pre_comp_autogain_on";
 
 	static const std::string ampResonanceDbId = "amp_resonance";
 	static const std::string ampBassDbId = "amp_bass";
@@ -536,8 +597,24 @@ namespace apvts
 	static const std::string cabinetImpulseResponseConvolutionFileId = "cab_file";
 	static const std::string cabinetGainId = "cabinet_gain";
 
+	static const std::string instrumentCompressorIsPreEq = "inst_comp_pre_eq_on";
+	static const std::string instrumentCompressorIsOn = "inst_comp_is_on";
+	static const std::string instrumentCompressorIsLookaheadOn = "inst_comp_lookahead_on";
+	static const std::string instrumentCompressorIsAutoMakeupOn = "inst_comp_auto_gain_on";
+	static const std::string instrumentCompressorIsAutoAttackOn = "inst_comp_auto_attack_on";
+	static const std::string instrumentCompressorIsAutoReleaseOn = "inst_comp_auto_release_on";
+	static const std::string instrumentCompressorInputGain = "inst_comp_input_gain";
+	static const std::string instrumentCompressorMakeup = "inst_comp_makeup_gain";
+	static const std::string instrumentCompressorThreshold = "inst_comp_threshold";
+	static const std::string instrumentCompressorRatio = "inst_comp_ratio";
+	static const std::string instrumentCompressorKnee = "inst_comp_knee";
+	static const std::string instrumentCompressorAttack = "inst_comp_attack";
+	static const std::string instrumentCompressorRelease = "inst_comp_release";
+	static const std::string instrumentCompressorMix = "inst_comp_mix";
+
 	static const std::string instrumentEqualiserLowPassOnId = "eq_low_pass_on";
 	static const std::string instrumentEqualiserLowPassFrequencyId = "eq_low_pass_freq";
+	static const std::string instrumentEqualiserLowPassQualityId = "eq_low_pass_quality";
 	
 	static const std::string instrumentEqualiserLowPeakOnId = "eq_low_peak_on";
 	static const std::string instrumentEqualiserLowPeakFrequencyId = "eq_low_peak_freq";
@@ -561,6 +638,7 @@ namespace apvts
 	
 	static const std::string instrumentEqualiserHighPassOnId = "eq_high_pass_on";
 	static const std::string instrumentEqualiserHighPassFrequencyId = "eq_high_pass_freq";
+	static const std::string instrumentEqualiserHighPassQualityId = "eq_high_pass_quality";
 
 	static const std::string limiterOnId = "limiter_on";
 	static const std::string limiterThresholdId = "limiter_threshold";
@@ -576,14 +654,14 @@ namespace apvts
 		{noiseGateRatioId, ParameterEnum::NOISE_GATE_RATIO},
 		{noiseGateReleaseId, ParameterEnum::NOISE_GATE_RELEASE},
 		
-		{preCompressorOnId, ParameterEnum::PRE_COMPRESSOR_ON},
+		{preCompressorOnId, ParameterEnum::PRE_COMPRESSOR_IS_ON},
 		{preCompressorThresholdId, ParameterEnum::PRE_COMPRESSOR_THRESHOLD},
 		{preCompressorAttackId, ParameterEnum::PRE_COMPRESSOR_ATTACK},
 		{preCompressorRatioId, ParameterEnum::PRE_COMPRESSOR_RATIO},
 		{preCompressorReleaseId, ParameterEnum::PRE_COMPRESSOR_RELEASE},
-		{preCompressorBlendId, ParameterEnum::PRE_COMPRESSOR_BLEND},
+		{preCompressorDryWetMixId, ParameterEnum::PRE_COMPRESSOR_DRY_WET_MIX},
 		{preCompressorGainId, ParameterEnum::PRE_COMPRESSOR_GAIN},
-		{preCompressorAutoMakeupOn, ParameterEnum::PRE_COMPRESSOR_AUTO_MAKEUP},
+		{preCompressorAutoMakeUpOnId, ParameterEnum::PRE_COMPRESSOR_AUTO_MAKE_UP_ON},
 
 		{tubeScreamerOnId, ParameterEnum::TUBE_SCREAMER_ON},
 		{tubeScreamerDriveId, ParameterEnum::TUBE_SCREAMER_DRIVE},
@@ -613,25 +691,25 @@ namespace apvts
 		{stage1InputGainId, ParameterEnum::STAGE1_INPUT_GAIN},
 		{stage1WaveShaperId, ParameterEnum::STAGE1_WAVE_SHAPER},
 		{stage1OutputGainId, ParameterEnum::STAGE1_OUTPUT_GAIN},
-		{stage1DryWetId, ParameterEnum::STAGE1_DRY_WET},
+		{stage1DryWetId, ParameterEnum::STAGE1_DRY_WET_MIX},
 		
 		{stage2OnId, ParameterEnum::STAGE2_ON},
 		{stage2InputGainId, ParameterEnum::STAGE2_INPUT_GAIN},
 		{stage2WaveShaperId, ParameterEnum::STAGE2_WAVE_SHAPER},
 		{stage2OutputGainId, ParameterEnum::STAGE2_OUTPUT_GAIN},
-		{stage2DryWetId, ParameterEnum::STAGE2_DRY_WET},
+		{stage2DryWetId, ParameterEnum::STAGE2_DRY_WET_MIX},
 		
 		{stage3OnId, ParameterEnum::STAGE3_ON},
 		{stage3InputGainId, ParameterEnum::STAGE3_INPUT_GAIN},
 		{stage3WaveShaperId, ParameterEnum::STAGE3_WAVE_SHAPER},
 		{stage3OutputGainId, ParameterEnum::STAGE3_OUTPUT_GAIN},
-		{stage3DryWetId, ParameterEnum::STAGE3_DRY_WET},
+		{stage3DryWetId, ParameterEnum::STAGE3_DRY_WET_MIX},
 		
 		{stage4OnId, ParameterEnum::STAGE4_ON},
 		{stage4InputGainId, ParameterEnum::STAGE4_INPUT_GAIN},
 		{stage4WaveShaperId, ParameterEnum::STAGE4_WAVE_SHAPER},
 		{stage4OutputGainId, ParameterEnum::STAGE4_OUTPUT_GAIN},
-		{stage4DryWetId, ParameterEnum::STAGE4_DRY_WET},
+		{stage4DryWetId, ParameterEnum::STAGE4_DRY_WET_MIX},
 		
 		{biasId, ParameterEnum::BIAS},
 		
@@ -640,6 +718,9 @@ namespace apvts
 		{postCompressorRatioId, ParameterEnum::POST_COMPRESSOR_RATIO},
 		{postCompressorReleaseId, ParameterEnum::POST_COMPRESSOR_RELEASE},
 		{postCompressorGainId, ParameterEnum::POST_COMPRESSOR_GAIN},
+		{postCompressorIsOnId, ParameterEnum::POST_COMPRESSOR_IS_ON},
+		{postCompressorDryWetMixId, ParameterEnum::POST_COMPRESSOR_DRY_WET_MIX},
+		{postCompressorAutoMakeUpOnId, ParameterEnum::POST_COMPRESSOR_AUTO_MAKE_UP_ON},
 		
 		{ampResonanceDbId, ParameterEnum::AMP_RESONANCE_DB},
 		{ampBassDbId, ParameterEnum::AMP_BASS_DB},
@@ -680,8 +761,24 @@ namespace apvts
 		{phaserFeedbackId, ParameterEnum::PHASER_FEEDBACK},
 		{phaserMixId, ParameterEnum::PHASER_MIX},
 
+		{ instrumentCompressorIsPreEq, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON},
+		{ instrumentCompressorIsOn, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON },
+		{ instrumentCompressorIsLookaheadOn, ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON },
+		{ instrumentCompressorIsAutoMakeupOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON },
+		{ instrumentCompressorIsAutoAttackOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_ATTACK_ON },
+		{ instrumentCompressorIsAutoReleaseOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON },
+		{ instrumentCompressorInputGain, ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN },
+		{ instrumentCompressorMakeup, ParameterEnum::INSTRUMENT_COMPRESSOR_MAKEUP_GAIN },
+		{ instrumentCompressorThreshold, ParameterEnum::INSTRUMENT_COMPRESSOR_THRESHOLD },
+		{ instrumentCompressorRatio, ParameterEnum::INSTRUMENT_COMPRESSOR_RATIO },
+		{ instrumentCompressorKnee, ParameterEnum::INSTRUMENT_COMPRESSOR_KNEE },
+		{ instrumentCompressorAttack, ParameterEnum::INSTRUMENT_COMPRESSOR_ATTACK },
+		{ instrumentCompressorRelease, ParameterEnum::INSTRUMENT_COMPRESSOR_RELEASE },
+		{ instrumentCompressorMix, ParameterEnum::INSTRUMENT_COMPRESSOR_MIX },
+
 		{instrumentEqualiserLowPassOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_ON },
 		{instrumentEqualiserLowPassFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY },
+		{instrumentEqualiserLowPassQualityId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_QUALITY},
 		{instrumentEqualiserLowPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_ON },
 		{instrumentEqualiserLowPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_FREQUENCY },
 		{instrumentEqualiserLowPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_GAIN },
@@ -700,6 +797,7 @@ namespace apvts
 		{instrumentEqualiserHighPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY },
 		{instrumentEqualiserHighPassOnId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_ON },
 		{instrumentEqualiserHighPassFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY },
+		{instrumentEqualiserHighPassQualityId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_QUALITY},
 
 		{roomOnId, ParameterEnum::REVERB_ON},
 		{roomSizeId, ParameterEnum::REVERB_SIZE},

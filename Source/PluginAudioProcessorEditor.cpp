@@ -10,6 +10,10 @@ static const std::vector<std::vector<std::string>> sMixerIds = {
 	apvts::instrumentEqualiserLowPassOnId,
 },
 {
+	apvts::instrumentEqualiserHighPassQualityId,
+	apvts::instrumentEqualiserLowPassQualityId,
+},
+{
 	apvts::instrumentEqualiserLowPeakOnId,
 	apvts::instrumentEqualiserLowMidPeakOnId,
 	apvts::instrumentEqualiserHighMidPeakOnId,
@@ -34,11 +38,26 @@ static const std::vector<std::vector<std::string>> sMixerIds = {
 	apvts::instrumentEqualiserHighPeakGainId,
 },
 {
-	apvts::postCompressorThresholdId,
-	apvts::postCompressorAttackId,
-	apvts::postCompressorRatioId,
-	apvts::postCompressorReleaseId,
-	apvts::postCompressorGainId,
+apvts::instrumentCompressorIsOn,
+apvts::instrumentCompressorIsPreEq,
+},
+{
+apvts::instrumentCompressorInputGain,
+apvts::instrumentCompressorThreshold,
+apvts::instrumentCompressorKnee,
+apvts::instrumentCompressorRatio,
+},
+{
+apvts::instrumentCompressorIsAutoMakeupOn,
+apvts::instrumentCompressorIsAutoAttackOn,
+apvts::instrumentCompressorIsAutoReleaseOn,
+apvts::instrumentCompressorIsLookaheadOn,
+},
+{
+apvts::instrumentCompressorMakeup,
+apvts::instrumentCompressorAttack,
+apvts::instrumentCompressorRelease,
+apvts::instrumentCompressorMix,
 },
 {
 	apvts::limiterOnId,

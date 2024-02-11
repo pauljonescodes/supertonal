@@ -20,13 +20,6 @@ public:
 
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
-	apvts::ampResonanceDbId,
-	apvts::ampBassDbId,
-	apvts::ampMiddleDbId,
-	apvts::ampTrebleDbId,
-	apvts::ampPresenceDbId,
-},
-{
 	apvts::stage1OnId,
 	apvts::stage1InputGainId,
 	apvts::stage1WaveShaperId,
@@ -53,6 +46,25 @@ public:
 	apvts::stage4WaveShaperId,
 	apvts::stage4OutputGainId,
 	apvts::stage4DryWetId,
+},
+{
+	apvts::ampResonanceDbId,
+	apvts::ampBassDbId,
+	apvts::ampMiddleDbId,
+	apvts::ampTrebleDbId,
+	apvts::ampPresenceDbId,
+},
+{
+	apvts::postCompressorIsOnId,
+	apvts::postCompressorThresholdId,
+	apvts::postCompressorAttackId,
+	apvts::postCompressorRatioId,
+},
+{
+	apvts::postCompressorReleaseId,
+	apvts::postCompressorGainId,
+	apvts::postCompressorAutoMakeUpOnId,
+	apvts::postCompressorDryWetMixId,
 },
 {
 	apvts::stageModeId,

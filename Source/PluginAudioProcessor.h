@@ -8,6 +8,7 @@
 #include "Processors/GraphicEqualiser.h"
 #include "Processors/AmplifierEqualiser.h"
 #include "Processors/InstrumentEqualiser.h"
+#include "CTAGDRC/dsp/include/Compressor.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -103,9 +104,13 @@ private:
 
     std::unique_ptr<juce::dsp::Bias<float>> mBiasPtr;
     std::unique_ptr<AmplifierEqualiser> mAmplifierEqualiser;
-    
+
+    bool mPostCompressorIsOn = false;
+    bool mPostCompressorAutoMakeup = false;
     std::unique_ptr<juce::dsp::Compressor<float>> mPostCompressorPtr;
-    std::unique_ptr<juce::dsp::Gain<float>> mCompressorGainPtr;
+    std::unique_ptr<juce::dsp::Gain<float>> mPostCompressorGainPtr;
+    std::unique_ptr<juce::dsp::DryWetMixer<float>> mPostCompressorDryWetMixerPtr;
+    juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mPostCompressorGainSmoothedValue;
     
     bool mDelayOn = false;
     bool mDelayBpmSynced = false;
@@ -137,6 +142,11 @@ private:
     std::unique_ptr<juce::dsp::Gain<float>> mCabinetGainPtr;
 
     std::unique_ptr<InstrumentEqualiser> mInstrumentEqualiser;
+
+    bool mInstrumentCompressorIsPreEqualiser;
+    std::unique_ptr<Compressor> mInstrumentCompressor;
+    //LevelEnvelopeFollower inLevelFollower;
+    //LevelEnvelopeFollower outLevelFollower;
 
     bool mLimiterOn = true;
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;

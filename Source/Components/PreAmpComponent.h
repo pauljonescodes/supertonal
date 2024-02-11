@@ -30,10 +30,10 @@ public:
 				{ apvts::preCompressorRatioId, "Ratio", " : 1" },
 				{ apvts::preCompressorReleaseId, "Release", "ms" },
 				{ apvts::preCompressorGainId, "Makeup", "dB" },
-				{ apvts::preCompressorBlendId, "Mix", "" }
+				{ apvts::preCompressorDryWetMixId, "Mix", "" }
 		},
 			apvts::preCompressorOnId,
-					apvts::preCompressorAutoMakeupOn));
+					apvts::preCompressorAutoMakeUpOnId));
 
 		mContainerPtr->addAndMakeVisible(new EqualiserComponent(
 			audioProcessorValueTreeState,

@@ -4,7 +4,6 @@
 #include "PluginAudioParameters.h"
 #include <cassert>
 #include "PluginUtils.h"
-#include "SIMDMath.h"
 
 //==============================================================================
 PluginAudioProcessor::PluginAudioProcessor()
@@ -29,7 +28,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mNoiseGate(std::make_unique<juce::dsp::NoiseGate<float>>()),
 	mPreCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
 	mPreCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
-	
+
 	mPreCompressorDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
 
 	mTubeScreamerPtr(std::make_unique<TubeScreamer>()),
@@ -64,10 +63,11 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mAmplifierEqualiser(std::make_unique<AmplifierEqualiser>()),
 
 	mPostCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
-	mCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
+	mPostCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
+	mPostCompressorDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
 
-	mDelayLineLeftPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue * (apvts::sampleRateAssumption / 1000))),
-	mDelayLineRightPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue * (apvts::sampleRateAssumption / 1000))),
+	mDelayLineLeftPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue* (apvts::sampleRateAssumption / 1000))),
+	mDelayLineRightPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue* (apvts::sampleRateAssumption / 1000))),
 	mDelayLineDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
 	mDelayHighPassFilterPtr(std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>(
 		juce::dsp::IIR::Coefficients<float>::makeHighPass(apvts::sampleRateAssumption, InstrumentEqualiser::sHighPassFrequencyNormalisableRange.start)
@@ -81,6 +81,8 @@ PluginAudioProcessor::PluginAudioProcessor()
 
 	mConvolutionMessageQueuePtr(std::make_unique<juce::dsp::ConvolutionMessageQueue>()),
 	mCabinetImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 128 }, * mConvolutionMessageQueuePtr.get())),
+	
+	mInstrumentCompressor(std::make_unique<Compressor>()),
 	mInstrumentEqualiser(std::make_unique<InstrumentEqualiser>()),
 
 	mReverb(std::make_unique<juce::dsp::Reverb>()),
@@ -139,13 +141,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::STAGE3_ON:
 		case apvts::ParameterEnum::STAGE4_ON:
 		case apvts::ParameterEnum::REVERB_ON:
-		case apvts::ParameterEnum::PRE_COMPRESSOR_ON:
+		case apvts::ParameterEnum::PRE_COMPRESSOR_IS_ON:
+		case apvts::ParameterEnum::POST_COMPRESSOR_IS_ON:
 		case apvts::ParameterEnum::DELAY_ON:
 		case apvts::ParameterEnum::PHASER_ON:
 		case apvts::ParameterEnum::CHORUS_ON:
 		case apvts::ParameterEnum::PRE_EQUALISER_ON:
 		case apvts::ParameterEnum::DELAY_IS_SYNCED:
-		case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKEUP:
+		case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKE_UP_ON:
+		case apvts::ParameterEnum::POST_COMPRESSOR_AUTO_MAKE_UP_ON:
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON:
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON:
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON:
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_ATTACK_ON:
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON:
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
@@ -256,11 +266,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			break;
 		case apvts::ParameterEnum::CHORUS_MIX:
 		case apvts::ParameterEnum::PHASER_MIX:
-		case apvts::ParameterEnum::STAGE1_DRY_WET:
-		case apvts::ParameterEnum::STAGE2_DRY_WET:
-		case apvts::ParameterEnum::STAGE3_DRY_WET:
-		case apvts::ParameterEnum::STAGE4_DRY_WET:
-		case apvts::ParameterEnum::PRE_COMPRESSOR_BLEND:
+		case apvts::ParameterEnum::STAGE1_DRY_WET_MIX:
+		case apvts::ParameterEnum::STAGE2_DRY_WET_MIX:
+		case apvts::ParameterEnum::STAGE3_DRY_WET_MIX:
+		case apvts::ParameterEnum::STAGE4_DRY_WET_MIX:
+		case apvts::ParameterEnum::PRE_COMPRESSOR_DRY_WET_MIX:
+		case apvts::ParameterEnum::POST_COMPRESSOR_DRY_WET_MIX:
 		case apvts::ParameterEnum::TUBE_SCREAMER_TONE:
 		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
 		case apvts::ParameterEnum::REVERB_WIDTH:
@@ -290,6 +301,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_QUALITY:
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_QUALITY:
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY:
+		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_QUALITY:
+		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_QUALITY:
 		{
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -311,7 +324,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				InstrumentEqualiser::sLowPassFrequencyDefaultValue
 				));
 		}
-			break;
+		break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_FREQUENCY:
 		{
 			juce::NormalisableRange<float> normalisableRange = InstrumentEqualiser::sLowPeakFrequencyNormalisableRange;
@@ -323,7 +336,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				InstrumentEqualiser::sLowPeakFrequencyDefaultValue
 				));
 		}
-			break;
+		break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_FREQUENCY:
 		{
 			juce::NormalisableRange<float> normalisableRange = InstrumentEqualiser::sLowMidPeakFrequencyNormalisableRange;
@@ -335,7 +348,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				InstrumentEqualiser::sLowMidPeakFrequencyDefaultValue
 				));
 		}
-			break;
+		break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_FREQUENCY:
 		{
 			juce::NormalisableRange<float> normalisableRange = InstrumentEqualiser::sHighMidPeakFrequencyNormalisableRange;
@@ -347,7 +360,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				InstrumentEqualiser::sHighMidPeakFrequencyDefaultValue
 				));
 		}
-			break;
+		break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_FREQUENCY:
 		{
 			juce::NormalisableRange<float> normalisableRange = InstrumentEqualiser::sHighPeakFrequencyNormalisableRange;
@@ -359,7 +372,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				InstrumentEqualiser::sHighPeakFrequencyDefaultValue
 				));
 		}
-			break;
+		break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY:
 		case apvts::ParameterEnum::DELAY_HIGH_PASS_FREQUENCY:
 		{
@@ -372,15 +385,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				InstrumentEqualiser::sHighPassFrequencyDefaultValue
 				));
 		}
-			break;
+		break;
 		case apvts::ParameterEnum::STAGE1_ON:
 		case apvts::ParameterEnum::LIMITER_ON:
 		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
-			layout.add(std::make_unique<juce::AudioParameterBool>(
-				juce::ParameterID{ parameterId, apvts::version },
-				parameterId,
-				true
-				));
+			layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{ parameterId, apvts::version }, parameterId, true ));
 			break;
 		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
 		case apvts::ParameterEnum::DELAY_DRY_WET:
@@ -551,6 +560,128 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::tubeScreamerDiodeCountDefaultValue
 				));
 			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::inputStart,
+					apvts::Ctagdrc::inputEnd,
+					apvts::Ctagdrc::inputInterval), 0.0f,
+				String(),
+				AudioProcessorParameter::genericParameter,
+				[](float value, float)
+				{
+					return String(value, 1) + " dB";
+				}));
+			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_MAKEUP_GAIN:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::makeupStart,
+					apvts::Ctagdrc::makeupEnd,
+					apvts::Ctagdrc::makeupInterval), 0.0f,
+				String(),
+				AudioProcessorParameter::genericParameter,
+				[](float value, float)
+				{
+					return String(value, 1) + " dB ";
+				}));
+			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_THRESHOLD:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::thresholdStart,
+					apvts::Ctagdrc::thresholdEnd,
+					apvts::Ctagdrc::thresholdInterval), -10.0f,
+				String(), AudioProcessorParameter::genericParameter,
+				[](float value, float maxStrLen)
+				{
+					return String(value, 1) + " dB";
+				}));
+			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_RATIO:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::ratioStart,
+					apvts::Ctagdrc::ratioEnd,
+					apvts::Ctagdrc::ratioInterval, 0.5f), 2.0f,
+				String(), AudioProcessorParameter::genericParameter,
+				[](float value, float)
+				{
+					if (value > 23.9f)return String("Infinity") + ":1";
+			return String(value, 1) + ":1";
+				}));
+			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_KNEE:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::kneeStart,
+					apvts::Ctagdrc::kneeEnd,
+					apvts::Ctagdrc::kneeInterval),
+				6.0f, String(), AudioProcessorParameter::genericParameter,
+				[](float value, float)
+				{
+					return String(value, 1) + " dB";
+				}));
+			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_ATTACK:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::attackStart,
+					apvts::Ctagdrc::attackEnd,
+					apvts::Ctagdrc::attackInterval, 0.5f), 2.0f,
+				"ms",
+				AudioProcessorParameter::genericParameter,
+				[](float value, float)
+				{
+					if (value == 100.0f) return String(value, 0) + " ms";
+			return String(value, 2) + " ms";
+				}));
+			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_RELEASE:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::releaseStart,
+					apvts::Ctagdrc::releaseEnd,
+					apvts::Ctagdrc::releaseInterval, 0.35f),
+				140.0f,
+				String(),
+				AudioProcessorParameter::genericParameter,
+				[](float value, float)
+				{
+					if (value <= 100) return String(value, 2) + " ms";
+			if (value >= 1000)
+				return String(value * 0.001f, 2) + " s";
+			return String(value, 1) + " ms";
+				}));
+			break;
+		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_MIX:
+			layout.add(std::make_unique<AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				NormalisableRange<float>(
+					apvts::Ctagdrc::mixStart,
+					apvts::Ctagdrc::mixEnd,
+					apvts::Ctagdrc::mixInterval),
+				1.0f, "%", AudioProcessorParameter::genericParameter,
+				[](float value, float)
+				{
+					return String(value * 100.0f, 1) + " %";
+				}));
+			break;
 		default:
 			assert(false);
 			break;
@@ -610,7 +741,8 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mAmplifierEqualiser->prepare(spec);
 
 	mPostCompressorPtr->prepare(spec);
-	mCompressorGainPtr->prepare(spec);
+	mPostCompressorGainPtr->prepare(spec);
+	mPostCompressorDryWetMixerPtr->prepare(spec);
 
 	const auto maximumDelayInSamples = apvts::delayTimeMsMaximumValue * (spec.sampleRate / 1000);
 	mDelayLineLeftPtr->setMaximumDelayInSamples(maximumDelayInSamples);
@@ -629,7 +761,17 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	loadImpulseResponseFromState();
 
 	mInstrumentEqualiser->prepare(spec);
+	mInstrumentCompressor->prepare(spec);
 
+	if (*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorIsLookaheadOn) > 0.5f)
+	{
+		setLatencySamples(static_cast<int>(0.005 * sampleRate));
+	}
+	else
+	{
+		setLatencySamples(0);
+	}
+		
 	mReverb->prepare(spec);
 
 	mCabinetGainPtr->prepare(spec);
@@ -651,7 +793,7 @@ void PluginAudioProcessor::reset()
 	mNoiseGate->reset();
 	mPreCompressorPtr->reset();
 	mPreCompressorGainPtr->reset();
-	
+
 	mPreCompressorDryWetMixerPtr->reset();
 
 	mTubeScreamerPtr->reset();
@@ -679,9 +821,10 @@ void PluginAudioProcessor::reset()
 
 	mBiasPtr->reset();
 	mAmplifierEqualiser->reset();
-	mPostCompressorPtr->reset();
 
-	mCompressorGainPtr->reset();
+	mPostCompressorPtr->reset();
+	mPostCompressorGainPtr->reset();
+	mPostCompressorDryWetMixerPtr->reset();
 
 	mDelayLineLeftPtr->reset();
 	mDelayLineRightPtr->reset();
@@ -694,6 +837,7 @@ void PluginAudioProcessor::reset()
 
 	mCabinetImpulseResponseConvolutionPtr->reset();
 	mInstrumentEqualiser->reset();
+	//mInstrumentCompressor->reset();
 
 	mReverb->reset();
 
@@ -720,12 +864,10 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		return;
 	}
 
-	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) 
+	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
 	{
 		buffer.clear(i, 0, numSamples);
 	}
-
-	float inputRMS = calculateRMS(buffer, totalNumInputChannels, numSamples);
 
 	auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
 	auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
@@ -736,13 +878,13 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	if (mPreCompressorIsOn)
 	{
 		mPreCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
+		float preCompressorInputRms = mPreCompressorAutoMakeup ? calculateRMS(buffer, totalNumInputChannels, numSamples) : 0;
 		mPreCompressorPtr->process(processContext);
 
 		if (mPreCompressorAutoMakeup)
 		{
-			float compressedRMS = calculateRMS(buffer, totalNumInputChannels, numSamples);
-			float rawMakeupGain = inputRMS / (compressedRMS + 0.0001);
-			mPreCompressorGainSmoothedValue.setTargetValue(std::min(rawMakeupGain, 12.0f));
+			float preCompressorOutputRms = calculateRMS(buffer, totalNumInputChannels, numSamples);
+			mPreCompressorGainSmoothedValue.setTargetValue(std::min(preCompressorInputRms / preCompressorOutputRms, 12.0f));
 
 			for (int sample = 0; sample < numSamples; ++sample)
 			{
@@ -916,8 +1058,32 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	mAmplifierEqualiser->processBlock(buffer);
 	mBiasPtr->process(processContext);
 
-	mPostCompressorPtr->process(processContext);
-	mCompressorGainPtr->process(processContext);
+	if (mPostCompressorIsOn)
+	{
+		mPostCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
+		float postCompressorInputRms = mPostCompressorAutoMakeup ? calculateRMS(buffer, totalNumInputChannels, numSamples) : 0;
+		mPostCompressorPtr->process(processContext);
+
+		if (mPostCompressorAutoMakeup)
+		{
+			float postCompressorOutputRms = calculateRMS(buffer, totalNumInputChannels, numSamples);
+			mPostCompressorGainSmoothedValue.setTargetValue(std::min(postCompressorInputRms / postCompressorOutputRms, 12.0f));
+
+			for (int sample = 0; sample < numSamples; ++sample)
+			{
+				float preCompressorGainSmoothedNextValue = mPostCompressorGainSmoothedValue.getNextValue();
+
+				for (int channel = 0; channel < totalNumInputChannels; ++channel)
+				{
+					auto* channelData = buffer.getWritePointer(channel);
+					channelData[sample] *= preCompressorGainSmoothedNextValue;
+				}
+			}
+		}
+
+		mPostCompressorGainPtr->process(processContext);
+		mPostCompressorDryWetMixerPtr->mixWetSamples(audioBlock);
+	}
 
 	if (mDelayFeedback > 0.0f && mDelayOn)
 	{
@@ -1015,7 +1181,17 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mCabinetGainPtr->process(processContext);
 	}
 
+	if (mInstrumentCompressorIsPreEqualiser)
+	{
+		mInstrumentCompressor->process(buffer);
+	}
+
 	mInstrumentEqualiser->processBlock(buffer);
+
+	if (!mInstrumentCompressorIsPreEqualiser)
+	{
+		mInstrumentCompressor->process(buffer);
+	}
 
 	if (mLimiterOn)
 	{
@@ -1069,31 +1245,37 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mInputGainPtr->setGainDecibels(newValue);
 		break;
 	case apvts::ParameterEnum::REVERB_ON:
-		mReverbOn = newValue;
+		mReverbOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::LIMITER_ON:
-		mLimiterOn = newValue;
+		mLimiterOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::BYPASS_ON:
-		mBypassIsOn = newValue;
+		mBypassIsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::STAGE1_ON:
-		mStage1IsOn = newValue;
+		mStage1IsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::STAGE2_ON:
-		mStage2IsOn = newValue;
+		mStage2IsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::STAGE3_ON:
-		mStage3IsOn = newValue;
+		mStage3IsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::STAGE4_ON:
-		mStage4IsOn = newValue;
+		mStage4IsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_ON:
-		mGraphicEqualiserIsOn = newValue;
+		mGraphicEqualiserIsOn = static_cast<bool>(newValue);
 		break;
-	case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKEUP:
-		mPreCompressorAutoMakeup = newValue;
+	case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKE_UP_ON:
+		mPreCompressorAutoMakeup = static_cast<bool>(newValue);
+		break;
+	case apvts::ParameterEnum::POST_COMPRESSOR_AUTO_MAKE_UP_ON:
+		mPostCompressorAutoMakeup = static_cast<bool>(newValue);
+		break;
+	case apvts::ParameterEnum::POST_COMPRESSOR_DRY_WET_MIX:
+		mPostCompressorDryWetMixerPtr->setWetMixProportion(newValue);
 		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_100_GAIN:
 		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 0);
@@ -1134,8 +1316,11 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::AMP_PRESENCE_DB:
 		mAmplifierEqualiser->setPresenceDecibels(newValue);
 		break;
-	case apvts::ParameterEnum::PRE_COMPRESSOR_ON:
-		mPreCompressorIsOn = newValue;
+	case apvts::ParameterEnum::POST_COMPRESSOR_IS_ON:
+		mPostCompressorIsOn = static_cast<bool>(newValue);
+		break;
+	case apvts::ParameterEnum::PRE_COMPRESSOR_IS_ON:
+		mPreCompressorIsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::STAGE1_INPUT_GAIN:
 		mStage1InputGainPtr->setGainDecibels(newValue);
@@ -1173,16 +1358,16 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::STAGE4_OUTPUT_GAIN:
 		mStage4OutputGainPtr->setGainDecibels(newValue);
 		break;
-	case apvts::ParameterEnum::STAGE1_DRY_WET:
+	case apvts::ParameterEnum::STAGE1_DRY_WET_MIX:
 		mStage1DryWetMixerPtr->setWetMixProportion(newValue);
 		break;
-	case apvts::ParameterEnum::STAGE2_DRY_WET:
+	case apvts::ParameterEnum::STAGE2_DRY_WET_MIX:
 		mStage2DryWetMixerPtr->setWetMixProportion(newValue);
 		break;
-	case apvts::ParameterEnum::STAGE3_DRY_WET:
+	case apvts::ParameterEnum::STAGE3_DRY_WET_MIX:
 		mStage3DryWetMixerPtr->setWetMixProportion(newValue);
 		break;
-	case apvts::ParameterEnum::STAGE4_DRY_WET:
+	case apvts::ParameterEnum::STAGE4_DRY_WET_MIX:
 		mStage4DryWetMixerPtr->setWetMixProportion(newValue);
 		break;
 	case apvts::ParameterEnum::STAGE_MODE:
@@ -1218,14 +1403,14 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::PRE_COMPRESSOR_GAIN:
 		mPreCompressorGainPtr->setGainDecibels(newValue);
 		break;
-	case apvts::ParameterEnum::PRE_COMPRESSOR_BLEND:
+	case apvts::ParameterEnum::PRE_COMPRESSOR_DRY_WET_MIX:
 		mPreCompressorDryWetMixerPtr->setWetMixProportion(newValue);
 		break;
 	case apvts::ParameterEnum::POST_COMPRESSOR_GAIN:
-		mCompressorGainPtr->setGainDecibels(newValue);
+		mPostCompressorGainPtr->setGainDecibels(newValue);
 		break;
 	case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
-		mCabImpulseResponseConvolutionIsOn = newValue;
+		mCabImpulseResponseConvolutionIsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::CABINET_OUTPUT_GAIN:
 		mCabinetGainPtr->setGainDecibels(newValue);
@@ -1269,49 +1454,25 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::REVERB_SIZE:
 	{
 		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({
-			newValue,
-			parameters.damping,
-			parameters.wetLevel,
-			parameters.dryLevel,
-			parameters.width,
-			0.0f });
+		mReverb->setParameters({ newValue, parameters.damping, parameters.wetLevel, parameters.dryLevel, parameters.width, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::REVERB_DAMPING:
 	{
 		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({
-			parameters.roomSize,
-			newValue,
-			parameters.wetLevel,
-			parameters.dryLevel,
-			parameters.width,
-			0.0f });
+		mReverb->setParameters({ parameters.roomSize, newValue, parameters.wetLevel, parameters.dryLevel, parameters.width, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::REVERB_MIX:
 	{
 		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({
-			parameters.roomSize,
-			parameters.damping,
-			newValue, // wet
-			1.0f - newValue, // dry
-			parameters.width,
-			0.0f });
+		mReverb->setParameters({ parameters.roomSize, parameters.damping, newValue, 1.0f - newValue, parameters.width, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::REVERB_WIDTH:
 	{
 		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({
-			parameters.roomSize,
-			parameters.damping,
-			parameters.wetLevel,
-			parameters.dryLevel,
-			newValue,
-			0.0f });
+		mReverb->setParameters({ parameters.roomSize, parameters.damping, parameters.wetLevel, parameters.dryLevel, newValue, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::DELAY_DRY_WET:
@@ -1321,10 +1482,10 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mDelayFeedback = newValue;
 		break;
 	case apvts::ParameterEnum::DELAY_LOW_PASS_FREQUENCY:
-		*mDelayLowPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, newValue, 0.7);
+		*mDelayLowPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, std::max(newValue, apvts::defaultEpsilon), 0.7);
 		break;
 	case apvts::ParameterEnum::DELAY_HIGH_PASS_FREQUENCY:
-		*mDelayHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, newValue, 0.7);
+		*mDelayHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, std::max(newValue, apvts::defaultEpsilon), 0.7);
 		break;
 	case apvts::ParameterEnum::DELAY_LEFT_MS:
 		mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, newValue));
@@ -1363,10 +1524,10 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mMouseDrivePtr->setVolume(newValue);
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_ON:
-		mMouseDriveIsOn = newValue;
+		mMouseDriveIsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::TUBE_SCREAMER_ON:
-		mTubeScreamerIsOn = newValue;
+		mTubeScreamerIsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
 		mTubeScreamerPtr->setDrive(newValue);
@@ -1387,22 +1548,25 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mOutputGainPtr->setGainDecibels(newValue);
 		break;
 	case apvts::ParameterEnum::DELAY_ON:
-		mDelayOn = newValue;
+		mDelayOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::PHASER_ON:
-		mPhaserOn = newValue;
+		mPhaserOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::CHORUS_ON:
-		mChorusOn = newValue;
+		mChorusOn = static_cast<bool>(newValue);
 		break;
-	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_ON:
-		mInstrumentEqualiser->setOnAtIndex(newValue, 0);
+	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_ON:
+		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 0);
 		break;
-	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY:
+	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY:
 		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 0);
 		break;
+	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_QUALITY:
+		mInstrumentEqualiser->setQualityAtIndex(newValue, 0);
+		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(newValue, 1);
+		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 1);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_FREQUENCY:
 		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 1);
@@ -1414,7 +1578,7 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mInstrumentEqualiser->setQualityAtIndex(newValue, 1);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(newValue, 2);
+		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 2);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_FREQUENCY:
 		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 2);
@@ -1426,7 +1590,7 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mInstrumentEqualiser->setQualityAtIndex(newValue, 2);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(newValue, 3);
+		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 3);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_FREQUENCY:
 		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 3);
@@ -1438,7 +1602,7 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mInstrumentEqualiser->setQualityAtIndex(newValue, 3);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(newValue, 4);
+		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 4);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_FREQUENCY:
 		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 4);
@@ -1449,11 +1613,83 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY:
 		mInstrumentEqualiser->setQualityAtIndex(newValue, 4);
 		break;
-	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_ON:
-		mInstrumentEqualiser->setOnAtIndex(newValue, 5);
+	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_ON:
+		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 5);
 		break;
-	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY:
+	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY:
 		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 5);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_QUALITY:
+		mInstrumentEqualiser->setQualityAtIndex(newValue, 5);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON:
+		mInstrumentCompressorIsPreEqualiser = static_cast<bool>(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON:
+		mInstrumentCompressor->setPower(!static_cast<bool>(newValue));
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON:
+	{
+		const bool newBool = static_cast<bool>(newValue);
+		if (newBool)
+		{
+			setLatencySamples(static_cast<int>(0.005 * mInstrumentCompressor->getSampleRate()));
+		}
+		else 
+		{ 
+			setLatencySamples(0); 
+		}
+
+		mInstrumentCompressor->setLookahead(newBool);
+	}
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON:
+		mInstrumentCompressor->setAutoMakeup(static_cast<bool>(newValue));
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_ATTACK_ON:
+	{
+		const bool newBool = static_cast<bool>(newValue);
+		mInstrumentCompressor->setAutoAttack(newBool);
+
+		if (!newBool)
+		{
+			mInstrumentCompressor->setAttack(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorAttack));
+		}
+	}
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON:
+	{
+		const bool newBool = static_cast<bool>(newValue);
+		mInstrumentCompressor->setAutoRelease(newBool);
+		if (!newBool)
+		{
+			mInstrumentCompressor->setRelease(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorRelease));
+		}
+	}
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN:
+		mInstrumentCompressor->setInput(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_MAKEUP_GAIN:
+		mInstrumentCompressor->setMakeup(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_THRESHOLD:
+		mInstrumentCompressor->setThreshold(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_RATIO:
+		mInstrumentCompressor->setRatio(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_KNEE:
+		mInstrumentCompressor->setKnee(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_ATTACK:
+		mInstrumentCompressor->setAttack(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_RELEASE:
+		mInstrumentCompressor->setRelease(newValue);
+		break;
+	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_MIX:
+		mInstrumentCompressor->setMix(newValue);
 		break;
 	default:
 		assert(false);
@@ -1515,7 +1751,7 @@ void PluginAudioProcessor::setStateInformation(const void* data, int sizeInBytes
 			mAudioProcessorValueTreeStatePtr->replaceState(valueTree);
 			loadImpulseResponseFromState();
 		}
-}
+	}
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
@@ -1641,5 +1877,5 @@ float PluginAudioProcessor::calculateRMS(juce::AudioBuffer<float>& buffer, int n
 	}
 
 	float mean = sum / (numChannels * numSamples); // Calculate the mean of the squared sums.
-	return std::sqrt(mean); // Return the square root of the mean.
+	return std::sqrt(mean) + 0.0001; // Return the square root of the mean.
 }

@@ -79,7 +79,9 @@ void InstrumentEqualiser::setFrequencyAtIndex(float newValue, int index)
         }
         else 
         {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(mCurrentSampleRate, newValue, quality, juce::Decibels::decibelsToGain(gain));
+            *filter.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+                mCurrentSampleRate, 
+                newValue, quality, juce::Decibels::decibelsToGain(gain));
         }
     }
 }
