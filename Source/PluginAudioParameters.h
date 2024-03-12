@@ -379,6 +379,7 @@ namespace apvts
 		AMP_PRESENCE_DB,
 		
 		DELAY_ON,
+		DELAY_LINKED,
 		DELAY_IS_SYNCED,
 		DELAY_LEFT_PER_BEAT,
 		DELAY_RIGHT_PER_BEAT,
@@ -535,6 +536,7 @@ namespace apvts
 	static const std::string ampPresenceDbId = "amp_presence";
 
 	static const std::string delayOnId = "delay_on";
+	static const std::string delayLinkedId = "delay_linked";
 	static const std::string delayIsSyncedId = "delay_is_synced";
 	static const std::string delayLeftPerBeatId = "delay_left_per_beat";
 	static const std::string delayRightPerBeatId = "delay_right_per_beat";
@@ -698,6 +700,7 @@ namespace apvts
 		{limiterReleaseId, ParameterEnum::LIMITER_RELEASE},
 
 		{delayOnId, ParameterEnum::DELAY_ON},
+		{delayLinkedId, ParameterEnum::DELAY_LINKED},
 		{delayIsSyncedId, ParameterEnum::DELAY_IS_SYNCED},
 		{delayLeftPerBeatId, ParameterEnum::DELAY_LEFT_PER_BEAT},
 		{delayRightPerBeatId, ParameterEnum::DELAY_RIGHT_PER_BEAT},

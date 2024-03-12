@@ -388,7 +388,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::STAGE1_ON:
 		case apvts::ParameterEnum::LIMITER_ON:
 		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
-			layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{ parameterId, apvts::version }, parameterId, true ));
+		case apvts::ParameterEnum::DELAY_LINKED:
+			layout.add(std::make_unique<juce::AudioParameterBool>(
+				juce::ParameterID{ parameterId, apvts::version },
+				parameterId,
+				true));
 			break;
 		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
 		case apvts::ParameterEnum::DELAY_DRY_WET:
@@ -775,7 +779,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 
 	for (const auto& patameterIdToEnum : apvts::parameterIdToEnumMap)
 	{
-		auto newValue = mAudioProcessorValueTreeStatePtr->getParameterAsValue(patameterIdToEnum.first).getValue();
+		float newValue = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(patameterIdToEnum.first);
 		parameterChanged(patameterIdToEnum.first, newValue);
 	}
 }
@@ -1000,6 +1004,7 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mPostCompressorDryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
+
 	if (mDelayFeedback > 0.0f && mDelayOn)
 	{
 		mDelayLineDryWetMixerPtr->pushDrySamples(audioBlock);
@@ -1007,17 +1012,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		auto* leftChannelData = audioBlock.getChannelPointer(0);
 		if (leftChannelData)
 		{
-			float fractionOfWholeBeatLeft = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::delayLeftPerBeatId);
-			const auto nextDelayLeftSamples = mDelayBpmSynced ?
-				PluginUtils::calculateSamplesForBpmFractionAndRate(smoothedBeatsPerMinute, fractionOfWholeBeatLeft, samplesPerSecond) :
-				PluginUtils::calculateSamplesForMilliseconds(samplesPerSecond, mDelayLeftMilliseconds);
-
-			if (mDelayLineLeftPtr->getDelay() != nextDelayLeftSamples)
-			{
-				mDelayLineLeftPtr->setDelay(nextDelayLeftSamples);
-			}
-
-
 			for (int i = 0; i < numSamples; ++i)
 			{
 				const float delayedSample = mDelayLineLeftPtr->popSample(0, mDelayLineLeftPtr->getDelay());
@@ -1033,16 +1027,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		auto* rightChannelData = audioBlock.getChannelPointer(1);
 		if (rightChannelData)
 		{
-			float fractionOfWholeBeatRight = *mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::delayRightPerBeatId);
-			const auto nextDelayRightSamples = mDelayBpmSynced ?
-				PluginUtils::calculateSamplesForBpmFractionAndRate(smoothedBeatsPerMinute, fractionOfWholeBeatRight, samplesPerSecond) :
-				PluginUtils::calculateSamplesForMilliseconds(samplesPerSecond, mDelayRightMilliseconds);
-
-			if (mDelayLineLeftPtr->getDelay() != nextDelayRightSamples)
-			{
-				mDelayLineLeftPtr->setDelay(nextDelayRightSamples);
-			}
-
 			for (int i = 0; i < numSamples; ++i)
 			{
 				const float delayedSample = mDelayLineRightPtr->popSample(0, mDelayLineRightPtr->getDelay());
@@ -1059,7 +1043,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 		mDelayLowPassFilterPtr->process(wetContext);
 		mDelayHighPassFilterPtr->process(wetContext);
-
 		mDelayLineDryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
@@ -1376,19 +1359,33 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		*mDelayHighPassFilterPtr->state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, std::max(newValue, apvts::defaultEpsilon), 0.7);
 		break;
 	case apvts::ParameterEnum::DELAY_LEFT_MS:
+		mDelayLeftMilliseconds = newValue;
 		mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, newValue));
 		break;
 	case apvts::ParameterEnum::DELAY_RIGHT_MS:
+		mDelayRightMilliseconds = newValue;
 		mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, newValue));
 		break;
 	case apvts::ParameterEnum::DELAY_LEFT_PER_BEAT:
+		mDelayLeftPerBeatDivision = newValue;
 		mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, newValue, sampleRate));
 		break;
 	case apvts::ParameterEnum::DELAY_RIGHT_PER_BEAT:
+		mDelayRightPerBeatDivision = newValue;
 		mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, newValue, sampleRate));
 		break;
 	case apvts::ParameterEnum::DELAY_IS_SYNCED:
 		mDelayBpmSynced = newValue;
+		if (mDelayBpmSynced)
+		{
+			mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, mDelayLeftPerBeatDivision, sampleRate));
+			mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, mDelayRightPerBeatDivision, sampleRate));
+		}
+		else
+		{
+			mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, mDelayLeftMilliseconds));
+			mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, mDelayRightMilliseconds));
+		}
 		break;
 	case apvts::ParameterEnum::NOISE_GATE_THRESHOLD:
 		mNoiseGate->setThreshold(newValue);
@@ -1531,6 +1528,37 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mInstrumentCompressor->setLookahead(newBool);
 	}
 	break;
+	case apvts::ParameterEnum::DELAY_LINKED:
+		mDelayIsLinked = static_cast<bool>(newValue);
+
+		if (mDelayIsLinked)
+		{
+			if (mDelayBpmSynced)
+			{
+				mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, mDelayLeftPerBeatDivision, sampleRate));
+				mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, mDelayLeftPerBeatDivision, sampleRate));
+			}
+			else
+			{
+				mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, mDelayLeftMilliseconds));
+				mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, mDelayLeftMilliseconds));
+			}
+		}
+		else
+		{
+			if (mDelayBpmSynced)
+			{
+				mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, mDelayLeftPerBeatDivision, sampleRate));
+				mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForBpmFractionAndRate(beatsPerMinute, mDelayRightPerBeatDivision, sampleRate));
+			}
+			else
+			{
+				mDelayLineLeftPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, mDelayLeftMilliseconds));
+				mDelayLineRightPtr->setDelay(PluginUtils::calculateSamplesForMilliseconds(sampleRate, mDelayRightMilliseconds));
+			}
+		}
+
+		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON:
 		mInstrumentCompressor->setAutoMakeup(static_cast<bool>(newValue));
 		break;

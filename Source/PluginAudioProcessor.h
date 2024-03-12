@@ -113,8 +113,11 @@ private:
     
     bool mDelayOn = false;
     bool mDelayBpmSynced = false;
+    bool mDelayIsLinked = true;
     float mDelayLeftMilliseconds = 30;
     float mDelayRightMilliseconds = 30;
+    float mDelayLeftPerBeatDivision = 2.0f;
+    float mDelayRightPerBeatDivision = 2.0f;
     float mDelayFeedback = 0.5f;
     juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
     std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLineLeftPtr;

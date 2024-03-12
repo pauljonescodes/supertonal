@@ -18,6 +18,7 @@ public:
         const std::string& delayFeedbackParameterId,
         const std::string& delayDryWetParameterId,
         const std::string& delayIsSyncedParameterId,
+        const std::string& delayIsLinkedParameterId,
         const std::string& toggleParameterId) noexcept :
         mApvts(apvts)
     {
@@ -31,7 +32,7 @@ public:
             apvts, delayLeftPerBeatParameterId, *mLeftPerBeatSliderPtr);
 
         mLeftPerBeatLabelPtr = std::make_unique<juce::Label>();
-        mLeftPerBeatLabelPtr->setText("Left", juce::dontSendNotification);
+        mLeftPerBeatLabelPtr->setText("Left delay", juce::dontSendNotification);
         mLeftPerBeatLabelPtr->attachToComponent(mLeftPerBeatSliderPtr.get(), false);
 
         addAndMakeVisible(mLeftPerBeatSliderPtr.get());
@@ -47,7 +48,7 @@ public:
             apvts, delayRightPerBeatParameterId, *mRightPerBeatSliderPtr);
 
         mRightPerBeatLabelPtr = std::make_unique<juce::Label>();
-        mRightPerBeatLabelPtr->setText("Right", juce::dontSendNotification);
+        mRightPerBeatLabelPtr->setText("Right delay", juce::dontSendNotification);
         mRightPerBeatLabelPtr->attachToComponent(mRightPerBeatSliderPtr.get(), false);
 
         addAndMakeVisible(mRightPerBeatSliderPtr.get());
@@ -63,7 +64,7 @@ public:
             apvts, delayLeftMillisecondParameterId, *mLeftMillisecondSliderPtr);
 
         mLeftMillisecondLabelPtr = std::make_unique<juce::Label>();
-        mLeftMillisecondLabelPtr->setText("Left", juce::dontSendNotification);
+        mLeftMillisecondLabelPtr->setText("Left delay", juce::dontSendNotification);
         mLeftMillisecondLabelPtr->attachToComponent(mLeftMillisecondSliderPtr.get(), false);
 
         addAndMakeVisible(mLeftMillisecondSliderPtr.get());
@@ -79,7 +80,7 @@ public:
             apvts, delayRightMillisecondParameterId, *mRightMillisecondSliderPtr);
 
         mRightMillisecondLabelPtr = std::make_unique<juce::Label>();
-        mRightMillisecondLabelPtr->setText("Right", juce::dontSendNotification);
+        mRightMillisecondLabelPtr->setText("Right delay", juce::dontSendNotification);
         mRightMillisecondLabelPtr->attachToComponent(mRightMillisecondSliderPtr.get(), false);
 
         addAndMakeVisible(mRightMillisecondSliderPtr.get());
@@ -161,6 +162,16 @@ public:
         addAndMakeVisible(mSyncButtonPtr.get());
 
         apvts.addParameterListener(mDelayIsSyncedParameterId, this);
+        parameterChanged(mDelayIsSyncedParameterId, *apvts.getRawParameterValue(mDelayIsSyncedParameterId));
+
+        mDelayIsLinkedParameterId = delayIsLinkedParameterId;
+        mLinkedButtonPtr = std::make_unique<juce::ToggleButton>("Linked");
+        mLinkedButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            apvts, delayIsLinkedParameterId, *mLinkedButtonPtr);
+        addAndMakeVisible(mLinkedButtonPtr.get());
+
+        apvts.addParameterListener(mDelayIsLinkedParameterId, this);
+        parameterChanged(mDelayIsLinkedParameterId, *apvts.getRawParameterValue(mDelayIsLinkedParameterId));
 
         // Toggle Button
         mToggleButtonPtr = std::make_unique<juce::ToggleButton>();
@@ -171,7 +182,26 @@ public:
 
     void parameterChanged(const juce::String& parameterID, float newValue) override
     {
-        mDelayIsSynced = newValue;
+        if (parameterID.toStdString() == mDelayIsSyncedParameterId)
+        {
+            mDelayIsSynced = newValue;
+        }
+        else if (parameterID.toStdString() == mDelayIsLinkedParameterId)
+        {
+            mDelayIsLinked = newValue;
+        }
+
+        if (mDelayIsLinked)
+        {
+            mLeftPerBeatLabelPtr->setText("Delay", juce::dontSendNotification);
+            mLeftMillisecondLabelPtr->setText("Delay", juce::dontSendNotification);
+        }
+        else
+        {
+            mLeftPerBeatLabelPtr->setText("Left delay", juce::dontSendNotification);
+            mLeftMillisecondLabelPtr->setText("Left delay", juce::dontSendNotification);
+        }
+        
         resized();
     }
 
@@ -206,11 +236,16 @@ public:
         mLowPassFrequencyAttachmentPtr.reset();
         mFeedbackAttachmentPtr.reset();
         mDryWetAttachmentPtr.reset();
+        mSyncButtonAttachmentPtr.reset();
+        mLinkedButtonAttachmentPtr.reset();
 
         // Reset any additional controls not previously mentioned
         mToggleButtonPtr.reset();
         mToggleButtonAttachmentPtr.reset();
         mGroupComponentPtr.reset();
+
+        mSyncButtonPtr.reset();
+        mLinkedButtonPtr.reset();
     }
 
     void resized() override
@@ -233,7 +268,8 @@ public:
         row1FlexBox.alignContent = juce::FlexBox::AlignContent::stretch;
         row1FlexBox.flexWrap = juce::FlexBox::Wrap::wrap;
 
-        row1FlexBox.items.add(juce::FlexItem(*mSyncButtonPtr).withFlex(1).withMaxHeight(44));
+        row1FlexBox.items.add(juce::FlexItem(*mSyncButtonPtr).withFlex(0.5).withMaxHeight(44));
+        row1FlexBox.items.add(juce::FlexItem(*mLinkedButtonPtr).withFlex(0.5).withMaxHeight(44));
         mainFlexBox.items.add(juce::FlexItem(row1FlexBox).withFlex(0.5));
 
         juce::FlexBox row2FlexBox;
@@ -246,20 +282,27 @@ public:
         row2FlexBox.items.add(juce::FlexItem(*mFeedbackSliderPtr).withFlex(1).withMaxHeight(128));
 
         mLeftPerBeatSliderPtr->setVisible(mDelayIsSynced);
-        mRightPerBeatSliderPtr->setVisible(mDelayIsSynced);
+        mRightPerBeatSliderPtr->setVisible(mDelayIsSynced && !mDelayIsLinked);
 
         mLeftMillisecondSliderPtr->setVisible(!mDelayIsSynced);
-        mRightMillisecondSliderPtr->setVisible(!mDelayIsSynced);
+        mRightMillisecondSliderPtr->setVisible(!mDelayIsSynced && !mDelayIsLinked);
 
         if (mDelayIsSynced)
         {
             row2FlexBox.items.add(juce::FlexItem(*mLeftPerBeatSliderPtr).withFlex(1).withMaxHeight(128));
-            row2FlexBox.items.add(juce::FlexItem(*mRightPerBeatSliderPtr).withFlex(1).withMaxHeight(128));
+
+            if (!mDelayIsLinked)
+            {
+                row2FlexBox.items.add(juce::FlexItem(*mRightPerBeatSliderPtr).withFlex(1).withMaxHeight(128));
+            }
         }
         else
         {
             row2FlexBox.items.add(juce::FlexItem(*mLeftMillisecondSliderPtr).withFlex(1).withMaxHeight(128));
-            row2FlexBox.items.add(juce::FlexItem(*mRightMillisecondSliderPtr).withFlex(1).withMaxHeight(128));
+            if (!mDelayIsLinked)
+            {
+                row2FlexBox.items.add(juce::FlexItem(*mRightMillisecondSliderPtr).withFlex(1).withMaxHeight(128));
+            }
         }
 
         mainFlexBox.items.add(juce::FlexItem(row2FlexBox).withFlex(1));
@@ -299,8 +342,10 @@ private:
     juce::AudioProcessorValueTreeState& mApvts;
 
     std::string mDelayIsSyncedParameterId;
+    std::string mDelayIsLinkedParameterId;
 
     bool mDelayIsSynced = false;
+    bool mDelayIsLinked = true;
 
     std::unique_ptr<juce::GroupComponent> mGroupComponentPtr;
     
@@ -338,6 +383,9 @@ private:
 
     std::unique_ptr<juce::ToggleButton> mSyncButtonPtr;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mSyncButtonAttachmentPtr;
+
+    std::unique_ptr<juce::ToggleButton> mLinkedButtonPtr;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mLinkedButtonAttachmentPtr;
     
     std::unique_ptr<juce::ToggleButton> mToggleButtonPtr;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mToggleButtonAttachmentPtr;

@@ -82,6 +82,7 @@ public:
 			apvts::delayFeedbackId,
 			apvts::delayDryWetId,
 			apvts::delayIsSyncedId,
+			apvts::delayLinkedId,
 			apvts::delayOnId ));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
