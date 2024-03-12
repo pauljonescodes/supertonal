@@ -22,6 +22,9 @@ public:
     static std::string toSnakeCase(const std::string& str);
     static std::string toTitleCase(const std::string& str);
 
+    static void checkForInvalidSamples(const juce::dsp::AudioBlock<float>& blockToCheck);
+    static float calculateRMS(juce::AudioBuffer<float>& buffer, int numChannels, int numSamples);
+
     static inline float calculateSamplesForBpmFractionAndRate(
         float beatsPerMinute, // ex. 120
         float fractionOfBeat, // ex. 4.0f

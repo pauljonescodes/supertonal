@@ -62,10 +62,6 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mBiasPtr(std::make_unique<juce::dsp::Bias<float>>()),
 	mAmplifierEqualiser(std::make_unique<AmplifierEqualiser>()),
 
-	mPostCompressorPtr(std::make_unique<juce::dsp::Compressor<float>>()),
-	mPostCompressorGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
-	mPostCompressorDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
-
 	mDelayLineLeftPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue* (apvts::sampleRateAssumption / 1000))),
 	mDelayLineRightPtr(std::make_unique<juce::dsp::DelayLine<float>>(apvts::delayTimeMsMaximumValue* (apvts::sampleRateAssumption / 1000))),
 	mDelayLineDryWetMixerPtr(std::make_unique<juce::dsp::DryWetMixer<float>>()),
@@ -738,10 +734,6 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mBiasPtr->prepare(spec);
 	mAmplifierEqualiser->prepare(spec);
 
-	mPostCompressorPtr->prepare(spec);
-	mPostCompressorGainPtr->prepare(spec);
-	mPostCompressorDryWetMixerPtr->prepare(spec);
-
 	const auto maximumDelayInSamples = apvts::delayTimeMsMaximumValue * (spec.sampleRate / 1000);
 	mDelayLineLeftPtr->setMaximumDelayInSamples(maximumDelayInSamples);
 	mDelayLineLeftPtr->prepare(spec);
@@ -820,10 +812,6 @@ void PluginAudioProcessor::reset()
 	mBiasPtr->reset();
 	mAmplifierEqualiser->reset();
 
-	mPostCompressorPtr->reset();
-	mPostCompressorGainPtr->reset();
-	mPostCompressorDryWetMixerPtr->reset();
-
 	mDelayLineLeftPtr->reset();
 	mDelayLineRightPtr->reset();
 	mDelayLineDryWetMixerPtr->reset();
@@ -876,12 +864,12 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	if (mPreCompressorIsOn)
 	{
 		mPreCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
-		float preCompressorInputRms = mPreCompressorAutoMakeup ? calculateRMS(buffer, totalNumInputChannels, numSamples) : 0;
+		float preCompressorInputRms = mPreCompressorAutoMakeup ? PluginUtils::calculateRMS(buffer, totalNumInputChannels, numSamples) : 0;
 		mPreCompressorPtr->process(processContext);
 
 		if (mPreCompressorAutoMakeup)
 		{
-			float preCompressorOutputRms = calculateRMS(buffer, totalNumInputChannels, numSamples);
+			float preCompressorOutputRms = PluginUtils::calculateRMS(buffer, totalNumInputChannels, numSamples);
 			mPreCompressorGainSmoothedValue.setTargetValue(std::min(preCompressorInputRms / preCompressorOutputRms, 12.0f));
 
 			for (int sample = 0; sample < numSamples; ++sample)
@@ -915,24 +903,14 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mMouseDrivePtr->processBlock(buffer);
 	}
 
-	mStage1Buffer->clear();
-	auto stage1Block = juce::dsp::AudioBlock<float>(*mStage1Buffer.get());
-
-
-	auto stage1Context = juce::dsp::ProcessContextReplacing<float>(stage1Block);
 	if (mStage1IsOn)
 	{
 		mStage1DryWetMixerPtr->pushDrySamples(audioBlock);
-
 		mStage1InputGainPtr->process(processContext);
 		mStage1WaveShaperPtr->process(processContext);
 		mStage1OutputGainPtr->process(processContext);
 		mStage1DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
-
-	mStage2Buffer->clear();
-	auto stage2Block = juce::dsp::AudioBlock<float>(*mStage2Buffer.get());
-	auto stage2Context = juce::dsp::ProcessContextReplacing<float>(stage2Block);
 
 	if (mStage2IsOn)
 	{
@@ -943,10 +921,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mStage2DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
-	mStage3Buffer->clear();
-	auto stage3Block = juce::dsp::AudioBlock<float>(*mStage3Buffer.get());
-	auto stage3Context = juce::dsp::ProcessContextReplacing<float>(stage3Block);
-
 	if (mStage3IsOn)
 	{
 		mStage3DryWetMixerPtr->pushDrySamples(audioBlock);
@@ -955,10 +929,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mStage3OutputGainPtr->process(processContext);
 		mStage3DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
-
-	mStage4Buffer->clear();
-	auto stage4Block = juce::dsp::AudioBlock<float>(*mStage4Buffer.get());
-	auto stage4Context = juce::dsp::ProcessContextReplacing<float>(stage4Block);
 
 	if (mStage4IsOn)
 	{
@@ -977,34 +947,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	mAmplifierEqualiser->processBlock(buffer);
 	mBiasPtr->process(processContext);
 
-	if (mPostCompressorIsOn)
-	{
-		mPostCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
-		float postCompressorInputRms = mPostCompressorAutoMakeup ? calculateRMS(buffer, totalNumInputChannels, numSamples) : 0;
-		mPostCompressorPtr->process(processContext);
-
-		if (mPostCompressorAutoMakeup)
-		{
-			float postCompressorOutputRms = calculateRMS(buffer, totalNumInputChannels, numSamples);
-			mPostCompressorGainSmoothedValue.setTargetValue(std::min(postCompressorInputRms / postCompressorOutputRms, 12.0f));
-
-			for (int sample = 0; sample < numSamples; ++sample)
-			{
-				float preCompressorGainSmoothedNextValue = mPostCompressorGainSmoothedValue.getNextValue();
-
-				for (int channel = 0; channel < totalNumInputChannels; ++channel)
-				{
-					auto* channelData = buffer.getWritePointer(channel);
-					channelData[sample] *= preCompressorGainSmoothedNextValue;
-				}
-			}
-		}
-
-		mPostCompressorGainPtr->process(processContext);
-		mPostCompressorDryWetMixerPtr->mixWetSamples(audioBlock);
-	}
-
-
 	if (mDelayFeedback > 0.0f && mDelayOn)
 	{
 		mDelayLineDryWetMixerPtr->pushDrySamples(audioBlock);
@@ -1012,14 +954,14 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		auto* leftChannelData = audioBlock.getChannelPointer(0);
 		if (leftChannelData)
 		{
-			for (int i = 0; i < numSamples; ++i)
+			for (int sampleIndex = 0; sampleIndex < numSamples; ++sampleIndex)
 			{
 				const float delayedSample = mDelayLineLeftPtr->popSample(0, mDelayLineLeftPtr->getDelay());
 
-				if (i < audioBlock.getNumSamples())
+				if (sampleIndex < audioBlock.getNumSamples())
 				{
-					mDelayLineLeftPtr->pushSample(0, leftChannelData[i] + mDelayFeedback * delayedSample);
-					leftChannelData[i] += delayedSample;
+					mDelayLineLeftPtr->pushSample(0, leftChannelData[sampleIndex] + mDelayFeedback * delayedSample);
+					leftChannelData[sampleIndex] += delayedSample;
 				}
 			}
 		}
@@ -1027,14 +969,14 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		auto* rightChannelData = audioBlock.getChannelPointer(1);
 		if (rightChannelData)
 		{
-			for (int i = 0; i < numSamples; ++i)
+			for (int sampleIndex = 0; sampleIndex < numSamples; ++sampleIndex)
 			{
 				const float delayedSample = mDelayLineRightPtr->popSample(0, mDelayLineRightPtr->getDelay());
 
-				if (i < audioBlock.getNumSamples())
+				if (sampleIndex < audioBlock.getNumSamples())
 				{
-					mDelayLineRightPtr->pushSample(0, rightChannelData[i] + mDelayFeedback * delayedSample);
-					rightChannelData[i] += delayedSample;
+					mDelayLineRightPtr->pushSample(0, rightChannelData[sampleIndex] + mDelayFeedback * delayedSample);
+					rightChannelData[sampleIndex] += delayedSample;
 				}
 			}
 		}
@@ -1099,27 +1041,10 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	mOutputGainPtr->process(processContext);
 
 #ifdef JUCE_DEBUG
-	checkForInvalidSamples(audioBlock);
+	PluginUtils::checkForInvalidSamples(audioBlock);
 #endif
 }
 
-void PluginAudioProcessor::checkForInvalidSamples(const juce::dsp::AudioBlock<float>& blockToCheck)
-{
-	auto numChans = blockToCheck.getNumChannels();
-	auto numSamps = blockToCheck.getNumSamples();
-
-	for (auto c = 0; c < numChans; ++c)
-	{
-		for (auto s = 0; s < numSamps; ++s)
-		{
-			auto sample = blockToCheck.getSample(c, s);
-			jassert(!std::isnan(sample));
-			// Probably also this ones
-			jassert(sample <= 1.0f);
-			jassert(sample >= -1.0f);
-		}
-	}
-}
 
 void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceString, float newValue)
 {
@@ -1777,21 +1702,4 @@ juce::AudioProcessorEditor* PluginAudioProcessor::createEditor()
 		*mAudioProcessorValueTreeStatePtr.get(),
 		*mPresetManagerPtr.get()
 	);
-}
-
-float PluginAudioProcessor::calculateRMS(juce::AudioBuffer<float>& buffer, int numChannels, int numSamples)
-{
-	float sum = 0.0f;
-
-	for (int channel = 0; channel < numChannels; ++channel) {
-		const float* channelData = buffer.getReadPointer(channel, 0);
-
-		for (int i = 0; i < numSamples; ++i) {
-			float sample = channelData[i];
-			sum += sample * sample; // Square the sample and add it to the sum.
-		}
-	}
-
-	float mean = sum / (numChannels * numSamples); // Calculate the mean of the squared sums.
-	return std::sqrt(mean) + 0.0001; // Return the square root of the mean.
 }

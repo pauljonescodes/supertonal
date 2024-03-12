@@ -51,6 +51,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState> mAudioProcessorValueTreeStatePtr;
     std::unique_ptr<PluginPresetManager> mPresetManagerPtr;
     std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
+    juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
 
     std::unique_ptr<juce::dsp::Gain<float>> mInputGainPtr;
 
@@ -71,7 +72,6 @@ private:
 
     bool mGraphicEqualiserIsOn = false;
     std::unique_ptr<GraphicEqualiser> mGraphicEqualiser;
-
 
     bool mStage1IsOn = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage1Buffer;
@@ -103,13 +103,6 @@ private:
 
     std::unique_ptr<juce::dsp::Bias<float>> mBiasPtr;
     std::unique_ptr<AmplifierEqualiser> mAmplifierEqualiser;
-
-    bool mPostCompressorIsOn = false;
-    bool mPostCompressorAutoMakeup = false;
-    std::unique_ptr<juce::dsp::Compressor<float>> mPostCompressorPtr;
-    std::unique_ptr<juce::dsp::Gain<float>> mPostCompressorGainPtr;
-    std::unique_ptr<juce::dsp::DryWetMixer<float>> mPostCompressorDryWetMixerPtr;
-    juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mPostCompressorGainSmoothedValue;
     
     bool mDelayOn = false;
     bool mDelayBpmSynced = false;
@@ -119,13 +112,10 @@ private:
     float mDelayLeftPerBeatDivision = 2.0f;
     float mDelayRightPerBeatDivision = 2.0f;
     float mDelayFeedback = 0.5f;
-    juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
     std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLineLeftPtr;
     std::unique_ptr<juce::dsp::DelayLine<float>> mDelayLineRightPtr;
-
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mDelayLowPassFilterPtr;
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mDelayHighPassFilterPtr;
-    
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mDelayLineDryWetMixerPtr;
 
     bool mChorusOn = false;
@@ -158,8 +148,6 @@ private:
     bool mBypassIsOn = false;
 
     void loadImpulseResponseFromState();
-    void checkForInvalidSamples (const juce::dsp::AudioBlock<float>& blockToCheck);
-    float calculateRMS(juce::AudioBuffer<float>& buffer, int numChannels, int numSamples);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginAudioProcessor)
 };
