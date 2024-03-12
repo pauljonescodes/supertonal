@@ -199,7 +199,8 @@ namespace apvts
 		{lowPassEqualizationComponentId,lowPassFrequencyDefaultValue},
 	};
 
-	static constexpr float qualityDefaultValue = 0.001; 
+	static constexpr float qualityOffDefaultValue = 0.001f; 
+	static constexpr float qualityOnDefaultValue = 1.00f;
 	static constexpr float qualityMinimumValue = 0.001f;
 	static constexpr float qualityMaximumValue = 10.f;
 	static const juce::NormalisableRange<float> qualityNormalisableRange = makeLogarithmicRange(

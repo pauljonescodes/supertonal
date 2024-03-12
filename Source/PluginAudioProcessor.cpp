@@ -296,6 +296,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_QUALITY:
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_QUALITY:
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY:
+		{
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				apvts::qualityNormalisableRange,
+				apvts::qualityOnDefaultValue
+				));
+		}
+		break;
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_QUALITY:
 		case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_QUALITY:
 		{
@@ -303,7 +312,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::qualityNormalisableRange,
-				apvts::qualityDefaultValue
+				apvts::qualityOffDefaultValue
 				));
 		}
 		break;
