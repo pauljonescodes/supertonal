@@ -10,7 +10,7 @@
 #include "Processors/GraphicEqualiser.h"
 #include "Processors/AmplifierEqualiser.h"
 #include "Processors/InstrumentEqualiser.h"
-#include "CTAGDRC/dsp/include/Compressor.h"
+#include "Processors/CTAGDRC/dsp/include/Compressor.h"
 #include "Processors/BitCrusher.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener

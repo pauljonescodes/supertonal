@@ -46,45 +46,45 @@
               file="Source/Components/PresetComponent.h"/>
         <FILE id="JJ02wX" name="TopComponent.h" compile="0" resource="0" file="Source/Components/TopComponent.h"/>
       </GROUP>
-      <GROUP id="{58C39481-C96F-9F03-0FD2-56DBF06160A3}" name="CTAGDRC">
-        <GROUP id="{5778DDA8-F192-603D-2FA2-EFA3B433986C}" name="dsp">
-          <GROUP id="{C14D85C5-3837-266C-FFD3-9DB6B09A4484}" name="include">
-            <FILE id="UPtoiq" name="Compressor.h" compile="0" resource="0" file="Source/CTAGDRC/dsp/include/Compressor.h"/>
-            <FILE id="BSs3nv" name="CrestFactor.h" compile="0" resource="0" file="Source/CTAGDRC/dsp/include/CrestFactor.h"/>
-            <FILE id="nj2x1W" name="DelayLine.h" compile="0" resource="0" file="Source/CTAGDRC/dsp/include/DelayLine.h"/>
-            <FILE id="hsgDHC" name="EnvelopeFollower.h" compile="0" resource="0"
-                  file="Source/CTAGDRC/dsp/include/EnvelopeFollower.h"/>
-            <FILE id="iBY51y" name="GainComputer.h" compile="0" resource="0" file="Source/CTAGDRC/dsp/include/GainComputer.h"/>
-            <FILE id="naWLRc" name="LevelDetector.h" compile="0" resource="0" file="Source/CTAGDRC/dsp/include/LevelDetector.h"/>
-            <FILE id="FcNnu2" name="LevelEnvelopeFollower.h" compile="0" resource="0"
-                  file="Source/CTAGDRC/dsp/include/LevelEnvelopeFollower.h"/>
-            <FILE id="KUp2n8" name="LookAhead.h" compile="0" resource="0" file="Source/CTAGDRC/dsp/include/LookAhead.h"/>
-            <FILE id="gBQEnz" name="SmoothingFilter.h" compile="0" resource="0"
-                  file="Source/CTAGDRC/dsp/include/SmoothingFilter.h"/>
-          </GROUP>
-          <FILE id="kuQ7we" name="Compressor.cpp" compile="1" resource="0" file="Source/CTAGDRC/dsp/Compressor.cpp"/>
-          <FILE id="r3PEBK" name="CrestFactor.cpp" compile="1" resource="0" file="Source/CTAGDRC/dsp/CrestFactor.cpp"/>
-          <FILE id="bcRqX1" name="DelayLine.cpp" compile="1" resource="0" file="Source/CTAGDRC/dsp/DelayLine.cpp"/>
-          <FILE id="MyNjaV" name="EnvelopeFollower.cpp" compile="1" resource="0"
-                file="Source/CTAGDRC/dsp/EnvelopeFollower.cpp"/>
-          <FILE id="S0Qmkk" name="GainComputer.cpp" compile="1" resource="0"
-                file="Source/CTAGDRC/dsp/GainComputer.cpp"/>
-          <FILE id="rJdt5T" name="LevelDetector.cpp" compile="1" resource="0"
-                file="Source/CTAGDRC/dsp/LevelDetector.cpp"/>
-          <FILE id="uXaPgX" name="LevelEnvelopeFollower.cpp" compile="1" resource="0"
-                file="Source/CTAGDRC/dsp/LevelEnvelopeFollower.cpp"/>
-          <FILE id="D3zHgN" name="LookAhead.cpp" compile="1" resource="0" file="Source/CTAGDRC/dsp/LookAhead.cpp"/>
-          <FILE id="cT4OMA" name="SmoothingFilter.cpp" compile="1" resource="0"
-                file="Source/CTAGDRC/dsp/SmoothingFilter.cpp"/>
-        </GROUP>
-        <GROUP id="{FA5B5066-0DA6-DEDC-2B2A-13AE18B7ED15}" name="util">
-          <GROUP id="{9658AB46-EC37-4483-D7D1-085B67AF437C}" name="include">
-            <FILE id="sYWytn" name="Constants.h" compile="0" resource="0" file="Source/CTAGDRC/util/include/Constants.h"/>
-            <FILE id="zDDVNb" name="SIMDMath.h" compile="0" resource="0" file="Source/CTAGDRC/util/include/SIMDMath.h"/>
-          </GROUP>
-        </GROUP>
-      </GROUP>
       <GROUP id="{DEDDA15C-1DE5-7D7A-FDED-908468144E16}" name="Processors">
+        <GROUP id="{6E6EEA58-D37D-0DC6-2792-2F3D385AC990}" name="CTAGDRC">
+          <GROUP id="{30C77374-4782-6766-4658-F66040CDF973}" name="dsp">
+            <GROUP id="{5C6651F4-47CC-333E-7A74-2C057F6E2D1C}" name="include">
+              <FILE id="NaY1Oj" name="Compressor.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/dsp/include/Compressor.h"/>
+              <FILE id="J5jFxu" name="CrestFactor.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/dsp/include/CrestFactor.h"/>
+              <FILE id="pwl5E8" name="DelayLine.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/dsp/include/DelayLine.h"/>
+              <FILE id="ERVkyI" name="EnvelopeFollower.h" compile="0" resource="0"
+                    file="Source/Processors/CTAGDRC/dsp/include/EnvelopeFollower.h"/>
+              <FILE id="a6Tx6t" name="GainComputer.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/dsp/include/GainComputer.h"/>
+              <FILE id="HKYhcB" name="LevelDetector.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/dsp/include/LevelDetector.h"/>
+              <FILE id="wB5YON" name="LevelEnvelopeFollower.h" compile="0" resource="0"
+                    file="Source/Processors/CTAGDRC/dsp/include/LevelEnvelopeFollower.h"/>
+              <FILE id="MeFZXZ" name="LookAhead.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/dsp/include/LookAhead.h"/>
+              <FILE id="VGmXMM" name="SmoothingFilter.h" compile="0" resource="0"
+                    file="Source/Processors/CTAGDRC/dsp/include/SmoothingFilter.h"/>
+            </GROUP>
+            <FILE id="OGcg37" name="Compressor.cpp" compile="1" resource="0" file="Source/Processors/CTAGDRC/dsp/Compressor.cpp"/>
+            <FILE id="TJD0yH" name="CrestFactor.cpp" compile="1" resource="0" file="Source/Processors/CTAGDRC/dsp/CrestFactor.cpp"/>
+            <FILE id="yb6vyr" name="DelayLine.cpp" compile="1" resource="0" file="Source/Processors/CTAGDRC/dsp/DelayLine.cpp"/>
+            <FILE id="djKSs0" name="EnvelopeFollower.cpp" compile="1" resource="0"
+                  file="Source/Processors/CTAGDRC/dsp/EnvelopeFollower.cpp"/>
+            <FILE id="Xr2kB0" name="GainComputer.cpp" compile="1" resource="0"
+                  file="Source/Processors/CTAGDRC/dsp/GainComputer.cpp"/>
+            <FILE id="hvHBnD" name="LevelDetector.cpp" compile="1" resource="0"
+                  file="Source/Processors/CTAGDRC/dsp/LevelDetector.cpp"/>
+            <FILE id="IBEHRs" name="LevelEnvelopeFollower.cpp" compile="1" resource="0"
+                  file="Source/Processors/CTAGDRC/dsp/LevelEnvelopeFollower.cpp"/>
+            <FILE id="OtO4p3" name="LookAhead.cpp" compile="1" resource="0" file="Source/Processors/CTAGDRC/dsp/LookAhead.cpp"/>
+            <FILE id="A6ek3h" name="SmoothingFilter.cpp" compile="1" resource="0"
+                  file="Source/Processors/CTAGDRC/dsp/SmoothingFilter.cpp"/>
+          </GROUP>
+          <GROUP id="{25CBE718-A62A-C5B3-47E2-75038783BCF4}" name="util">
+            <GROUP id="{7753FFE3-6FBF-E54F-6A46-662EBD3104B7}" name="include">
+              <FILE id="TDi3uw" name="Constants.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/util/include/Constants.h"/>
+              <FILE id="hzu2i4" name="SIMDMath.h" compile="0" resource="0" file="Source/Processors/CTAGDRC/util/include/SIMDMath.h"/>
+            </GROUP>
+          </GROUP>
+        </GROUP>
         <FILE id="KsiAJx" name="AmplifierEqualiser.cpp" compile="1" resource="0"
               file="Source/Processors/AmplifierEqualiser.cpp"/>
         <FILE id="xPBCPw" name="AmplifierEqualiser.h" compile="0" resource="0"
