@@ -582,7 +582,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::makeupStart,
 					apvts::Ctagdrc::makeupEnd,
-					apvts::Ctagdrc::makeupInterval), 0.0f,
+					apvts::Ctagdrc::makeupInterval), 
+				apvts::Ctagdrc::makeupDefault,
 				String(),
 				AudioProcessorParameter::genericParameter,
 				[](float value, float)
@@ -597,7 +598,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::thresholdStart,
 					apvts::Ctagdrc::thresholdEnd,
-					apvts::Ctagdrc::thresholdInterval), -10.0f,
+					apvts::Ctagdrc::thresholdInterval), 
+				apvts::Ctagdrc::thresholdDefault,
 				String(), AudioProcessorParameter::genericParameter,
 				[](float value, float maxStrLen)
 				{
@@ -611,7 +613,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::ratioStart,
 					apvts::Ctagdrc::ratioEnd,
-					apvts::Ctagdrc::ratioInterval, 0.5f), 2.0f,
+					apvts::Ctagdrc::ratioInterval, 
+					0.5f), 
+				apvts::Ctagdrc::ratioDefault,
 				String(), AudioProcessorParameter::genericParameter,
 				[](float value, float)
 				{
@@ -640,7 +644,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::attackStart,
 					apvts::Ctagdrc::attackEnd,
-					apvts::Ctagdrc::attackInterval, 0.5f), 2.0f,
+					apvts::Ctagdrc::attackInterval, 0.5f), 
+				apvts::Ctagdrc::attackDefault,
 				"ms",
 				AudioProcessorParameter::genericParameter,
 				[](float value, float)
@@ -657,7 +662,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 					apvts::Ctagdrc::releaseStart,
 					apvts::Ctagdrc::releaseEnd,
 					apvts::Ctagdrc::releaseInterval, 0.35f),
-				140.0f,
+				apvts::Ctagdrc::releaseDefault,
 				String(),
 				AudioProcessorParameter::genericParameter,
 				[](float value, float)

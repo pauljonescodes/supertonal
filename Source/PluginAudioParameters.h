@@ -284,29 +284,34 @@ namespace apvts
 		constexpr float inputEnd = 30.0f;
 		constexpr float inputInterval = 0.1f;
 
-		constexpr float thresholdStart = -60.0f;
+		constexpr float thresholdStart = -100.0f;
 		constexpr float thresholdEnd = 0.0f;
 		constexpr float thresholdInterval = 0.1f;
+		constexpr float thresholdDefault = 0.0f;
 
-		constexpr float ratioStart = 1.0f;
-		constexpr float ratioEnd = 24.0f;
+		constexpr float ratioStart = 2.0f;
+		constexpr float ratioEnd = 12.0f;
 		constexpr float ratioInterval = 0.05f;
+		constexpr float ratioDefault = 2.0f;
 
 		constexpr float kneeStart = 0.0f;
 		constexpr float kneeEnd = 24.0f;
 		constexpr float kneeInterval = 0.1f;
 
-		constexpr float attackStart = 0.0f;
-		constexpr float attackEnd = 100.0f;
+		constexpr float attackStart = 3.0f;
+		constexpr float attackEnd = 200.0f;
 		constexpr float attackInterval = 0.01f;
+		constexpr float attackDefault = 50.0f;
 
-		constexpr float releaseStart = 5.0f;
-		constexpr float releaseEnd = 1500.0f;
+		constexpr float releaseStart = 10.0f;
+		constexpr float releaseEnd = 4000.0f;
 		constexpr float releaseInterval = 0.01f;
+		constexpr float releaseDefault = 500.0f;
 
-		constexpr float makeupStart = -40.0f;
-		constexpr float makeupEnd = 40.0f;
+		constexpr float makeupStart = 0.0f;
+		constexpr float makeupEnd = 24.0f;
 		constexpr float makeupInterval = 0.1f;
+		constexpr float makeupDefault = 0.0f;
 
 		constexpr float mixStart = 0.0f;
 		constexpr float mixEnd = 1.0f;
