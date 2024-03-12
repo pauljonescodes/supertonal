@@ -28,6 +28,13 @@
             file="Assets/WorkSans-Regular.ttf"/>
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
+      <GROUP id="{E61AEAD2-A27B-4077-58C6-0AA347A325BE}" name="Utilities">
+        <FILE id="zIhfUN" name="CircuitQuantityHelper.cpp" compile="1" resource="0"
+              file="Source/Utilities/CircuitQuantityHelper.cpp"/>
+        <FILE id="quTl9D" name="CircuitQuantityHelper.h" compile="0" resource="0"
+              file="Source/Utilities/CircuitQuantityHelper.h"/>
+        <FILE id="ClkX0h" name="OmegaProvider.h" compile="0" resource="0" file="Source/Utilities/OmegaProvider.h"/>
+      </GROUP>
       <GROUP id="{4158DADA-03E3-DF91-81E4-7F16E37B44DD}" name="Components">
         <FILE id="d4eaVE" name="AmpComponent.h" compile="0" resource="0" file="Source/Components/AmpComponent.h"/>
         <FILE id="qVRro4" name="CabinetComponent.h" compile="0" resource="0"
@@ -47,6 +54,37 @@
         <FILE id="JJ02wX" name="TopComponent.h" compile="0" resource="0" file="Source/Components/TopComponent.h"/>
       </GROUP>
       <GROUP id="{DEDDA15C-1DE5-7D7A-FDED-908468144E16}" name="Processors">
+        <GROUP id="{5B869611-B206-28D5-C958-2731ED1ECBE4}" name="Modulators"/>
+        <GROUP id="{DB7C5CF8-BA5F-152F-2185-2ACD2FB71555}" name="Other">
+          <FILE id="CAHShK" name="BitCrusher.h" compile="0" resource="0" file="Source/Processors/Other/BitCrusher.h"/>
+          <FILE id="GZTF4J" name="Krusher.h" compile="0" resource="0" file="Source/Processors/Other/Krusher.h"/>
+        </GROUP>
+        <GROUP id="{48569B5C-89A6-9FBD-C12B-E0EB684137A4}" name="Saturators">
+          <FILE id="laPG50" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/Saturators/MouseDrive.cpp"/>
+          <FILE id="cqDzjM" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/Saturators/MouseDrive.h"/>
+          <FILE id="PtVcPy" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/Saturators/MouseDriveWDF.h"/>
+          <FILE id="jUzltY" name="TubeScreamer.cpp" compile="1" resource="0"
+                file="Source/Processors/Saturators/TubeScreamer.cpp"/>
+          <FILE id="r2mpz2" name="TubeScreamer.h" compile="0" resource="0" file="Source/Processors/Saturators/TubeScreamer.h"/>
+          <FILE id="PsMWmK" name="TubeScreamerTone.h" compile="0" resource="0"
+                file="Source/Processors/Saturators/TubeScreamerTone.h"/>
+          <FILE id="EMr1uG" name="TubeScreamerWDF.h" compile="0" resource="0"
+                file="Source/Processors/Saturators/TubeScreamerWDF.h"/>
+        </GROUP>
+        <GROUP id="{64E4000E-0899-B8A4-1590-707E80D99B64}" name="Equilisers">
+          <FILE id="Eu8rSK" name="AmplifierEqualiser.cpp" compile="1" resource="0"
+                file="Source/Processors/Equilisers/AmplifierEqualiser.cpp"/>
+          <FILE id="wslfEP" name="AmplifierEqualiser.h" compile="0" resource="0"
+                file="Source/Processors/Equilisers/AmplifierEqualiser.h"/>
+          <FILE id="mpTW3x" name="GraphicEqualiser.cpp" compile="1" resource="0"
+                file="Source/Processors/Equilisers/GraphicEqualiser.cpp"/>
+          <FILE id="APBrCo" name="GraphicEqualiser.h" compile="0" resource="0"
+                file="Source/Processors/Equilisers/GraphicEqualiser.h"/>
+          <FILE id="mj6u0p" name="InstrumentEqualiser.cpp" compile="1" resource="0"
+                file="Source/Processors/Equilisers/InstrumentEqualiser.cpp"/>
+          <FILE id="xT3pxK" name="InstrumentEqualiser.h" compile="0" resource="0"
+                file="Source/Processors/Equilisers/InstrumentEqualiser.h"/>
+        </GROUP>
         <GROUP id="{6E6EEA58-D37D-0DC6-2792-2F3D385AC990}" name="CTAGDRC">
           <GROUP id="{30C77374-4782-6766-4658-F66040CDF973}" name="dsp">
             <GROUP id="{5C6651F4-47CC-333E-7A74-2C057F6E2D1C}" name="include">
@@ -85,35 +123,6 @@
             </GROUP>
           </GROUP>
         </GROUP>
-        <FILE id="KsiAJx" name="AmplifierEqualiser.cpp" compile="1" resource="0"
-              file="Source/Processors/AmplifierEqualiser.cpp"/>
-        <FILE id="xPBCPw" name="AmplifierEqualiser.h" compile="0" resource="0"
-              file="Source/Processors/AmplifierEqualiser.h"/>
-        <FILE id="pksgON" name="BitCrusher.h" compile="0" resource="0" file="Source/Processors/BitCrusher.h"/>
-        <FILE id="lPEM6L" name="CircuitQuantityHelper.cpp" compile="1" resource="0"
-              file="Source/Processors/CircuitQuantityHelper.cpp"/>
-        <FILE id="Apt5ZJ" name="CircuitQuantityHelper.h" compile="0" resource="0"
-              file="Source/Processors/CircuitQuantityHelper.h"/>
-        <FILE id="lohpDI" name="GraphicEqualiser.cpp" compile="1" resource="0"
-              file="Source/Processors/GraphicEqualiser.cpp"/>
-        <FILE id="c8r1AO" name="GraphicEqualiser.h" compile="0" resource="0"
-              file="Source/Processors/GraphicEqualiser.h"/>
-        <FILE id="FqBnRX" name="InstrumentEqualiser.cpp" compile="1" resource="0"
-              file="Source/Processors/InstrumentEqualiser.cpp"/>
-        <FILE id="attHtB" name="InstrumentEqualiser.h" compile="0" resource="0"
-              file="Source/Processors/InstrumentEqualiser.h"/>
-        <FILE id="XoI98A" name="Krusher.h" compile="0" resource="0" file="Source/Processors/Krusher.h"/>
-        <FILE id="VTRb6A" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/MouseDrive.cpp"/>
-        <FILE id="b3ou1p" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/MouseDrive.h"/>
-        <FILE id="rcNVYV" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/MouseDriveWDF.h"/>
-        <FILE id="LXpnkn" name="OmegaProvider.h" compile="0" resource="0" file="Source/Processors/OmegaProvider.h"/>
-        <FILE id="Vg4uMN" name="TubeScreamer.cpp" compile="1" resource="0"
-              file="Source/Processors/TubeScreamer.cpp"/>
-        <FILE id="XSd2NB" name="TubeScreamer.h" compile="0" resource="0" file="Source/Processors/TubeScreamer.h"/>
-        <FILE id="ZM1xZr" name="TubeScreamerTone.h" compile="0" resource="0"
-              file="Source/Processors/TubeScreamerTone.h"/>
-        <FILE id="b1rRnG" name="TubeScreamerWDF.h" compile="0" resource="0"
-              file="Source/Processors/TubeScreamerWDF.h"/>
       </GROUP>
       <FILE id="PeiO2K" name="PluginAudioParameters.h" compile="0" resource="0"
             file="Source/PluginAudioParameters.h"/>

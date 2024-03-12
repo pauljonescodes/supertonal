@@ -1,7 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "OmegaProvider.h"
+#include "../../Utilities/OmegaProvider.h"
 #include "chowdsp_wdf.h"
 
 class TubeScreamerWDF

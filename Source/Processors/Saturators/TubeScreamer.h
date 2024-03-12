@@ -5,7 +5,7 @@
 
 #include <JuceHeader.h>
 #include "TubeScreamerWDF.h"
-#include "CircuitQuantityHelper.h"
+#include "../../Utilities/CircuitQuantityHelper.h"
 #include "TubeScreamerTone.h"
 
 class TubeScreamer

@@ -5,13 +5,13 @@
 
 #include <JuceHeader.h>
 #include "PluginPresetManager.h"
-#include "Processors/MouseDrive.h"
-#include "Processors/TubeScreamer.h"
-#include "Processors/GraphicEqualiser.h"
-#include "Processors/AmplifierEqualiser.h"
-#include "Processors/InstrumentEqualiser.h"
+#include "Processors/Saturators/MouseDrive.h"
+#include "Processors/Saturators/TubeScreamer.h"
+#include "Processors/Equilisers/GraphicEqualiser.h"
+#include "Processors/Equilisers/AmplifierEqualiser.h"
+#include "Processors/Equilisers/InstrumentEqualiser.h"
 #include "Processors/CTAGDRC/dsp/include/Compressor.h"
-#include "Processors/BitCrusher.h"
+#include "Processors/Other/BitCrusher.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {

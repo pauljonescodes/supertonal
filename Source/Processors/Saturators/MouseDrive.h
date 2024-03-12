@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MouseDriveWDF.h"
-#include "CircuitQuantityHelper.h"
+#include "../../Utilities/CircuitQuantityHelper.h"
 #include <JuceHeader.h>
 
 class MouseDrive 
