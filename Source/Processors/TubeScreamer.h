@@ -1,5 +1,8 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <JuceHeader.h>
 #include "TubeScreamerWDF.h"
 #include "CircuitQuantityHelper.h"

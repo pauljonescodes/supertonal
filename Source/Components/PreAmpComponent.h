@@ -109,6 +109,15 @@ public:
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
 			audioProcessorValueTreeState,
+			"Bit Crusher",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::bitCrusherSampleRateId, "Sample rate", " hz"},
+				{ apvts::bitCrusherBitDepthId, "Bit depth", "bits" },
+		},
+			apvts::bitCrusherOnId));
+
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
 			"Reverb",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::roomSizeId, "Size", ""},

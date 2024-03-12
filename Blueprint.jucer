@@ -4,7 +4,8 @@
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
               jucerFormatVersion="1" version="0.2.1" companyName="Supertonal DSP"
               companyCopyright="2024" pluginFormats="buildAAX,buildAU,buildStandalone,buildVST3"
-              pluginAAXCategory="8192" headerPath="../../Modules/math_approx/include&#10;../../Modules/chowdsp_wdf/include/chowdsp_wdf">
+              pluginAAXCategory="8192" headerPath="../../Modules/math_approx/include&#10;../../Modules/chowdsp_wdf/include/chowdsp_wdf"
+              cppLanguageStandard="20">
   <MAINGROUP id="Pdzbsi" name="Blueprint Cory Bergeron2">
     <GROUP id="{2ED2996E-C3B4-16E6-D794-2D6A2D1A240A}" name="Assets">
       <FILE id="NiXqDL" name="cory_bread_and_butter_normalized.wav" compile="0"
@@ -88,6 +89,7 @@
               file="Source/Processors/AmplifierEqualiser.cpp"/>
         <FILE id="xPBCPw" name="AmplifierEqualiser.h" compile="0" resource="0"
               file="Source/Processors/AmplifierEqualiser.h"/>
+        <FILE id="pksgON" name="BitCrusher.h" compile="0" resource="0" file="Source/Processors/BitCrusher.h"/>
         <FILE id="lPEM6L" name="CircuitQuantityHelper.cpp" compile="1" resource="0"
               file="Source/Processors/CircuitQuantityHelper.cpp"/>
         <FILE id="Apt5ZJ" name="CircuitQuantityHelper.h" compile="0" resource="0"
@@ -100,6 +102,7 @@
               file="Source/Processors/InstrumentEqualiser.cpp"/>
         <FILE id="attHtB" name="InstrumentEqualiser.h" compile="0" resource="0"
               file="Source/Processors/InstrumentEqualiser.h"/>
+        <FILE id="XoI98A" name="Krusher.h" compile="0" resource="0" file="Source/Processors/Krusher.h"/>
         <FILE id="VTRb6A" name="MouseDrive.cpp" compile="1" resource="0" file="Source/Processors/MouseDrive.cpp"/>
         <FILE id="b3ou1p" name="MouseDrive.h" compile="0" resource="0" file="Source/Processors/MouseDrive.h"/>
         <FILE id="rcNVYV" name="MouseDriveWDF.h" compile="0" resource="0" file="Source/Processors/MouseDriveWDF.h"/>

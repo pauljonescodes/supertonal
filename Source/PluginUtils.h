@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    PluginUtils.h
-    Created: 29 Dec 2023 8:14:17pm
-    Author:  paulm
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include "PluginAudioParameters.h"
@@ -45,5 +35,14 @@ public:
         const float milliseconds // 1/1000th second, ex. 30
     ) {
         return (milliseconds * 0.001) * samplesPerSecond;
+    }
+
+    static inline float clampedValueForFractionOfBeat(
+        float beatsPerMinute,
+        float fractionOfBeat, float minimumValue = 0.000f, float maximumValue = 99.999f)
+    {
+        float noteDurationSeconds = 60.0f / beatsPerMinute * fractionOfBeat;
+        float frequencyHz = 1.0f / noteDurationSeconds;
+        return std::clamp(frequencyHz, minimumValue, maximumValue);
     }
 };

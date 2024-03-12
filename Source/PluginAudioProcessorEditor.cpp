@@ -38,26 +38,26 @@ static const std::vector<std::vector<std::string>> sMixerIds = {
 	apvts::instrumentEqualiserHighPeakGainId,
 },
 {
-apvts::instrumentCompressorIsOn,
-apvts::instrumentCompressorIsPreEq,
+	apvts::instrumentCompressorIsOn,
+	apvts::instrumentCompressorIsPreEq,
 },
 {
-apvts::instrumentCompressorInputGain,
-apvts::instrumentCompressorThreshold,
-apvts::instrumentCompressorKnee,
-apvts::instrumentCompressorRatio,
+	apvts::instrumentCompressorInputGain,
+	apvts::instrumentCompressorThreshold,
+	apvts::instrumentCompressorKnee,
+	apvts::instrumentCompressorRatio,
 },
 {
-apvts::instrumentCompressorIsAutoMakeupOn,
-apvts::instrumentCompressorIsAutoAttackOn,
-apvts::instrumentCompressorIsAutoReleaseOn,
-apvts::instrumentCompressorIsLookaheadOn,
+	apvts::instrumentCompressorIsAutoMakeupOn,
+	apvts::instrumentCompressorIsAutoAttackOn,
+	apvts::instrumentCompressorIsAutoReleaseOn,
+	apvts::instrumentCompressorIsLookaheadOn,
 },
 {
-apvts::instrumentCompressorMakeup,
-apvts::instrumentCompressorAttack,
-apvts::instrumentCompressorRelease,
-apvts::instrumentCompressorMix,
+	apvts::instrumentCompressorMakeup,
+	apvts::instrumentCompressorAttack,
+	apvts::instrumentCompressorRelease,
+	apvts::instrumentCompressorMix,
 },
 {
 	apvts::limiterOnId,
@@ -96,7 +96,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	this->launchAsyncFileChooserForImpulseResponse();
 		})),
 	mMixerApvtsIdComponentPtr(std::make_unique<ApvtsIdComponent>(mAudioProcessorValueTreeState, sMixerIds)),
-	mHiddenApvtsIdComponentPtr(std::make_unique<ApvtsIdComponent>(mAudioProcessorValueTreeState, sHiddenIds))
+			mHiddenApvtsIdComponentPtr(std::make_unique<ApvtsIdComponent>(mAudioProcessorValueTreeState, sHiddenIds))
 {
 	setLookAndFeel(&mLookAndFeel);
 

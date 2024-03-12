@@ -21,7 +21,7 @@ namespace apvts
 	static inline juce::NormalisableRange<float> makeLogarithmicRange(float rangeStart, float rangeEnd, float intervalValue)
 	{
 		juce::NormalisableRange<float> normalisableRange = {
-			rangeStart, 
+			rangeStart,
 			rangeEnd,
 			[=](float start, float end, float normalised)
 			{
@@ -30,7 +30,7 @@ namespace apvts
 			[=](float start, float end, float unnormalised)
 			{
 				return std::log2(((unnormalised - start) / (end - start) * (std::exp2(6.0f) - 1)) + 1) / 6.0f;
-			} 
+			}
 		};
 		normalisableRange.interval = intervalValue;
 		return normalisableRange;
@@ -40,15 +40,15 @@ namespace apvts
 	{
 		juce::NormalisableRange<float> range = {
 			rangeStart,
-			rangeEnd, 
+			rangeEnd,
 			[=](float min, float max, float normalised) // convertFrom0to1
 			{
-				return normalised * (max - min) + min; 
+				return normalised * (max - min) + min;
 			},
 			[=](float min, float max, float unnormalised) // convertTo0to1
 			{
-				return (unnormalised - min) / (max - min); 
-			} 
+				return (unnormalised - min) / (max - min);
+			}
 		};
 		range.interval = rangeInterval; // Setting the interval for the range
 		return range;
@@ -157,16 +157,16 @@ namespace apvts
 	static constexpr float attackMsMaximumValue = 1000.0f;
 	static constexpr float attackMsDefaultValue = 5.0f;
 	static const juce::NormalisableRange<float> attackNormalisableRange = makeLogarithmicRange(
-		attackMsMinimumValue, 
-		attackMsMaximumValue, 
+		attackMsMinimumValue,
+		attackMsMaximumValue,
 		defaultIntervalValue);
 
 	static constexpr float releaseMsMinimumValue = 0.0f;
 	static constexpr float releaseMsMaximumValue = 10000.0f;
 	static constexpr float releaseMsDefaultValue = 100.0f;
 	static const juce::NormalisableRange<float> releaseMsNormalisableRange = makeLogarithmicRange(
-		releaseMsMinimumValue, 
-		releaseMsMaximumValue, 
+		releaseMsMinimumValue,
+		releaseMsMaximumValue,
 		defaultIntervalValue);
 
 	// TIME
@@ -199,20 +199,20 @@ namespace apvts
 		{lowPassEqualizationComponentId,lowPassFrequencyDefaultValue},
 	};
 
-	static constexpr float qualityOffDefaultValue = 0.001f; 
+	static constexpr float qualityOffDefaultValue = 0.001f;
 	static constexpr float qualityOnDefaultValue = 1.00f;
 	static constexpr float qualityMinimumValue = 0.001f;
 	static constexpr float qualityMaximumValue = 10.f;
 	static const juce::NormalisableRange<float> qualityNormalisableRange = makeLogarithmicRange(
-		qualityMinimumValue, 
-		qualityMaximumValue, 
+		qualityMinimumValue,
+		qualityMaximumValue,
 		defaultIntervalValue);
 
 	static constexpr float frequencyMinimumValue = 15.0f;
 	static constexpr float frequencyMaximumValue = 20000.0f;
 	static const juce::NormalisableRange<float> frequencyNormalisableRange = makeLogarithmicRange(
-		frequencyMinimumValue, 
-		frequencyMaximumValue, 
+		frequencyMinimumValue,
+		frequencyMaximumValue,
 		defaultIntervalValue);
 
 	// Limiter 
@@ -234,16 +234,27 @@ namespace apvts
 
 	static constexpr float phaserCenterFrequencyDefaultValue = 1000.0f;
 
-	// Rate to BPM
+	// Bitcrusher
 
-	static float clampedValueForFractionOfBeat(
-		float beatsPerMinute, 
-		float fractionOfBeat, float minimumValue = 0.000f, float maximumValue = 99.999f) 
-	{
-		float noteDurationSeconds = 60.0f / beatsPerMinute * fractionOfBeat;
-		float frequencyHz = 1.0f / noteDurationSeconds;
-		return std::clamp(frequencyHz, minimumValue, maximumValue);
-	}
+	static constexpr float bitCrusherSampleRateMinimumValue = 1000.0f;
+	static constexpr float bitCrusherSampleRateMaximumValue = 48000.0f;
+	static constexpr float bitCrusherSampleRateIntervalValue = 1000.0f;
+	static constexpr float bitCrusherSampleRateDefaultValue = 8000.0f;
+	static const juce::NormalisableRange<float> bitCrusherSampleRateNormalizableRange =
+		juce::NormalisableRange<float>(
+			bitCrusherSampleRateMinimumValue,
+			bitCrusherSampleRateMaximumValue,
+			bitCrusherSampleRateIntervalValue);
+
+	static constexpr float bitCrusherBitDepthMinimumValue = 1.0f;
+	static constexpr float bitCrusherBitDepthMaximumValue = 12.0f;
+	static constexpr float bitCrusherBitDepthIntervalValue = 1.0f;
+	static constexpr float bitCrusherBitDepthDefaultValue = 12.0f;
+	static const juce::NormalisableRange<float> bitCrusherBitDepthNormalizableRange =
+		juce::NormalisableRange<float>(
+			bitCrusherBitDepthMinimumValue,
+			bitCrusherBitDepthMaximumValue,
+			bitCrusherBitDepthIntervalValue);
 
 	// Tube screamer
 
@@ -265,7 +276,6 @@ namespace apvts
 		tubeScreamerDiodeCountMaximumValue,
 		tubeScreamerDiodeCountInterval);
 
-	// CTAGDRC
 
 	namespace Ctagdrc
 	{
@@ -351,33 +361,33 @@ namespace apvts
 		STAGE1_WAVE_SHAPER,
 		STAGE1_OUTPUT_GAIN,
 		STAGE1_DRY_WET_MIX,
-		
+
 		STAGE2_ON,
 		STAGE2_INPUT_GAIN,
 		STAGE2_WAVE_SHAPER,
 		STAGE2_OUTPUT_GAIN,
 		STAGE2_DRY_WET_MIX,
-		
+
 		STAGE3_ON,
 		STAGE3_INPUT_GAIN,
 		STAGE3_WAVE_SHAPER,
 		STAGE3_OUTPUT_GAIN,
 		STAGE3_DRY_WET_MIX,
-		
+
 		STAGE4_ON,
 		STAGE4_INPUT_GAIN,
 		STAGE4_WAVE_SHAPER,
 		STAGE4_OUTPUT_GAIN,
 		STAGE4_DRY_WET_MIX,
-		
+
 		BIAS,
-		
+
 		AMP_RESONANCE_DB,
 		AMP_BASS_DB,
 		AMP_MIDDLE_DB,
 		AMP_TREBLE_DB,
 		AMP_PRESENCE_DB,
-		
+
 		DELAY_ON,
 		DELAY_LINKED,
 		DELAY_IS_SYNCED,
@@ -396,14 +406,18 @@ namespace apvts
 		CHORUS_CENTER_DELAY_FRACTION_OF_BEAT,
 		CHORUS_FEEDBACK,
 		CHORUS_MIX,
-		
+
 		PHASER_ON,
 		PHASER_RATE_FRACTION_OF_BEAT,
 		PHASER_DEPTH,
 		PHASER_CENTER_FREQUENCY,
 		PHASER_FEEDBACK,
 		PHASER_MIX,
-		
+
+		BIT_CRUSHER_ON,
+		BIT_CRUSHER_SAMPLE_RATE,
+		BIT_CRUSHER_BIT_DEPTH,
+
 		REVERB_ON,
 		REVERB_SIZE,
 		REVERB_DAMPING,
@@ -561,6 +575,10 @@ namespace apvts
 	static const std::string phaserFeedbackId = "phaser_feedback";
 	static const std::string phaserMixId = "phaser_mix";
 
+	static const std::string bitCrusherOnId = "bit_crusher_on";
+	static const std::string bitCrusherSampleRateId = "bit_crusher_sample_rate";
+	static const std::string bitCrusherBitDepthId = "bit_crusher_bit_depth";
+
 	static const std::string roomOnId = "room_on";
 	static const std::string roomSizeId = "room_size";
 	static const std::string roomDampingId = "room_damping";
@@ -589,27 +607,27 @@ namespace apvts
 	static const std::string instrumentEqualiserLowPassOnId = "eq_low_pass_on";
 	static const std::string instrumentEqualiserLowPassFrequencyId = "eq_low_pass_freq";
 	static const std::string instrumentEqualiserLowPassQualityId = "eq_low_pass_quality";
-	
+
 	static const std::string instrumentEqualiserLowPeakOnId = "eq_low_peak_on";
 	static const std::string instrumentEqualiserLowPeakFrequencyId = "eq_low_peak_freq";
 	static const std::string instrumentEqualiserLowPeakGainId = "eq_low_peak_gain";
 	static const std::string instrumentEqualiserLowPeakQualityId = "eq_low_peak_q";
-	
+
 	static const std::string instrumentEqualiserLowMidPeakOnId = "eq_low_mid_peak_on";
 	static const std::string instrumentEqualiserLowMidPeakFrequencyId = "eq_low_mid_peak_freq";
 	static const std::string instrumentEqualiserLowMidPeakGainId = "eq_low_mid_peak_gain";
 	static const std::string instrumentEqualiserLowMidPeakQualityId = "eq_low_mid_peak_q";
-	
+
 	static const std::string instrumentEqualiserHighMidPeakOnId = "eq_high_mid_peak_on";
 	static const std::string instrumentEqualiserHighMidPeakFrequencyId = "eq_high_mid_peak_freq";
 	static const std::string instrumentEqualiserHighMidPeakGainId = "eq_high_mid_peak_gain";
 	static const std::string instrumentEqualiserHighMidPeakQualityId = "eq_high_mid_peak_q";
-	
+
 	static const std::string instrumentEqualiserHighPeakOnId = "eq_high_peak_on";
 	static const std::string instrumentEqualiserHighPeakFrequencyId = "eq_high_peak_freq";
 	static const std::string instrumentEqualiserHighPeakGainId = "eq_high_peak_gain";
 	static const std::string instrumentEqualiserHighPeakQualityId = "eq_high_peak_q";
-	
+
 	static const std::string instrumentEqualiserHighPassOnId = "eq_high_pass_on";
 	static const std::string instrumentEqualiserHighPassFrequencyId = "eq_high_pass_freq";
 	static const std::string instrumentEqualiserHighPassQualityId = "eq_high_pass_quality";
@@ -620,14 +638,14 @@ namespace apvts
 
 	static const std::string outputGainId = "output_gain";
 
-	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap {
+	static const std::map<std::string, ParameterEnum> parameterIdToEnumMap{
 		{inputGainId, ParameterEnum::INPUT_GAIN},
 
 		{noiseGateThresholdId, ParameterEnum::NOISE_GATE_THRESHOLD},
 		{noiseGateAttackId, ParameterEnum::NOISE_GATE_ATTACK},
 		{noiseGateRatioId, ParameterEnum::NOISE_GATE_RATIO},
 		{noiseGateReleaseId, ParameterEnum::NOISE_GATE_RELEASE},
-		
+
 		{preCompressorOnId, ParameterEnum::PRE_COMPRESSOR_IS_ON},
 		{preCompressorThresholdId, ParameterEnum::PRE_COMPRESSOR_THRESHOLD},
 		{preCompressorAttackId, ParameterEnum::PRE_COMPRESSOR_ATTACK},
@@ -664,37 +682,37 @@ namespace apvts
 		{stage1WaveShaperId, ParameterEnum::STAGE1_WAVE_SHAPER},
 		{stage1OutputGainId, ParameterEnum::STAGE1_OUTPUT_GAIN},
 		{stage1DryWetId, ParameterEnum::STAGE1_DRY_WET_MIX},
-		
+
 		{stage2OnId, ParameterEnum::STAGE2_ON},
 		{stage2InputGainId, ParameterEnum::STAGE2_INPUT_GAIN},
 		{stage2WaveShaperId, ParameterEnum::STAGE2_WAVE_SHAPER},
 		{stage2OutputGainId, ParameterEnum::STAGE2_OUTPUT_GAIN},
 		{stage2DryWetId, ParameterEnum::STAGE2_DRY_WET_MIX},
-		
+
 		{stage3OnId, ParameterEnum::STAGE3_ON},
 		{stage3InputGainId, ParameterEnum::STAGE3_INPUT_GAIN},
 		{stage3WaveShaperId, ParameterEnum::STAGE3_WAVE_SHAPER},
 		{stage3OutputGainId, ParameterEnum::STAGE3_OUTPUT_GAIN},
 		{stage3DryWetId, ParameterEnum::STAGE3_DRY_WET_MIX},
-		
+
 		{stage4OnId, ParameterEnum::STAGE4_ON},
 		{stage4InputGainId, ParameterEnum::STAGE4_INPUT_GAIN},
 		{stage4WaveShaperId, ParameterEnum::STAGE4_WAVE_SHAPER},
 		{stage4OutputGainId, ParameterEnum::STAGE4_OUTPUT_GAIN},
 		{stage4DryWetId, ParameterEnum::STAGE4_DRY_WET_MIX},
-		
+
 		{biasId, ParameterEnum::BIAS},
-		
+
 		{ampResonanceDbId, ParameterEnum::AMP_RESONANCE_DB},
 		{ampBassDbId, ParameterEnum::AMP_BASS_DB},
 		{ampMiddleDbId, ParameterEnum::AMP_MIDDLE_DB},
 		{ampTrebleDbId, ParameterEnum::AMP_TREBLE_DB},
 		{ampPresenceDbId, ParameterEnum::AMP_PRESENCE_DB},
-		
+
 		{cabinetImpulseResponseConvolutionOnId, ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON},
-		
+
 		{cabinetGainId, ParameterEnum::CABINET_OUTPUT_GAIN},
-		
+
 		{limiterOnId, ParameterEnum::LIMITER_ON},
 		{limiterThresholdId, ParameterEnum::LIMITER_THRESHOLD},
 		{limiterReleaseId, ParameterEnum::LIMITER_RELEASE},
@@ -724,6 +742,10 @@ namespace apvts
 		{phaserCenterFrequencyId, ParameterEnum::PHASER_CENTER_FREQUENCY},
 		{phaserFeedbackId, ParameterEnum::PHASER_FEEDBACK},
 		{phaserMixId, ParameterEnum::PHASER_MIX},
+
+		{bitCrusherOnId, ParameterEnum::BIT_CRUSHER_ON},
+		{bitCrusherSampleRateId, ParameterEnum::BIT_CRUSHER_SAMPLE_RATE},
+		{bitCrusherBitDepthId, ParameterEnum::BIT_CRUSHER_BIT_DEPTH},
 
 		{instrumentCompressorIsPreEq, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON},
 		{instrumentCompressorIsOn, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON},

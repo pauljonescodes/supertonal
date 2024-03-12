@@ -1,7 +1,9 @@
 #pragma once
 
-#include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_dsp/juce_dsp.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
+
+#include <JuceHeader.h>
 #include "PluginPresetManager.h"
 #include "Processors/MouseDrive.h"
 #include "Processors/TubeScreamer.h"
@@ -9,6 +11,7 @@
 #include "Processors/AmplifierEqualiser.h"
 #include "Processors/InstrumentEqualiser.h"
 #include "CTAGDRC/dsp/include/Compressor.h"
+#include "Processors/BitCrusher.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -57,44 +60,44 @@ private:
 
     std::unique_ptr<juce::dsp::NoiseGate<float>> mNoiseGate;
 
-    bool mPreCompressorIsOn = false;
+    bool mIsPreCompressorOn = false;
     std::unique_ptr<juce::dsp::Compressor<float>> mPreCompressorPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mPreCompressorGainPtr;
     juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mPreCompressorGainSmoothedValue;
-    bool mPreCompressorAutoMakeup = false;
+    bool mIsPreCompressorAutoMakeup = false;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mPreCompressorDryWetMixerPtr;
 
-    bool mTubeScreamerIsOn = false;
+    bool mIsTubeScreamerOn = false;
     std::unique_ptr<TubeScreamer> mTubeScreamerPtr;
 
-    bool mMouseDriveIsOn = false;
+    bool mIsMouseDriveOn = false;
     std::unique_ptr<MouseDrive> mMouseDrivePtr;
 
-    bool mGraphicEqualiserIsOn = false;
+    bool mIsGraphicEqualiserOn = false;
     std::unique_ptr<GraphicEqualiser> mGraphicEqualiser;
 
-    bool mStage1IsOn = false;
+    bool mIsStage1On = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage1Buffer;
     std::unique_ptr<juce::dsp::Gain<float>> mStage1InputGainPtr;
     std::unique_ptr<juce::dsp::WaveShaper<float>> mStage1WaveShaperPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mStage1OutputGainPtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage1DryWetMixerPtr;
 
-    bool mStage2IsOn = false;
+    bool mIsStage2On = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage2Buffer;
     std::unique_ptr<juce::dsp::Gain<float>> mStage2InputGainPtr;
     std::unique_ptr<juce::dsp::WaveShaper<float>> mStage2WaveShaperPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mStage2OutputGainPtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage2DryWetMixerPtr;
 
-    bool mStage3IsOn = false;
+    bool mIsStage3On = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage3Buffer;
     std::unique_ptr<juce::dsp::Gain<float>> mStage3InputGainPtr;
     std::unique_ptr<juce::dsp::WaveShaper<float>> mStage3WaveShaperPtr;
     std::unique_ptr<juce::dsp::Gain<float>> mStage3OutputGainPtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mStage3DryWetMixerPtr;
 
-    bool mStage4IsOn = false;
+    bool mIsStage4On = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage4Buffer;
     std::unique_ptr<juce::dsp::Gain<float>> mStage4InputGainPtr;
     std::unique_ptr<juce::dsp::WaveShaper<float>> mStage4WaveShaperPtr;
@@ -104,7 +107,7 @@ private:
     std::unique_ptr<juce::dsp::Bias<float>> mBiasPtr;
     std::unique_ptr<AmplifierEqualiser> mAmplifierEqualiser;
     
-    bool mDelayOn = false;
+    bool mIsDelayOn = false;
     bool mDelayBpmSynced = false;
     bool mDelayIsLinked = true;
     float mDelayLeftMilliseconds = 30;
@@ -118,34 +121,36 @@ private:
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mDelayHighPassFilterPtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mDelayLineDryWetMixerPtr;
 
-    bool mChorusOn = false;
-    std::unique_ptr<juce::dsp::Chorus<float>> mChorusPtr;
+    bool mIsChorusOn = false;
+    //std::unique_ptr<juce::dsp::Chorus<float>> mChorusPtr;
 
-    bool mPhaserOn = false;
-    std::unique_ptr<juce::dsp::Phaser<float>> mPhaserPtr;
+    bool mIsPhaserOn = false;
+    //std::unique_ptr<juce::dsp::Phaser<float>> mPhaserPtr;
 
-    bool mCabImpulseResponseConvolutionIsOn = true;
+    std::unique_ptr<BitCrusher> mBitCrusher;
+
+    bool mIsCabImpulseResponseConvolutionOn = true;
     std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;
     std::unique_ptr<juce::dsp::Convolution> mCabinetImpulseResponseConvolutionPtr;
 
-    bool mReverbOn = false;
+    bool mIsReverbOn = false;
     std::unique_ptr<juce::dsp::Reverb> mReverb;
     
     std::unique_ptr<juce::dsp::Gain<float>> mCabinetGainPtr;
 
     std::unique_ptr<InstrumentEqualiser> mInstrumentEqualiser;
 
-    bool mInstrumentCompressorIsPreEqualiser;
+    bool mIsInstrumentCompressorPreEqualiser;
     std::unique_ptr<Compressor> mInstrumentCompressor;
     //LevelEnvelopeFollower inLevelFollower;
     //LevelEnvelopeFollower outLevelFollower;
 
-    bool mLimiterOn = true;
+    bool mIsLimiterOn = true;
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
 
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
 
-    bool mBypassIsOn = false;
+    bool mIsBypassOn = false;
 
     void loadImpulseResponseFromState();
     
