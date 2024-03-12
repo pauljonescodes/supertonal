@@ -50,20 +50,11 @@ public:
 					));
 					mContainerPtr->addAndMakeVisible(button);
 				}
-				else if (PluginUtils::isWaveshaperId(parameterId) || PluginUtils::isStageModeId(parameterId))
+				else if (PluginUtils::isWaveshaperId(parameterId))
 				{
 					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
-					if (PluginUtils::isWaveshaperId(parameterId))
-					{
-						for (int waveshaperIndex = 0; waveshaperIndex < apvts::waveShaperIds.size(); waveshaperIndex++) {
-							comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
-						}
-					}
-					else if (PluginUtils::isStageModeId(parameterId))
-					{
-						for (int modeIndex = 0; modeIndex < apvts::stageModeIds.size(); modeIndex++) {
-							comboBox->addItem(apvts::stageModeIds.at(modeIndex), modeIndex + 1);
-						}
+					for (int waveshaperIndex = 0; waveshaperIndex < apvts::waveShaperIds.size(); waveshaperIndex++) {
+						comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
 					}
 					mComponentRows[row]->add(comboBox);
 					mComboBoxAttachments.add(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(

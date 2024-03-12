@@ -114,18 +114,6 @@ namespace apvts
 		{exponentialWaveShaperId, [](float x) { return std::exp(x) - 1; }}
 	};
 
-	// Series/Parallel
-
-	static const std::string stageModeComponentId = "mode";
-
-	static const std::string seriesId = "series";
-	static const std::string parallelId = "parallel";
-
-	static const std::vector<std::string> stageModeIds = {
-		seriesId,
-		parallelId,
-	};
-
 	// BYPASS
 
 	static const std::string onComponentId = "on";
@@ -357,8 +345,6 @@ namespace apvts
 		MOUSE_DRIVE_VOLUME,
 		MOUSE_DRIVE_FILTER,
 
-		STAGE_MODE,
-
 		STAGE1_ON,
 		STAGE1_INPUT_GAIN,
 		STAGE1_WAVE_SHAPER,
@@ -526,8 +512,6 @@ namespace apvts
 	static const std::string preEqualiser6400GainId = "pre_eq_6400_gain";
 	static const std::string preEqualiserLevelId = "pre_eq_level_gain";
 
-	static const std::string stageModeId = "mode";
-
 	static const std::string stage1OnId = "stage_1_on";
 	static const std::string stage1InputGainId = "stage_1_input_gain";
 	static const std::string stage1WaveShaperId = "stage_1_wave_shaper";
@@ -690,8 +674,6 @@ namespace apvts
 		{preEqualiser6400GainId, ParameterEnum::PRE_EQUALISER_6400_GAIN},
 		{preEqualiserLevelId, ParameterEnum::PRE_EQUALISER_LEVEL_GAIN},
 
-		{stageModeId, ParameterEnum::STAGE_MODE},
-		
 		{stage1OnId, ParameterEnum::STAGE1_ON},
 		{stage1InputGainId, ParameterEnum::STAGE1_INPUT_GAIN},
 		{stage1WaveShaperId, ParameterEnum::STAGE1_WAVE_SHAPER},

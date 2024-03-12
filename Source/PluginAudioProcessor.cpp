@@ -81,7 +81,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 
 	mConvolutionMessageQueuePtr(std::make_unique<juce::dsp::ConvolutionMessageQueue>()),
 	mCabinetImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 128 }, * mConvolutionMessageQueuePtr.get())),
-	
+
 	mInstrumentCompressor(std::make_unique<Compressor>()),
 	mInstrumentEqualiser(std::make_unique<InstrumentEqualiser>()),
 
@@ -107,11 +107,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 	juce::StringArray waveShaperIdsJuceStringArray;
 	for (const auto& idToFunction : apvts::waveShaperIdToFunctionMap) {
 		waveShaperIdsJuceStringArray.add(idToFunction.first);
-	}
-
-	juce::StringArray modeIdsJuceStringArray;
-	for (const auto& item : apvts::stageModeIds) {
-		modeIdsJuceStringArray.add(item);
 	}
 
 	for (const auto& parameterIdAndEnum : apvts::parameterIdToEnumMap)
@@ -426,13 +421,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				waveShaperIdsJuceStringArray,
 				1));
 			break;
-		case apvts::ParameterEnum::STAGE_MODE:
-			layout.add(std::make_unique<juce::AudioParameterChoice>(
-				juce::ParameterID{ parameterId, apvts::version },
-				PluginUtils::toTitleCase(parameterId),
-				modeIdsJuceStringArray,
-				0));
-			break;
 		case apvts::ParameterEnum::BIAS:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -582,7 +570,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::makeupStart,
 					apvts::Ctagdrc::makeupEnd,
-					apvts::Ctagdrc::makeupInterval), 
+					apvts::Ctagdrc::makeupInterval),
 				apvts::Ctagdrc::makeupDefault,
 				String(),
 				AudioProcessorParameter::genericParameter,
@@ -598,7 +586,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::thresholdStart,
 					apvts::Ctagdrc::thresholdEnd,
-					apvts::Ctagdrc::thresholdInterval), 
+					apvts::Ctagdrc::thresholdInterval),
 				apvts::Ctagdrc::thresholdDefault,
 				String(), AudioProcessorParameter::genericParameter,
 				[](float value, float maxStrLen)
@@ -613,8 +601,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::ratioStart,
 					apvts::Ctagdrc::ratioEnd,
-					apvts::Ctagdrc::ratioInterval, 
-					0.5f), 
+					apvts::Ctagdrc::ratioInterval,
+					0.5f),
 				apvts::Ctagdrc::ratioDefault,
 				String(), AudioProcessorParameter::genericParameter,
 				[](float value, float)
@@ -644,7 +632,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				NormalisableRange<float>(
 					apvts::Ctagdrc::attackStart,
 					apvts::Ctagdrc::attackEnd,
-					apvts::Ctagdrc::attackInterval, 0.5f), 
+					apvts::Ctagdrc::attackInterval, 0.5f),
 				apvts::Ctagdrc::attackDefault,
 				"ms",
 				AudioProcessorParameter::genericParameter,
@@ -776,7 +764,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	{
 		setLatencySamples(0);
 	}
-		
+
 	mReverb->prepare(spec);
 
 	mCabinetGainPtr->prepare(spec);
@@ -925,139 +913,60 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	mStage1Buffer->clear();
 	auto stage1Block = juce::dsp::AudioBlock<float>(*mStage1Buffer.get());
 
-	if (mStagesAreParallel)
-	{
-		stage1Block.copyFrom(buffer, 0, 0, numSamples);
-	}
 
 	auto stage1Context = juce::dsp::ProcessContextReplacing<float>(stage1Block);
 	if (mStage1IsOn)
 	{
 		mStage1DryWetMixerPtr->pushDrySamples(audioBlock);
 
-		if (mStagesAreParallel)
-		{
-			mStage1InputGainPtr->process(stage1Context);
-			mStage1WaveShaperPtr->process(stage1Context);
-			mStage1OutputGainPtr->process(stage1Context);
-			mStage1DryWetMixerPtr->mixWetSamples(stage1Block);
-		}
-		else
-		{
-			mStage1InputGainPtr->process(processContext);
-			mStage1WaveShaperPtr->process(processContext);
-			mStage1OutputGainPtr->process(processContext);
-			mStage1DryWetMixerPtr->mixWetSamples(audioBlock);
-		}
+		mStage1InputGainPtr->process(processContext);
+		mStage1WaveShaperPtr->process(processContext);
+		mStage1OutputGainPtr->process(processContext);
+		mStage1DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
 	mStage2Buffer->clear();
 	auto stage2Block = juce::dsp::AudioBlock<float>(*mStage2Buffer.get());
-	if (mStagesAreParallel)
-	{
-		stage2Block.copyFrom(buffer, 0, 0, numSamples);
-	}
 	auto stage2Context = juce::dsp::ProcessContextReplacing<float>(stage2Block);
 
 	if (mStage2IsOn)
 	{
 		mStage2DryWetMixerPtr->pushDrySamples(audioBlock);
-
-		if (mStagesAreParallel)
-		{
-			mStage2InputGainPtr->process(stage2Context);
-			mStage2WaveShaperPtr->process(stage2Context);
-			mStage2OutputGainPtr->process(stage2Context);
-			mStage2DryWetMixerPtr->mixWetSamples(stage2Block);
-		}
-		else
-		{
-			mStage2InputGainPtr->process(processContext);
-			mStage2WaveShaperPtr->process(processContext);
-			mStage2OutputGainPtr->process(processContext);
-			mStage2DryWetMixerPtr->mixWetSamples(audioBlock);
-		}
+		mStage2InputGainPtr->process(processContext);
+		mStage2WaveShaperPtr->process(processContext);
+		mStage2OutputGainPtr->process(processContext);
+		mStage2DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
 	mStage3Buffer->clear();
 	auto stage3Block = juce::dsp::AudioBlock<float>(*mStage3Buffer.get());
-	if (mStagesAreParallel)
-	{
-		stage3Block.copyFrom(buffer, 0, 0, numSamples);
-	}
 	auto stage3Context = juce::dsp::ProcessContextReplacing<float>(stage3Block);
 
 	if (mStage3IsOn)
 	{
 		mStage3DryWetMixerPtr->pushDrySamples(audioBlock);
-
-		if (mStagesAreParallel)
-		{
-			mStage3InputGainPtr->process(stage3Context);
-			mStage3WaveShaperPtr->process(stage3Context);
-			mStage3OutputGainPtr->process(stage3Context);
-			mStage3DryWetMixerPtr->mixWetSamples(stage3Block);
-		}
-		else
-		{
-			mStage3InputGainPtr->process(processContext);
-			mStage3WaveShaperPtr->process(processContext);
-			mStage3OutputGainPtr->process(processContext);
-			mStage3DryWetMixerPtr->mixWetSamples(audioBlock);
-		}
+		mStage3InputGainPtr->process(processContext);
+		mStage3WaveShaperPtr->process(processContext);
+		mStage3OutputGainPtr->process(processContext);
+		mStage3DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
 	mStage4Buffer->clear();
 	auto stage4Block = juce::dsp::AudioBlock<float>(*mStage4Buffer.get());
-	if (mStagesAreParallel)
-	{
-		stage4Block.copyFrom(buffer, 0, 0, numSamples);
-	}
 	auto stage4Context = juce::dsp::ProcessContextReplacing<float>(stage4Block);
 
 	if (mStage4IsOn)
 	{
 		mStage4DryWetMixerPtr->pushDrySamples(audioBlock);
-
-		if (mStagesAreParallel)
-		{
-			mStage4InputGainPtr->process(stage4Context);
-			mStage4WaveShaperPtr->process(stage4Context);
-			mStage4OutputGainPtr->process(stage4Context);
-			mStage4DryWetMixerPtr->mixWetSamples(stage4Block);
-		}
-		else
-		{
-			mStage4InputGainPtr->process(processContext);
-			mStage4WaveShaperPtr->process(processContext);
-			mStage4OutputGainPtr->process(processContext);
-			mStage4DryWetMixerPtr->mixWetSamples(audioBlock);
-		}
+		mStage4InputGainPtr->process(processContext);
+		mStage4WaveShaperPtr->process(processContext);
+		mStage4OutputGainPtr->process(processContext);
+		mStage4DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
-	if ((!mStage1IsOn && !mStage2IsOn && !mStage3IsOn && !mStage4IsOn) || mStagesAreParallel)
+	if ((!mStage1IsOn && !mStage2IsOn && !mStage3IsOn && !mStage4IsOn))
 	{
 		audioBlock.clear();
-	}
-
-	if (mStage1IsOn && mStagesAreParallel)
-	{
-		audioBlock.add(stage1Block);
-	}
-
-	if (mStage2IsOn && mStagesAreParallel)
-	{
-		audioBlock.add(stage2Block);
-	}
-
-	if (mStage3IsOn && mStagesAreParallel)
-	{
-		audioBlock.add(stage3Block);
-	}
-
-	if (mStage4IsOn && mStagesAreParallel)
-	{
-		audioBlock.add(stage4Block);
 	}
 
 	mAmplifierEqualiser->processBlock(buffer);
@@ -1375,9 +1284,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::STAGE4_DRY_WET_MIX:
 		mStage4DryWetMixerPtr->setWetMixProportion(newValue);
 		break;
-	case apvts::ParameterEnum::STAGE_MODE:
-		mStagesAreParallel = newValue;
-		break;
 	case apvts::ParameterEnum::BIAS:
 		mBiasPtr->setBias(newValue);
 		break;
@@ -1640,14 +1546,14 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		{
 			setLatencySamples(static_cast<int>(0.005 * mInstrumentCompressor->getSampleRate()));
 		}
-		else 
-		{ 
-			setLatencySamples(0); 
+		else
+		{
+			setLatencySamples(0);
 		}
 
 		mInstrumentCompressor->setLookahead(newBool);
 	}
-		break;
+	break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON:
 		mInstrumentCompressor->setAutoMakeup(static_cast<bool>(newValue));
 		break;
@@ -1661,7 +1567,7 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 			mInstrumentCompressor->setAttack(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorAttack));
 		}
 	}
-		break;
+	break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON:
 	{
 		const bool newBool = static_cast<bool>(newValue);
@@ -1671,7 +1577,7 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 			mInstrumentCompressor->setRelease(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorRelease));
 		}
 	}
-		break;
+	break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN:
 		mInstrumentCompressor->setInput(newValue);
 		break;

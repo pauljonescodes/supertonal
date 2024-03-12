@@ -72,7 +72,6 @@ private:
     bool mGraphicEqualiserIsOn = false;
     std::unique_ptr<GraphicEqualiser> mGraphicEqualiser;
 
-    bool mStagesAreParallel = false;
 
     bool mStage1IsOn = false;
     std::unique_ptr<juce::AudioBuffer<float>> mStage1Buffer;

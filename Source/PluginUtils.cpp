@@ -28,18 +28,6 @@ bool PluginUtils::isToggleId(const std::string& str)
     }
 }
 
-bool PluginUtils::isStageModeId(const std::string& str)
-{
-    if (str.length() >= apvts::stageModeComponentId.length())
-    {
-        return (0 == str.compare(str.length() - apvts::stageModeComponentId.length(), apvts::stageModeComponentId.length(), apvts::stageModeComponentId));
-    }
-    else
-    {
-        return false;
-    }
-}
-
 bool PluginUtils::isWaveshaperId(const std::string& str)
 {
     if (str.length() >= apvts::waveshaperComponentId.length())
