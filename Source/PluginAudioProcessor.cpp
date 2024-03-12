@@ -137,14 +137,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::STAGE4_ON:
 		case apvts::ParameterEnum::REVERB_ON:
 		case apvts::ParameterEnum::PRE_COMPRESSOR_IS_ON:
-		case apvts::ParameterEnum::POST_COMPRESSOR_IS_ON:
 		case apvts::ParameterEnum::DELAY_ON:
 		case apvts::ParameterEnum::PHASER_ON:
 		case apvts::ParameterEnum::CHORUS_ON:
 		case apvts::ParameterEnum::PRE_EQUALISER_ON:
 		case apvts::ParameterEnum::DELAY_IS_SYNCED:
 		case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKE_UP_ON:
-		case apvts::ParameterEnum::POST_COMPRESSOR_AUTO_MAKE_UP_ON:
 		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON:
 		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON:
 		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON:
@@ -216,7 +214,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::STAGE4_INPUT_GAIN:
 		case apvts::ParameterEnum::STAGE4_OUTPUT_GAIN:
 		case apvts::ParameterEnum::INPUT_GAIN:
-		case apvts::ParameterEnum::POST_COMPRESSOR_GAIN:
 		case apvts::ParameterEnum::OUTPUT_GAIN:
 		case apvts::ParameterEnum::PRE_COMPRESSOR_GAIN:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
@@ -235,7 +232,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				));
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_THRESHOLD:
-		case apvts::ParameterEnum::POST_COMPRESSOR_THRESHOLD:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
@@ -266,7 +262,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::STAGE3_DRY_WET_MIX:
 		case apvts::ParameterEnum::STAGE4_DRY_WET_MIX:
 		case apvts::ParameterEnum::PRE_COMPRESSOR_DRY_WET_MIX:
-		case apvts::ParameterEnum::POST_COMPRESSOR_DRY_WET_MIX:
 		case apvts::ParameterEnum::TUBE_SCREAMER_TONE:
 		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
 		case apvts::ParameterEnum::REVERB_WIDTH:
@@ -439,7 +434,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				));
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_ATTACK:
-		case apvts::ParameterEnum::POST_COMPRESSOR_ATTACK:
 		case apvts::ParameterEnum::NOISE_GATE_ATTACK:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -449,7 +443,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				));
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_RELEASE:
-		case apvts::ParameterEnum::POST_COMPRESSOR_RELEASE:
 		case apvts::ParameterEnum::NOISE_GATE_RELEASE:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -459,7 +452,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				));
 			break;
 		case apvts::ParameterEnum::PRE_COMPRESSOR_RATIO:
-		case apvts::ParameterEnum::POST_COMPRESSOR_RATIO:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
@@ -1194,12 +1186,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::PRE_COMPRESSOR_AUTO_MAKE_UP_ON:
 		mPreCompressorAutoMakeup = static_cast<bool>(newValue);
 		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_AUTO_MAKE_UP_ON:
-		mPostCompressorAutoMakeup = static_cast<bool>(newValue);
-		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_DRY_WET_MIX:
-		mPostCompressorDryWetMixerPtr->setWetMixProportion(newValue);
-		break;
 	case apvts::ParameterEnum::PRE_EQUALISER_100_GAIN:
 		mGraphicEqualiser->setGainDecibelsAtIndex(newValue, 0);
 		break;
@@ -1238,9 +1224,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::AMP_PRESENCE_DB:
 		mAmplifierEqualiser->setPresenceDecibels(newValue);
-		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_IS_ON:
-		mPostCompressorIsOn = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::PRE_COMPRESSOR_IS_ON:
 		mPreCompressorIsOn = static_cast<bool>(newValue);
@@ -1296,18 +1279,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::BIAS:
 		mBiasPtr->setBias(newValue);
 		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_THRESHOLD:
-		mPostCompressorPtr->setThreshold(newValue);
-		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_ATTACK:
-		mPostCompressorPtr->setAttack(newValue);
-		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_RATIO:
-		mPostCompressorPtr->setRatio(newValue);
-		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_RELEASE:
-		mPostCompressorPtr->setRelease(newValue);
-		break;
 	case apvts::ParameterEnum::PRE_COMPRESSOR_THRESHOLD:
 		mPreCompressorPtr->setThreshold(newValue);
 		break;
@@ -1325,9 +1296,6 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::PRE_COMPRESSOR_DRY_WET_MIX:
 		mPreCompressorDryWetMixerPtr->setWetMixProportion(newValue);
-		break;
-	case apvts::ParameterEnum::POST_COMPRESSOR_GAIN:
-		mPostCompressorGainPtr->setGainDecibels(newValue);
 		break;
 	case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON:
 		mCabImpulseResponseConvolutionIsOn = static_cast<bool>(newValue);

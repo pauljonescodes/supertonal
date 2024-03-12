@@ -55,18 +55,6 @@ public:
 	apvts::ampPresenceDbId,
 },
 {
-	apvts::postCompressorIsOnId,
-	apvts::postCompressorThresholdId,
-	apvts::postCompressorAttackId,
-	apvts::postCompressorRatioId,
-},
-{
-	apvts::postCompressorReleaseId,
-	apvts::postCompressorGainId,
-	apvts::postCompressorAutoMakeUpOnId,
-	apvts::postCompressorDryWetMixId,
-},
-{
 	apvts::biasId,
 }
 		};

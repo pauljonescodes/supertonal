@@ -372,15 +372,6 @@ namespace apvts
 		
 		BIAS,
 		
-		POST_COMPRESSOR_IS_ON,
-		POST_COMPRESSOR_THRESHOLD,
-		POST_COMPRESSOR_ATTACK,
-		POST_COMPRESSOR_RATIO,
-		POST_COMPRESSOR_RELEASE,
-		POST_COMPRESSOR_GAIN,
-		POST_COMPRESSOR_AUTO_MAKE_UP_ON,
-		POST_COMPRESSOR_DRY_WET_MIX,
-		
 		AMP_RESONANCE_DB,
 		AMP_BASS_DB,
 		AMP_MIDDLE_DB,
@@ -537,15 +528,6 @@ namespace apvts
 	static const std::string stage4OutputGainId = "stage_4_output_gain";
 	static const std::string stage4DryWetId = "stage_4_mix";
 
-	static const std::string postCompressorIsOnId = "post_comp_on";
-	static const std::string postCompressorThresholdId = "post_comp_thresh";
-	static const std::string postCompressorAttackId = "post_comp_attack";
-	static const std::string postCompressorRatioId = "post_comp_ratio";
-	static const std::string postCompressorReleaseId = "post_comp_release";
-	static const std::string postCompressorGainId = "post_comp_gain";
-	static const std::string postCompressorDryWetMixId = "pre_comp_blend";
-	static const std::string postCompressorAutoMakeUpOnId = "pre_comp_autogain_on";
-
 	static const std::string ampResonanceDbId = "amp_resonance";
 	static const std::string ampBassDbId = "amp_bass";
 	static const std::string ampMiddleDbId = "amp_middle";
@@ -701,15 +683,6 @@ namespace apvts
 		
 		{biasId, ParameterEnum::BIAS},
 		
-		{postCompressorThresholdId, ParameterEnum::POST_COMPRESSOR_THRESHOLD},
-		{postCompressorAttackId, ParameterEnum::POST_COMPRESSOR_ATTACK},
-		{postCompressorRatioId, ParameterEnum::POST_COMPRESSOR_RATIO},
-		{postCompressorReleaseId, ParameterEnum::POST_COMPRESSOR_RELEASE},
-		{postCompressorGainId, ParameterEnum::POST_COMPRESSOR_GAIN},
-		{postCompressorIsOnId, ParameterEnum::POST_COMPRESSOR_IS_ON},
-		{postCompressorDryWetMixId, ParameterEnum::POST_COMPRESSOR_DRY_WET_MIX},
-		{postCompressorAutoMakeUpOnId, ParameterEnum::POST_COMPRESSOR_AUTO_MAKE_UP_ON},
-		
 		{ampResonanceDbId, ParameterEnum::AMP_RESONANCE_DB},
 		{ampBassDbId, ParameterEnum::AMP_BASS_DB},
 		{ampMiddleDbId, ParameterEnum::AMP_MIDDLE_DB},
@@ -749,42 +722,42 @@ namespace apvts
 		{phaserFeedbackId, ParameterEnum::PHASER_FEEDBACK},
 		{phaserMixId, ParameterEnum::PHASER_MIX},
 
-		{ instrumentCompressorIsPreEq, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON},
-		{ instrumentCompressorIsOn, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON },
-		{ instrumentCompressorIsLookaheadOn, ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON },
-		{ instrumentCompressorIsAutoMakeupOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON },
-		{ instrumentCompressorIsAutoAttackOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_ATTACK_ON },
-		{ instrumentCompressorIsAutoReleaseOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON },
-		{ instrumentCompressorInputGain, ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN },
-		{ instrumentCompressorMakeup, ParameterEnum::INSTRUMENT_COMPRESSOR_MAKEUP_GAIN },
-		{ instrumentCompressorThreshold, ParameterEnum::INSTRUMENT_COMPRESSOR_THRESHOLD },
-		{ instrumentCompressorRatio, ParameterEnum::INSTRUMENT_COMPRESSOR_RATIO },
-		{ instrumentCompressorKnee, ParameterEnum::INSTRUMENT_COMPRESSOR_KNEE },
-		{ instrumentCompressorAttack, ParameterEnum::INSTRUMENT_COMPRESSOR_ATTACK },
-		{ instrumentCompressorRelease, ParameterEnum::INSTRUMENT_COMPRESSOR_RELEASE },
-		{ instrumentCompressorMix, ParameterEnum::INSTRUMENT_COMPRESSOR_MIX },
+		{instrumentCompressorIsPreEq, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON},
+		{instrumentCompressorIsOn, ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON},
+		{instrumentCompressorIsLookaheadOn, ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON},
+		{instrumentCompressorIsAutoMakeupOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON},
+		{instrumentCompressorIsAutoAttackOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_ATTACK_ON},
+		{instrumentCompressorIsAutoReleaseOn, ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON},
+		{instrumentCompressorInputGain, ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN},
+		{instrumentCompressorMakeup, ParameterEnum::INSTRUMENT_COMPRESSOR_MAKEUP_GAIN},
+		{instrumentCompressorThreshold, ParameterEnum::INSTRUMENT_COMPRESSOR_THRESHOLD},
+		{instrumentCompressorRatio, ParameterEnum::INSTRUMENT_COMPRESSOR_RATIO},
+		{instrumentCompressorKnee, ParameterEnum::INSTRUMENT_COMPRESSOR_KNEE},
+		{instrumentCompressorAttack, ParameterEnum::INSTRUMENT_COMPRESSOR_ATTACK},
+		{instrumentCompressorRelease, ParameterEnum::INSTRUMENT_COMPRESSOR_RELEASE},
+		{instrumentCompressorMix, ParameterEnum::INSTRUMENT_COMPRESSOR_MIX},
 
-		{instrumentEqualiserLowPassOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_ON },
-		{instrumentEqualiserLowPassFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY },
+		{instrumentEqualiserLowPassOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_ON},
+		{instrumentEqualiserLowPassFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY},
 		{instrumentEqualiserLowPassQualityId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_QUALITY},
-		{instrumentEqualiserLowPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_ON },
-		{instrumentEqualiserLowPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_FREQUENCY },
-		{instrumentEqualiserLowPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_GAIN },
-		{instrumentEqualiserLowPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_QUALITY },
-		{instrumentEqualiserLowMidPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_ON },
-		{instrumentEqualiserLowMidPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_FREQUENCY },
-		{instrumentEqualiserLowMidPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_GAIN },
-		{instrumentEqualiserLowMidPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_QUALITY },
-		{instrumentEqualiserHighMidPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_ON },
-		{instrumentEqualiserHighMidPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_FREQUENCY },
-		{instrumentEqualiserHighMidPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_GAIN },
-		{instrumentEqualiserHighMidPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_QUALITY },
-		{instrumentEqualiserHighPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_ON },
-		{instrumentEqualiserHighPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_FREQUENCY },
-		{instrumentEqualiserHighPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_GAIN },
-		{instrumentEqualiserHighPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY },
-		{instrumentEqualiserHighPassOnId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_ON },
-		{instrumentEqualiserHighPassFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY },
+		{instrumentEqualiserLowPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_ON},
+		{instrumentEqualiserLowPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_FREQUENCY},
+		{instrumentEqualiserLowPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_GAIN},
+		{instrumentEqualiserLowPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_QUALITY},
+		{instrumentEqualiserLowMidPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_ON},
+		{instrumentEqualiserLowMidPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_FREQUENCY},
+		{instrumentEqualiserLowMidPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_GAIN},
+		{instrumentEqualiserLowMidPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_QUALITY},
+		{instrumentEqualiserHighMidPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_ON},
+		{instrumentEqualiserHighMidPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_FREQUENCY},
+		{instrumentEqualiserHighMidPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_GAIN},
+		{instrumentEqualiserHighMidPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_QUALITY},
+		{instrumentEqualiserHighPeakOnId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_ON},
+		{instrumentEqualiserHighPeakFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_FREQUENCY},
+		{instrumentEqualiserHighPeakGainId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_GAIN},
+		{instrumentEqualiserHighPeakQualityId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY},
+		{instrumentEqualiserHighPassOnId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_ON},
+		{instrumentEqualiserHighPassFrequencyId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY},
 		{instrumentEqualiserHighPassQualityId, ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_QUALITY},
 
 		{roomOnId, ParameterEnum::REVERB_ON},
@@ -793,8 +766,8 @@ namespace apvts
 		{roomMixId, ParameterEnum::REVERB_MIX},
 		{roomWidthId, ParameterEnum::REVERB_WIDTH},
 
-		{ outputGainId, ParameterEnum::OUTPUT_GAIN},
-		{ bypassId, ParameterEnum::BYPASS_ON },
+		{outputGainId, ParameterEnum::OUTPUT_GAIN},
+		{bypassId, ParameterEnum::BYPASS_ON},
 	};
 
 	static const std::map<std::string, float> defaults = {
