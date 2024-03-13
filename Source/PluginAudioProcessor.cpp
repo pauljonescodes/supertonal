@@ -23,6 +23,8 @@ PluginAudioProcessor::PluginAudioProcessor()
 		createParameterLayout())),
 	mPresetManagerPtr(std::make_unique<PluginPresetManager>(*mAudioProcessorValueTreeStatePtr.get())),
 	mAudioFormatManagerPtr(std::make_unique<juce::AudioFormatManager>()),
+	mInputLevelMeterSourcePtr(std::make_unique<foleys::LevelMeterSource>()),
+	mOutputLevelMeterSourcePtr(std::make_unique<foleys::LevelMeterSource>()),
 
 	mInputGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
 
@@ -814,6 +816,9 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	spec.maximumBlockSize = samplesPerBlock;
 	spec.numChannels = numChannels;
 
+	mInputLevelMeterSourcePtr->resize(getTotalNumOutputChannels(), sampleRate * 0.1 / samplesPerBlock);
+	mOutputLevelMeterSourcePtr->resize(getTotalNumOutputChannels(), sampleRate * 0.1 / samplesPerBlock);
+
 	mInputGainPtr->prepare(spec);
 
 	mNoiseGate->prepare(spec);
@@ -974,6 +979,8 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	{
 		return;
 	}
+
+	mInputLevelMeterSourcePtr->measureBlock(buffer);
 
 	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
 	{
@@ -1147,6 +1154,8 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	}
 
 	mOutputGainPtr->process(processContext);
+
+	mOutputLevelMeterSourcePtr->measureBlock(buffer);
 
 #ifdef JUCE_DEBUG
 	PluginUtils::checkForInvalidSamples(audioBlock);
@@ -1849,10 +1858,5 @@ bool PluginAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* PluginAudioProcessor::createEditor()
 {
-	return new PluginAudioProcessorEditor(
-		*this,
-		*mAudioProcessorValueTreeStatePtr.get(),
-		*mUndoManager.get(),
-		*mPresetManagerPtr.get()
-	);
+	return new PluginAudioProcessorEditor(*this);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+
 #include "../PluginPresetManager.h"
 #include "../PluginAudioParameters.h"
 #include "../PluginUtils.h"
@@ -9,11 +10,21 @@ class TopComponent : public juce::Component
 {
 public:
 	TopComponent(
-		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) :
-		mAudioProcessorValueTreeState(audioProcessorValueTreeState)
+		PluginAudioProcessor& audioProcessor) :
+		mAudioProcessorValueTreeState(audioProcessor.getAudioProcessorValueTreeState())
 	{
 		mViewportPtr = std::make_unique<juce::Viewport>();
 		mContainerPtr = std::make_unique<juce::Component>();
+
+		lnf.setColour(foleys::LevelMeter::lmMeterGradientLowColour, juce::Colours::green);
+
+		mInputLevelMeter.setLookAndFeel(&lnf);
+		mInputLevelMeter.setMeterSource(&audioProcessor.getInputMeterSource());
+		addAndMakeVisible(mInputLevelMeter);
+
+		mOutputLevelMeter.setLookAndFeel(&lnf);
+		mOutputLevelMeter.setMeterSource(&audioProcessor.getOutputMeterSource());
+		addAndMakeVisible(mOutputLevelMeter);
 
 		addAndMakeVisible(mViewportPtr.get());
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
@@ -89,7 +100,6 @@ public:
 
 	~TopComponent()
 	{
-
 		mSliderAttachments.clear();
 		mButtonAttachments.clear();
 		mComboBoxAttachments.clear();
@@ -109,6 +119,12 @@ public:
 		const auto localBounds = getLocalBounds();
 		mViewportPtr->setBounds(localBounds);
 
+		const int levelMeterWidth = 30; // Arbitrary width for the level meters
+		const int levelMeterSpacing = 10; // Space between the meters and the main content
+
+		// Place the input level meter on the very left, spanning the full height.
+		mInputLevelMeter.setBounds(0, 0, levelMeterWidth, localBounds.getHeight());
+
 		int numRows = mComponentRows.size();
 		int numCols = 0;
 
@@ -120,7 +136,7 @@ public:
 			}
 		}
 
-		int buttonWidth = localBounds.getWidth() / numCols;
+		int buttonWidth = (localBounds.getWidth() - levelMeterWidth) / numCols;
 		int buttonHeight = 125;
 
 		int totalHeight = ((buttonHeight + 12.5) * numRows);
@@ -130,22 +146,28 @@ public:
 		{
 			for (int col = 0; col < mComponentRows[row]->size(); ++col)
 			{
-				(*mComponentRows[row])[col]->setBounds(col * buttonWidth, row * buttonHeight + 50, buttonWidth, buttonHeight - 50);
+				(*mComponentRows[row])[col]->setBounds((col * buttonWidth) + levelMeterWidth, row * buttonHeight + 50, buttonWidth, buttonHeight - 50);
 			}
 		}
+
+		mOutputLevelMeter.setBounds(localBounds.getWidth() - levelMeterWidth, 0, levelMeterWidth, localBounds.getHeight());
 	};
 
 private:
 	juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
 
-	std::unique_ptr <juce::Viewport> mViewportPtr;
-	std::unique_ptr <juce::Component> mContainerPtr;
+	std::unique_ptr<juce::Viewport> mViewportPtr;
+	std::unique_ptr<juce::Component> mContainerPtr;
 
 	juce::OwnedArray<juce::OwnedArray<juce::Component>> mComponentRows;
 
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> mButtonAttachments;
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> mSliderAttachments;
 	juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> mComboBoxAttachments;
+
+	foleys::LevelMeterLookAndFeel lnf;
+	foleys::LevelMeter mInputLevelMeter{ foleys::LevelMeter::Minimal };
+	foleys::LevelMeter mOutputLevelMeter{ foleys::LevelMeter::Minimal };
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TopComponent)
 };

@@ -150,6 +150,7 @@
     </GROUP>
   </MAINGROUP>
   <MODULES>
+    <MODULE id="ff_meters" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -186,6 +187,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../../modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../modules"/>
         <MODULEPATH id="juce_dsp" path="../../modules"/>
+        <MODULEPATH id="ff_meters" path="Modules"/>
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX" hardenedRuntime="1" iosDevelopmentTeamID="24TXZ384X3"
@@ -208,6 +210,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../../modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../modules"/>
         <MODULEPATH id="juce_dsp" path="../../modules"/>
+        <MODULEPATH id="ff_meters" path="Modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>

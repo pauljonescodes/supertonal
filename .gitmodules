@@ -7,3 +7,6 @@
 [submodule "Modules/chowdsp_wdf"]
 	path = Modules/chowdsp_wdf
 	url = https://github.com/Chowdhury-DSP/chowdsp_wdf
+[submodule "Modules/ff_meters"]
+	path = Modules/ff_meters
+	url = git@github.com:ffAudio/ff_meters.git

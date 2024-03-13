@@ -12,11 +12,7 @@
 class PluginAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    explicit PluginAudioProcessorEditor (
-        PluginAudioProcessor&, 
-        juce::AudioProcessorValueTreeState&,
-        juce::UndoManager& undoManager,
-        PluginPresetManager& presetManager);
+    explicit PluginAudioProcessorEditor (PluginAudioProcessor&);
     ~PluginAudioProcessorEditor() override;
 
     void paint (juce::Graphics&) override;

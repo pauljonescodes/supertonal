@@ -74,18 +74,14 @@ static const std::vector<std::vector<std::string>> sHiddenIds = {
 }
 };
 
-PluginAudioProcessorEditor::PluginAudioProcessorEditor(
-	PluginAudioProcessor& processorRef,
-	juce::AudioProcessorValueTreeState& apvts,
-	juce::UndoManager& undoManager,
-	PluginPresetManager& presetManager)
+PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& processorRef)
 	:
 	AudioProcessorEditor(&processorRef),
 	mProcessorRef(processorRef),
-	mAudioProcessorValueTreeState(apvts),
-	mTopComponent(std::make_unique<TopComponent>(mAudioProcessorValueTreeState)),
+	mAudioProcessorValueTreeState(processorRef.getAudioProcessorValueTreeState()),
+	mTopComponent(std::make_unique<TopComponent>(processorRef)),
 	mTabbedComponentPtr(std::make_unique<juce::TabbedComponent>(juce::TabbedButtonBar::Orientation::TabsAtTop)),
-	mPresetComponentPtr(std::make_unique<PresetComponent>(presetManager, undoManager)),
+	mPresetComponentPtr(std::make_unique<PresetComponent>(processorRef.getPresetManager(), processorRef.getUndoManager())),
 	mPedalsComponentPtr(std::make_unique<PreAmpComponent>(mAudioProcessorValueTreeState)),
 	mAmpComponentPtr(std::make_unique<AmpComponent>(mAudioProcessorValueTreeState)),
 	mFileChooser(std::make_unique<juce::FileChooser>("Select an Impulse Response File", juce::File{}, "*.wav;*.aiff;*.flac")),
@@ -113,33 +109,33 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	setResizable(true, true);
 }
 
-		void PluginAudioProcessorEditor::launchAsyncFileChooserForImpulseResponse()
+void PluginAudioProcessorEditor::launchAsyncFileChooserForImpulseResponse()
+{
+	mFileChooser->launchAsync(
+		juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
+		[this](const juce::FileChooser& chooser)
 		{
-			mFileChooser->launchAsync(
-				juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
-				[this](const juce::FileChooser& chooser)
-				{
-					mAudioProcessorValueTreeState.state.setProperty(
-						juce::Identifier(apvts::impulseResponseFileFullPathNameId),
-						chooser.getResult().getFullPathName(), nullptr);
-				});
-		}
+			mAudioProcessorValueTreeState.state.setProperty(
+				juce::Identifier(apvts::impulseResponseFileFullPathNameId),
+				chooser.getResult().getFullPathName(), nullptr);
+		});
+}
 
-		PluginAudioProcessorEditor::~PluginAudioProcessorEditor()
-		{
-			setLookAndFeel(nullptr);
-		}
+PluginAudioProcessorEditor::~PluginAudioProcessorEditor()
+{
+	setLookAndFeel(nullptr);
+}
 
-		void PluginAudioProcessorEditor::paint(juce::Graphics& g)
-		{
-			g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-		}
+void PluginAudioProcessorEditor::paint(juce::Graphics& g)
+{
+	g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+}
 
-		void PluginAudioProcessorEditor::resized()
-		{
-			auto localBounds = getLocalBounds();
+void PluginAudioProcessorEditor::resized()
+{
+	auto localBounds = getLocalBounds();
 
-			mPresetComponentPtr->setBounds(localBounds.removeFromTop(50));
-			mTopComponent->setBounds(localBounds.removeFromTop(150));
-			mTabbedComponentPtr->setBounds(localBounds);
-		}
+	mPresetComponentPtr->setBounds(localBounds.removeFromTop(50));
+	mTopComponent->setBounds(localBounds.removeFromTop(150));
+	mTabbedComponentPtr->setBounds(localBounds);
+}

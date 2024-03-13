@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include <JuceHeader.h>
+
 #include "PluginPresetManager.h"
 #include "Processors/Saturators/MouseDrive.h"
 #include "Processors/Saturators/TubeScreamer.h"
@@ -53,12 +54,40 @@ public:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
+    foleys::LevelMeterSource& getInputMeterSource()
+    {
+        return *mInputLevelMeterSourcePtr;
+    }
+
+    foleys::LevelMeterSource& getOutputMeterSource()
+    {
+        return *mOutputLevelMeterSourcePtr;
+    }
+
+    juce::AudioProcessorValueTreeState& getAudioProcessorValueTreeState()
+    {
+        return *mAudioProcessorValueTreeStatePtr;
+    }
+
+    PluginPresetManager& getPresetManager()
+    {
+        return *mPresetManagerPtr;
+    }
+
+    juce::UndoManager& getUndoManager()
+    {
+        return *mUndoManager;
+    }
+
 private:
     std::unique_ptr <juce::UndoManager> mUndoManager;
     std::unique_ptr<juce::AudioProcessorValueTreeState> mAudioProcessorValueTreeStatePtr;
     std::unique_ptr<PluginPresetManager> mPresetManagerPtr;
     std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
     juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
+
+    std::unique_ptr <foleys::LevelMeterSource> mInputLevelMeterSourcePtr;
+    std::unique_ptr <foleys::LevelMeterSource> mOutputLevelMeterSourcePtr;
 
     std::unique_ptr<juce::dsp::Gain<float>> mInputGainPtr;
 
