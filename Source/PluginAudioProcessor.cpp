@@ -75,19 +75,19 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mChorusPtr(std::make_unique<Chorus>()),
 	mPhaserPtr(std::make_unique<Phaser>()),
 	mFlangerPtr(std::make_unique<Flanger>()),
-	mBitCrusher(std::make_unique<Bitcrusher>()),
+	mBitcrusherPtr(std::make_unique<Bitcrusher>()),
 
 	mConvolutionMessageQueuePtr(std::make_unique<juce::dsp::ConvolutionMessageQueue>()),
 	mCabinetImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 128 }, * mConvolutionMessageQueuePtr.get())),
 	mLofiImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 128 }, * mConvolutionMessageQueuePtr.get())),
 
-	mInstrumentCompressor(std::make_unique<Compressor>()),
-	mInstrumentEqualiser(std::make_unique<InstrumentEqualiser>()),
+	mInstrumentCompressorPtr(std::make_unique<Compressor>()),
+	mInstrumentEqualiserPtr(std::make_unique<InstrumentEqualiser>()),
 
-	mReverb(std::make_unique<juce::dsp::Reverb>()),
+	mReverbPtr(std::make_unique<juce::dsp::Reverb>()),
 
 	mCabinetGainPtr(std::make_unique<juce::dsp::Gain<float>>()),
-	mLimiter(std::make_unique<juce::dsp::Limiter<float>>()),
+	mLimiterPtr(std::make_unique<juce::dsp::Limiter<float>>()),
 
 	mOutputGainPtr(std::make_unique<juce::dsp::Gain<float>>())
 {
@@ -786,6 +786,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				Flanger::frequencyDefaultValue
 				));
 			break;
+		case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_INDEX:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				juce::NormalisableRange<float>(0, 1, 1),
+				0
+				));
+			break;
 		default:
 			assert(false);
 			break;
@@ -857,14 +865,14 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mChorusPtr->prepare(spec);
 	mPhaserPtr->prepare(spec);
 	mFlangerPtr->prepare(spec);
-	mBitCrusher->prepare(spec);
+	mBitcrusherPtr->prepare(spec);
 
 	mCabinetImpulseResponseConvolutionPtr->prepare(spec);
 	mLofiImpulseResponseConvolutionPtr->prepare(spec);
 	loadImpulseResponseFromState();
 
-	mInstrumentEqualiser->prepare(spec);
-	mInstrumentCompressor->prepare(spec);
+	mInstrumentEqualiserPtr->prepare(spec);
+	mInstrumentCompressorPtr->prepare(spec);
 
 	if (*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorIsLookaheadOn) > 0.5f)
 	{
@@ -875,10 +883,10 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 		setLatencySamples(0);
 	}
 
-	mReverb->prepare(spec);
+	mReverbPtr->prepare(spec);
 
 	mCabinetGainPtr->prepare(spec);
-	mLimiter->prepare(spec);
+	mLimiterPtr->prepare(spec);
 
 	mOutputGainPtr->prepare(spec);
 
@@ -934,18 +942,18 @@ void PluginAudioProcessor::reset()
 	mChorusPtr->reset();
 	mPhaserPtr->reset();
 	mFlangerPtr->reset();
-	mBitCrusher->reset();
+	mBitcrusherPtr->reset();
 
 	mCabinetImpulseResponseConvolutionPtr->reset();
 	mLofiImpulseResponseConvolutionPtr->reset();
-	mInstrumentEqualiser->reset();
+	mInstrumentEqualiserPtr->reset();
 	//mInstrumentCompressor->reset();
 
-	mReverb->reset();
+	mReverbPtr->reset();
 
 	mCabinetGainPtr->reset();
 
-	mLimiter->reset();
+	mLimiterPtr->reset();
 
 	mOutputGainPtr->reset();
 }
@@ -1102,11 +1110,11 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	mChorusPtr->process(buffer);
 	mPhaserPtr->process(buffer);
 	mFlangerPtr->process(buffer);
-	mBitCrusher->process(buffer);
+	mBitcrusherPtr->process(buffer);
 
 	if (mIsReverbOn)
 	{
-		mReverb->process(processContext);
+		mReverbPtr->process(processContext);
 	}
 
 	if (mIsCabImpulseResponseConvolutionOn)
@@ -1117,19 +1125,19 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	if (mIsInstrumentCompressorPreEqualiser)
 	{
-		mInstrumentCompressor->process(buffer);
+		mInstrumentCompressorPtr->process(buffer);
 	}
 
-	mInstrumentEqualiser->processBlock(buffer);
+	mInstrumentEqualiserPtr->processBlock(buffer);
 
 	if (!mIsInstrumentCompressorPreEqualiser)
 	{
-		mInstrumentCompressor->process(buffer);
+		mInstrumentCompressorPtr->process(buffer);
 	}
 
 	if (mIsLimiterOn)
 	{
-		mLimiter->process(processContext);
+		mLimiterPtr->process(processContext);
 	}
 
 	if (mIsLofi)
@@ -1311,10 +1319,10 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mCabinetGainPtr->setGainDecibels(newValue);
 		break;
 	case apvts::ParameterEnum::LIMITER_RELEASE:
-		mLimiter->setRelease(newValue);
+		mLimiterPtr->setRelease(newValue);
 		break;
 	case apvts::ParameterEnum::LIMITER_THRESHOLD:
-		mLimiter->setThreshold(newValue);
+		mLimiterPtr->setThreshold(newValue);
 		break;
 	case apvts::ParameterEnum::CHORUS_DEPTH:
 		mChorusPtr->setDepth(newValue);
@@ -1342,26 +1350,26 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::REVERB_SIZE:
 	{
-		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({ newValue, parameters.damping, parameters.wetLevel, parameters.dryLevel, parameters.width, 0.0f });
+		const auto& parameters = mReverbPtr->getParameters();
+		mReverbPtr->setParameters({ newValue, parameters.damping, parameters.wetLevel, parameters.dryLevel, parameters.width, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::REVERB_DAMPING:
 	{
-		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({ parameters.roomSize, newValue, parameters.wetLevel, parameters.dryLevel, parameters.width, 0.0f });
+		const auto& parameters = mReverbPtr->getParameters();
+		mReverbPtr->setParameters({ parameters.roomSize, newValue, parameters.wetLevel, parameters.dryLevel, parameters.width, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::REVERB_MIX:
 	{
-		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({ parameters.roomSize, parameters.damping, newValue, 1.0f - newValue, parameters.width, 0.0f });
+		const auto& parameters = mReverbPtr->getParameters();
+		mReverbPtr->setParameters({ parameters.roomSize, parameters.damping, newValue, 1.0f - newValue, parameters.width, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::REVERB_WIDTH:
 	{
-		const auto& parameters = mReverb->getParameters();
-		mReverb->setParameters({ parameters.roomSize, parameters.damping, parameters.wetLevel, parameters.dryLevel, newValue, 0.0f });
+		const auto& parameters = mReverbPtr->getParameters();
+		mReverbPtr->setParameters({ parameters.roomSize, parameters.damping, parameters.wetLevel, parameters.dryLevel, newValue, 0.0f });
 	}
 	break;
 	case apvts::ParameterEnum::DELAY_DRY_WET:
@@ -1460,90 +1468,90 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mChorusPtr->setBypassed(!static_cast<bool>(newValue));
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_ON:
-		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 0);
+		mInstrumentEqualiserPtr->setOnAtIndex(static_cast<bool>(newValue), 0);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_FREQUENCY:
-		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 0);
+		mInstrumentEqualiserPtr->setFrequencyAtIndex(newValue, 0);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_QUALITY:
-		mInstrumentEqualiser->setQualityAtIndex(newValue, 0);
+		mInstrumentEqualiserPtr->setQualityAtIndex(newValue, 0);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 1);
+		mInstrumentEqualiserPtr->setOnAtIndex(static_cast<bool>(newValue), 1);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_FREQUENCY:
-		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 1);
+		mInstrumentEqualiserPtr->setFrequencyAtIndex(newValue, 1);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_GAIN:
-		mInstrumentEqualiser->setGainAtIndex(newValue, 1);
+		mInstrumentEqualiserPtr->setGainAtIndex(newValue, 1);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PEAK_QUALITY:
-		mInstrumentEqualiser->setQualityAtIndex(newValue, 1);
+		mInstrumentEqualiserPtr->setQualityAtIndex(newValue, 1);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 2);
+		mInstrumentEqualiserPtr->setOnAtIndex(static_cast<bool>(newValue), 2);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_FREQUENCY:
-		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 2);
+		mInstrumentEqualiserPtr->setFrequencyAtIndex(newValue, 2);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_GAIN:
-		mInstrumentEqualiser->setGainAtIndex(newValue, 2);
+		mInstrumentEqualiserPtr->setGainAtIndex(newValue, 2);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_MID_PEAK_QUALITY:
-		mInstrumentEqualiser->setQualityAtIndex(newValue, 2);
+		mInstrumentEqualiserPtr->setQualityAtIndex(newValue, 2);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 3);
+		mInstrumentEqualiserPtr->setOnAtIndex(static_cast<bool>(newValue), 3);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_FREQUENCY:
-		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 3);
+		mInstrumentEqualiserPtr->setFrequencyAtIndex(newValue, 3);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_GAIN:
-		mInstrumentEqualiser->setGainAtIndex(newValue, 3);
+		mInstrumentEqualiserPtr->setGainAtIndex(newValue, 3);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_MID_PEAK_QUALITY:
-		mInstrumentEqualiser->setQualityAtIndex(newValue, 3);
+		mInstrumentEqualiserPtr->setQualityAtIndex(newValue, 3);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_ON:
-		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 4);
+		mInstrumentEqualiserPtr->setOnAtIndex(static_cast<bool>(newValue), 4);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_FREQUENCY:
-		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 4);
+		mInstrumentEqualiserPtr->setFrequencyAtIndex(newValue, 4);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_GAIN:
-		mInstrumentEqualiser->setGainAtIndex(newValue, 4);
+		mInstrumentEqualiserPtr->setGainAtIndex(newValue, 4);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PEAK_QUALITY:
-		mInstrumentEqualiser->setQualityAtIndex(newValue, 4);
+		mInstrumentEqualiserPtr->setQualityAtIndex(newValue, 4);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_ON:
-		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 5);
+		mInstrumentEqualiserPtr->setOnAtIndex(static_cast<bool>(newValue), 5);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_FREQUENCY:
-		mInstrumentEqualiser->setFrequencyAtIndex(newValue, 5);
+		mInstrumentEqualiserPtr->setFrequencyAtIndex(newValue, 5);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_LOW_PASS_QUALITY:
-		mInstrumentEqualiser->setQualityAtIndex(newValue, 5);
+		mInstrumentEqualiserPtr->setQualityAtIndex(newValue, 5);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON:
 		mIsInstrumentCompressorPreEqualiser = static_cast<bool>(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_IS_ON:
-		mInstrumentCompressor->setPower(!static_cast<bool>(newValue));
+		mInstrumentCompressorPtr->setPower(!static_cast<bool>(newValue));
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON:
 	{
 		const bool newBool = static_cast<bool>(newValue);
 		if (newBool)
 		{
-			setLatencySamples(static_cast<int>(0.005 * mInstrumentCompressor->getSampleRate()));
+			setLatencySamples(static_cast<int>(0.005 * mInstrumentCompressorPtr->getSampleRate()));
 		}
 		else
 		{
 			setLatencySamples(0);
 		}
 
-		mInstrumentCompressor->setLookahead(newBool);
+		mInstrumentCompressorPtr->setLookahead(newBool);
 	}
 	break;
 	case apvts::ParameterEnum::DELAY_LINKED:
@@ -1578,61 +1586,61 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_GAIN_ON:
-		mInstrumentCompressor->setAutoMakeup(static_cast<bool>(newValue));
+		mInstrumentCompressorPtr->setAutoMakeup(static_cast<bool>(newValue));
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_ATTACK_ON:
 	{
 		const bool newBool = static_cast<bool>(newValue);
-		mInstrumentCompressor->setAutoAttack(newBool);
+		mInstrumentCompressorPtr->setAutoAttack(newBool);
 
 		if (!newBool)
 		{
-			mInstrumentCompressor->setAttack(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorAttack));
+			mInstrumentCompressorPtr->setAttack(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorAttack));
 		}
 	}
 	break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON:
 	{
 		const bool newBool = static_cast<bool>(newValue);
-		mInstrumentCompressor->setAutoRelease(newBool);
+		mInstrumentCompressorPtr->setAutoRelease(newBool);
 		if (!newBool)
 		{
-			mInstrumentCompressor->setRelease(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorRelease));
+			mInstrumentCompressorPtr->setRelease(*mAudioProcessorValueTreeStatePtr->getRawParameterValue(apvts::instrumentCompressorRelease));
 		}
 	}
 	break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN:
-		mInstrumentCompressor->setInput(newValue);
+		mInstrumentCompressorPtr->setInput(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_MAKEUP_GAIN:
-		mInstrumentCompressor->setMakeup(newValue);
+		mInstrumentCompressorPtr->setMakeup(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_THRESHOLD:
-		mInstrumentCompressor->setThreshold(newValue);
+		mInstrumentCompressorPtr->setThreshold(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_RATIO:
-		mInstrumentCompressor->setRatio(newValue);
+		mInstrumentCompressorPtr->setRatio(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_KNEE:
-		mInstrumentCompressor->setKnee(newValue);
+		mInstrumentCompressorPtr->setKnee(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_ATTACK:
-		mInstrumentCompressor->setAttack(newValue);
+		mInstrumentCompressorPtr->setAttack(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_RELEASE:
-		mInstrumentCompressor->setRelease(newValue);
+		mInstrumentCompressorPtr->setRelease(newValue);
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_MIX:
-		mInstrumentCompressor->setMix(newValue);
+		mInstrumentCompressorPtr->setMix(newValue);
 		break;
 	case apvts::ParameterEnum::BIT_CRUSHER_ON:
-		mBitCrusher->setIsBypassed(!newValue);
+		mBitcrusherPtr->setIsBypassed(!newValue);
 		break;
 	case apvts::ParameterEnum::BIT_CRUSHER_SAMPLE_RATE:
-		mBitCrusher->setTargetSampleRate(newValue);
+		mBitcrusherPtr->setTargetSampleRate(newValue);
 		break;
 	case apvts::ParameterEnum::BIT_CRUSHER_BIT_DEPTH:
-		mBitCrusher->setBitDepth(newValue);
+		mBitcrusherPtr->setBitDepth(newValue);
 		break;
 	case apvts::ParameterEnum::FLANGER_ON:
 		mFlangerPtr->setBypassed(!static_cast<bool>(newValue));
@@ -1654,6 +1662,10 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::IS_LOFI:
 		mIsLofi = static_cast<bool>(newValue);
+		break;
+	case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_INDEX:
+		mCabinetImpulseResponseIndex = newValue;
+		loadImpulseResponseFromState();
 		break;
 	default:
 		assert(false);
@@ -1686,13 +1698,29 @@ void PluginAudioProcessor::loadImpulseResponseFromState()
 	}
 	else
 	{
-		mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
-			BinaryData::default_cab_wav,
-			BinaryData::default_cab_wavSize,
-			juce::dsp::Convolution::Stereo::yes,
-			juce::dsp::Convolution::Trim::no,
-			BinaryData::default_cab_wavSize,
-			juce::dsp::Convolution::Normalise::yes);
+		switch (mCabinetImpulseResponseIndex)
+		{
+		case 0:
+			mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
+				BinaryData::default_cab_wav,
+				BinaryData::default_cab_wavSize,
+				juce::dsp::Convolution::Stereo::yes,
+				juce::dsp::Convolution::Trim::no,
+				BinaryData::default_cab_wavSize,
+				juce::dsp::Convolution::Normalise::yes);
+			break;
+		case 1:
+			mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
+				BinaryData::croy_cab_wav,
+				BinaryData::croy_cab_wavSize,
+				juce::dsp::Convolution::Stereo::yes,
+				juce::dsp::Convolution::Trim::no,
+				BinaryData::croy_cab_wavSize,
+				juce::dsp::Convolution::Normalise::yes);
+			break;
+		default:
+			break;
+		}
 	}
 }
 

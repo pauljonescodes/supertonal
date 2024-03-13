@@ -65,7 +65,6 @@ public:
 
 			for (const auto& parameterId : colIds)
 			{
-
 				if (mComponentRows.size() < row + 1)
 				{
 					mComponentRows.add(new juce::OwnedArray<juce::Component>());
@@ -154,7 +153,6 @@ public:
 
 		int totalHeight = ((buttonHeight + 12.5) * numRows);
 		mContainerPtr->setBounds(0, 0, mViewportPtr->getMaximumVisibleWidth() - 8, totalHeight);
-
 
 		for (int row = 0; row < mComponentRows.size(); ++row)
 		{

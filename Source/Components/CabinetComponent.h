@@ -5,7 +5,7 @@
 #include "../PluginAudioParameters.h"
 #include "../PluginUtils.h"
 
-class CabinetComponent : public juce::Component, private juce::Button::Listener, private juce::ValueTree::Listener
+class CabinetComponent : public juce::Component, private juce::Button::Listener, private juce::ValueTree::Listener, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     CabinetComponent(
@@ -23,6 +23,7 @@ public:
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
 
 		mAudioProcessorValueTreeState.state.addListener(this);
+		mAudioProcessorValueTreeState.addParameterListener(apvts::cabinetImpulseResponseConvolutionIndexId, this);
 
 		const auto impulseResponseFullPathName = mAudioProcessorValueTreeState.state.getProperty(
 			juce::String(apvts::impulseResponseFileFullPathNameId),
@@ -34,7 +35,8 @@ public:
 		}
 		else
 		{
-			mImpulseResponseFileLabelPtr->setText(juce::String("Default cab loaded"), juce::dontSendNotification);
+			const int index = *mAudioProcessorValueTreeState.getRawParameterValue(apvts::cabinetImpulseResponseConvolutionIndexId);
+			mImpulseResponseFileLabelPtr->setText(apvts::cabIds.at(index), juce::dontSendNotification);
 		}
 		
 		addAndMakeVisible(mImpulseResponseFileLabelPtr.get());
@@ -42,6 +44,7 @@ public:
 		static const std::vector<std::vector<std::string>> apvtsIdRows = {
 {
 	apvts::cabinetImpulseResponseConvolutionOnId,
+	apvts::cabinetImpulseResponseConvolutionIndexId,
 	apvts::cabinetImpulseResponseConvolutionFileId,
 	apvts::cabinetGainId
 }
@@ -78,6 +81,20 @@ public:
 					selectFileButton->addListener(this);
 					mComponentRows[row]->add(selectFileButton);
 				}
+				else if (parameterId == apvts::cabinetImpulseResponseConvolutionIndexId)
+				{
+					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
+					for (int cabIndex = 0; cabIndex < apvts::cabIds.size(); cabIndex++) {
+						comboBox->addItem(apvts::cabIds.at(cabIndex), cabIndex + 1);
+					}
+					mComponentRows[row]->add(comboBox);
+					mComboBoxAttachments.add(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(
+						mAudioProcessorValueTreeState,
+						parameterId,
+						*comboBox
+					));
+					mContainerPtr->addAndMakeVisible(comboBox);
+				}
 				else
 				{
 					auto* slider = new juce::Slider(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
@@ -109,6 +126,7 @@ public:
 		mViewportPtr.reset();
 		mContainerPtr.reset();
 		mAudioProcessorValueTreeState.state.removeListener(this);
+		mAudioProcessorValueTreeState.removeParameterListener(apvts::cabinetImpulseResponseConvolutionIndexId, this);
 	};
 
 	void paint(juce::Graphics& g) override
@@ -165,7 +183,29 @@ public:
 		{
 			juce::String newFilePath = treeWhosePropertyHasChanged.getProperty(property).toString();
 			mImpulseResponseFileLabelPtr->setText(newFilePath.isNotEmpty() ? newFilePath : "Default cab loaded", juce::dontSendNotification);
+
+
+			if (newFilePath.length() > 0)
+			{
+				mImpulseResponseFileLabelPtr->setText(newFilePath, juce::dontSendNotification);
+			}
+			else
+			{
+				const int index = *mAudioProcessorValueTreeState.getRawParameterValue(apvts::cabinetImpulseResponseConvolutionIndexId);
+				mImpulseResponseFileLabelPtr->setText(apvts::cabIds.at(index), juce::dontSendNotification);
+			}
 		}
+	}
+
+	void parameterChanged(const juce::String& parameterID, float newValue) override
+	{
+		if (parameterID.toStdString() == apvts::cabinetImpulseResponseConvolutionIndexId)
+		{
+			const int index = *mAudioProcessorValueTreeState.getRawParameterValue(apvts::cabinetImpulseResponseConvolutionIndexId);
+			mImpulseResponseFileLabelPtr->setText(apvts::cabIds.at(index), juce::dontSendNotification);
+		}
+
+		resized();
 	}
 
 private:

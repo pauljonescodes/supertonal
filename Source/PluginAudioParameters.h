@@ -105,6 +105,11 @@ namespace apvts
 		exponentialWaveShaperId,
 	};
 
+	static const std::vector<std::string> cabIds = {
+	"default",
+	"croy",
+	};
+
 	static const std::map<std::string, float (*) (float)> waveShaperIdToFunctionMap = {
 		{hyperbolicTangentWaveShaperId, [](float x) { return std::tanh(x); }},
 		{softClipWaveShaperId, [](float x) { return x / (std::abs(x) + 1.0f); }},
@@ -366,6 +371,7 @@ namespace apvts
 		REVERB_WIDTH,
 
 		CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON,
+		CABINET_IMPULSE_RESPONSE_INDEX,
 		CABINET_OUTPUT_GAIN,
 
 		INSTRUMENT_COMPRESSOR_IS_PRE_EQ_ON,
@@ -535,6 +541,7 @@ namespace apvts
 
 	static const std::string cabinetImpulseResponseConvolutionOnId = "cab_on";
 	static const std::string cabinetImpulseResponseConvolutionFileId = "cab_file";
+	static const std::string cabinetImpulseResponseConvolutionIndexId = "cab_index";
 	static const std::string cabinetGainId = "cabinet_gain";
 
 	static const std::string instrumentCompressorIsPreEq = "inst_comp_pre_eq_on";
@@ -660,6 +667,7 @@ namespace apvts
 		{ampPresenceDbId, ParameterEnum::AMP_PRESENCE_DB},
 
 		{cabinetImpulseResponseConvolutionOnId, ParameterEnum::CABINET_IMPULSE_RESPONSE_CONVOLUTION_ON},
+		{cabinetImpulseResponseConvolutionIndexId, ParameterEnum::CABINET_IMPULSE_RESPONSE_INDEX},
 
 		{cabinetGainId, ParameterEnum::CABINET_OUTPUT_GAIN},
 

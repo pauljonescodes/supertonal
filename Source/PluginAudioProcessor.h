@@ -127,9 +127,10 @@ private:
     std::unique_ptr<Chorus> mChorusPtr;
     std::unique_ptr<Phaser> mPhaserPtr;
     std::unique_ptr<Flanger> mFlangerPtr;
-    std::unique_ptr<Bitcrusher> mBitCrusher;
+    std::unique_ptr<Bitcrusher> mBitcrusherPtr;
 
     bool mIsCabImpulseResponseConvolutionOn = true;
+    int mCabinetImpulseResponseIndex = 0;
     std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;
     std::unique_ptr<juce::dsp::Convolution> mCabinetImpulseResponseConvolutionPtr;
 
@@ -137,19 +138,19 @@ private:
     std::unique_ptr<juce::dsp::Convolution> mLofiImpulseResponseConvolutionPtr;
 
     bool mIsReverbOn = false;
-    std::unique_ptr<juce::dsp::Reverb> mReverb;
+    std::unique_ptr<juce::dsp::Reverb> mReverbPtr;
     
     std::unique_ptr<juce::dsp::Gain<float>> mCabinetGainPtr;
 
-    std::unique_ptr<InstrumentEqualiser> mInstrumentEqualiser;
+    std::unique_ptr<InstrumentEqualiser> mInstrumentEqualiserPtr;
 
     bool mIsInstrumentCompressorPreEqualiser;
-    std::unique_ptr<Compressor> mInstrumentCompressor;
+    std::unique_ptr<Compressor> mInstrumentCompressorPtr;
     //LevelEnvelopeFollower inLevelFollower;
     //LevelEnvelopeFollower outLevelFollower;
 
     bool mIsLimiterOn = true;
-    std::unique_ptr<juce::dsp::Limiter<float>> mLimiter;
+    std::unique_ptr<juce::dsp::Limiter<float>> mLimiterPtr;
 
     std::unique_ptr<juce::dsp::Gain<float>> mOutputGainPtr;
 
