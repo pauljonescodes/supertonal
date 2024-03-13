@@ -79,6 +79,7 @@ PluginAudioProcessor::PluginAudioProcessor()
 
 	mConvolutionMessageQueuePtr(std::make_unique<juce::dsp::ConvolutionMessageQueue>()),
 	mCabinetImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 128 }, * mConvolutionMessageQueuePtr.get())),
+	mLofiImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 128 }, * mConvolutionMessageQueuePtr.get())),
 
 	mInstrumentCompressor(std::make_unique<Compressor>()),
 	mInstrumentEqualiser(std::make_unique<InstrumentEqualiser>()),
@@ -149,6 +150,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON:
 		case apvts::ParameterEnum::BIT_CRUSHER_ON:
 		case apvts::ParameterEnum::FLANGER_ON:
+		case apvts::ParameterEnum::IS_LOFI:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
@@ -858,6 +860,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mBitCrusher->prepare(spec);
 
 	mCabinetImpulseResponseConvolutionPtr->prepare(spec);
+	mLofiImpulseResponseConvolutionPtr->prepare(spec);
 	loadImpulseResponseFromState();
 
 	mInstrumentEqualiser->prepare(spec);
@@ -934,6 +937,7 @@ void PluginAudioProcessor::reset()
 	mBitCrusher->reset();
 
 	mCabinetImpulseResponseConvolutionPtr->reset();
+	mLofiImpulseResponseConvolutionPtr->reset();
 	mInstrumentEqualiser->reset();
 	//mInstrumentCompressor->reset();
 
@@ -1126,6 +1130,11 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	if (mIsLimiterOn)
 	{
 		mLimiter->process(processContext);
+	}
+
+	if (mIsLofi)
+	{
+		mLofiImpulseResponseConvolutionPtr->process(processContext);
 	}
 
 	mOutputGainPtr->process(processContext);
@@ -1643,6 +1652,9 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::FLANGER_FREQUENCY:
 		mFlangerPtr->setFrequency(newValue);
 		break;
+	case apvts::ParameterEnum::IS_LOFI:
+		mIsLofi = static_cast<bool>(newValue);
+		break;
 	default:
 		assert(false);
 	}
@@ -1675,11 +1687,11 @@ void PluginAudioProcessor::loadImpulseResponseFromState()
 	else
 	{
 		mCabinetImpulseResponseConvolutionPtr->loadImpulseResponse(
-			BinaryData::cory_bread_and_butter_normalized_wav,
-			BinaryData::cory_bread_and_butter_normalized_wavSize,
+			BinaryData::default_cab_wav,
+			BinaryData::default_cab_wavSize,
 			juce::dsp::Convolution::Stereo::yes,
 			juce::dsp::Convolution::Trim::no,
-			BinaryData::cory_bread_and_butter_normalized_wavSize,
+			BinaryData::default_cab_wavSize,
 			juce::dsp::Convolution::Normalise::yes);
 	}
 }

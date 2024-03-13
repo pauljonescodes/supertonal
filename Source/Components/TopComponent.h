@@ -23,6 +23,7 @@ public:
 	apvts::inputGainId,
 	apvts::noiseGateThresholdId,
 	apvts::outputGainId,
+	apvts::isLofiId,
 	apvts::bypassId,
 }
 		};

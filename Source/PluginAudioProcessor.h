@@ -133,6 +133,9 @@ private:
     std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;
     std::unique_ptr<juce::dsp::Convolution> mCabinetImpulseResponseConvolutionPtr;
 
+    bool mIsLofi = false;
+    std::unique_ptr<juce::dsp::Convolution> mLofiImpulseResponseConvolutionPtr;
+
     bool mIsReverbOn = false;
     std::unique_ptr<juce::dsp::Reverb> mReverb;
     

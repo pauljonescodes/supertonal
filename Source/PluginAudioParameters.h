@@ -415,6 +415,8 @@ namespace apvts
 		LIMITER_THRESHOLD,
 		LIMITER_RELEASE,
 
+		IS_LOFI,
+
 		OUTPUT_GAIN,
 		BYPASS_ON
 	};
@@ -577,6 +579,8 @@ namespace apvts
 	static const std::string instrumentEqualiserHighPassOnId = "eq_high_pass_on";
 	static const std::string instrumentEqualiserHighPassFrequencyId = "eq_high_pass_freq";
 	static const std::string instrumentEqualiserHighPassQualityId = "eq_high_pass_quality";
+
+	static const std::string isLofiId = "lofi_mode_on";
 
 	static const std::string limiterOnId = "limiter_on";
 	static const std::string limiterThresholdId = "limiter_threshold";
@@ -741,6 +745,8 @@ namespace apvts
 		{roomDampingId, ParameterEnum::REVERB_DAMPING},
 		{roomMixId, ParameterEnum::REVERB_MIX},
 		{roomWidthId, ParameterEnum::REVERB_WIDTH},
+
+		{isLofiId, ParameterEnum::IS_LOFI},
 
 		{outputGainId, ParameterEnum::OUTPUT_GAIN},
 		{bypassId, ParameterEnum::BYPASS_ON},

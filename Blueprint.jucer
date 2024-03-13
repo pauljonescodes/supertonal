@@ -8,12 +8,11 @@
               cppLanguageStandard="20">
   <MAINGROUP id="Pdzbsi" name="Blueprint Cory Bergeron2">
     <GROUP id="{2ED2996E-C3B4-16E6-D794-2D6A2D1A240A}" name="Assets">
-      <FILE id="NiXqDL" name="cory_bread_and_butter_normalized.wav" compile="0"
-            resource="1" file="Assets/cory_bread_and_butter_normalized.wav"/>
+      <FILE id="O15NRU" name="croy_cab.wav" compile="0" resource="1" file="Assets/croy_cab.wav"/>
+      <FILE id="VSSBIc" name="default_cab.wav" compile="0" resource="1" file="Assets/default_cab.wav"/>
       <FILE id="WCefh3" name="Guitar Plate.aif" compile="0" resource="1"
             file="Assets/Guitar Plate.aif"/>
-      <FILE id="cjKIfL" name="VTM60_low_pregain70_low50_mid50_high50_presence50.wav"
-            compile="0" resource="1" file="Assets/VTM60_low_pregain70_low50_mid50_high50_presence50.wav"/>
+      <FILE id="spVGh4" name="lofi_cab.wav" compile="0" resource="1" file="Assets/lofi_cab.wav"/>
       <FILE id="gvjmmK" name="WorkSans-Bold.ttf" compile="0" resource="1"
             file="Assets/WorkSans-Bold.ttf"/>
       <FILE id="ZZvlmT" name="WorkSans-BoldItalic.ttf" compile="0" resource="1"
