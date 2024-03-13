@@ -6,8 +6,10 @@
 class PresetComponent : public juce::Component, juce::Button::Listener, juce::ComboBox::Listener
 {
 public:
-	PresetComponent(PluginPresetManager& pm) : presetManager(pm)
+	PresetComponent(PluginPresetManager& pm, juce::UndoManager& um) : presetManager(pm), undoManager(um)
 	{
+		configureButton(undoButton, "Undo");
+		configureButton(redoButton, "Redo");
 		configureButton(saveButton, "Save");
 		configureButton(deleteButton, "Delete");
 		configureButton(previousPresetButton, "<");
@@ -23,6 +25,8 @@ public:
 
 	~PresetComponent()
 	{
+		undoButton.removeListener(this);
+		redoButton.removeListener(this);
 		saveButton.removeListener(this);
 		deleteButton.removeListener(this);
 		previousPresetButton.removeListener(this);
@@ -34,12 +38,15 @@ public:
 	{
 		const auto localBounds = getLocalBounds();
 		auto bounds = localBounds;
+		//2
 
-		saveButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.2f)));
+		undoButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.1f)));
+		redoButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.1f)));
+		saveButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.15f)));
 		previousPresetButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.1f)));
-		presetList.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.4f)));
+		presetList.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.3f)));
 		nextPresetButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.1f)));
-		deleteButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.2f)));
+		deleteButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.15f)));
 	}
 private:
 	void buttonClicked(juce::Button* button) override
@@ -73,6 +80,14 @@ private:
 			presetManager.deletePreset(presetManager.getCurrentPreset());
 			loadPresetList();
 		}
+		if (button == &undoButton)
+		{
+			undoManager.undo();
+		}
+		if (button == &redoButton)
+		{
+			undoManager.redo();
+		}
 	}
 	void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override
 	{
@@ -100,7 +115,8 @@ private:
 	}
 
 	PluginPresetManager& presetManager;
-	juce::TextButton saveButton, deleteButton, previousPresetButton, nextPresetButton;
+	juce::UndoManager& undoManager;
+	juce::TextButton undoButton, redoButton, saveButton, deleteButton, previousPresetButton, nextPresetButton;
 	juce::ComboBox presetList;
 	std::unique_ptr<juce::FileChooser> fileChooser;
 

@@ -77,6 +77,7 @@ static const std::vector<std::vector<std::string>> sHiddenIds = {
 PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	PluginAudioProcessor& processorRef,
 	juce::AudioProcessorValueTreeState& apvts,
+	juce::UndoManager& undoManager,
 	PluginPresetManager& presetManager)
 	:
 	AudioProcessorEditor(&processorRef),
@@ -84,7 +85,7 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(
 	mAudioProcessorValueTreeState(apvts),
 	mTopComponent(std::make_unique<TopComponent>(mAudioProcessorValueTreeState)),
 	mTabbedComponentPtr(std::make_unique<juce::TabbedComponent>(juce::TabbedButtonBar::Orientation::TabsAtTop)),
-	mPresetComponentPtr(std::make_unique<PresetComponent>(presetManager)),
+	mPresetComponentPtr(std::make_unique<PresetComponent>(presetManager, undoManager)),
 	mPedalsComponentPtr(std::make_unique<PreAmpComponent>(mAudioProcessorValueTreeState)),
 	mAmpComponentPtr(std::make_unique<AmpComponent>(mAudioProcessorValueTreeState)),
 	mFileChooser(std::make_unique<juce::FileChooser>("Select an Impulse Response File", juce::File{}, "*.wav;*.aiff;*.flac")),

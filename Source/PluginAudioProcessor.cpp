@@ -15,9 +15,10 @@ PluginAudioProcessor::PluginAudioProcessor()
 		.withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
 	),
+	mUndoManager(std::make_unique<juce::UndoManager>()),
 	mAudioProcessorValueTreeStatePtr(std::make_unique<juce::AudioProcessorValueTreeState>(
 		*this,
-		nullptr,
+		mUndoManager.get(),
 		juce::Identifier(apvts::identifier),
 		createParameterLayout())),
 	mPresetManagerPtr(std::make_unique<PluginPresetManager>(*mAudioProcessorValueTreeStatePtr.get())),
@@ -1851,6 +1852,7 @@ juce::AudioProcessorEditor* PluginAudioProcessor::createEditor()
 	return new PluginAudioProcessorEditor(
 		*this,
 		*mAudioProcessorValueTreeStatePtr.get(),
+		*mUndoManager.get(),
 		*mPresetManagerPtr.get()
 	);
 }

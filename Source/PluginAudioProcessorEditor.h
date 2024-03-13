@@ -15,6 +15,7 @@ public:
     explicit PluginAudioProcessorEditor (
         PluginAudioProcessor&, 
         juce::AudioProcessorValueTreeState&,
+        juce::UndoManager& undoManager,
         PluginPresetManager& presetManager);
     ~PluginAudioProcessorEditor() override;
 

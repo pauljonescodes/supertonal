@@ -54,6 +54,7 @@ public:
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
 private:
+    std::unique_ptr <juce::UndoManager> mUndoManager;
     std::unique_ptr<juce::AudioProcessorValueTreeState> mAudioProcessorValueTreeStatePtr;
     std::unique_ptr<PluginPresetManager> mPresetManagerPtr;
     std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
