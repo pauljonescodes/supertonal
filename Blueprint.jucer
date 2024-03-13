@@ -54,9 +54,13 @@
         <FILE id="JJ02wX" name="TopComponent.h" compile="0" resource="0" file="Source/Components/TopComponent.h"/>
       </GROUP>
       <GROUP id="{DEDDA15C-1DE5-7D7A-FDED-908468144E16}" name="Processors">
-        <GROUP id="{5B869611-B206-28D5-C958-2731ED1ECBE4}" name="Modulators"/>
+        <GROUP id="{5B869611-B206-28D5-C958-2731ED1ECBE4}" name="Modulators">
+          <FILE id="b3NpSs" name="Chorus.h" compile="0" resource="0" file="Source/Processors/Modulators/Chorus.h"/>
+          <FILE id="ErMXL0" name="Flanger.h" compile="0" resource="0" file="Source/Processors/Modulators/Flanger.h"/>
+          <FILE id="aYrAqt" name="Phaser.h" compile="0" resource="0" file="Source/Processors/Modulators/Phaser.h"/>
+        </GROUP>
         <GROUP id="{DB7C5CF8-BA5F-152F-2185-2ACD2FB71555}" name="Other">
-          <FILE id="CAHShK" name="BitCrusher.h" compile="0" resource="0" file="Source/Processors/Other/BitCrusher.h"/>
+          <FILE id="CAHShK" name="Bitcrusher.h" compile="0" resource="0" file="Source/Processors/Other/Bitcrusher.h"/>
           <FILE id="GZTF4J" name="Krusher.h" compile="0" resource="0" file="Source/Processors/Other/Krusher.h"/>
         </GROUP>
         <GROUP id="{48569B5C-89A6-9FBD-C12B-E0EB684137A4}" name="Saturators">

@@ -71,10 +71,6 @@ static const std::vector<std::vector<std::string>> sHiddenIds = {
 	apvts::noiseGateAttackId,
 	apvts::noiseGateRatioId,
 	apvts::noiseGateReleaseId,
-},
-{
-	apvts::chorusMixId,
-	apvts::phaserMixId,
 }
 };
 

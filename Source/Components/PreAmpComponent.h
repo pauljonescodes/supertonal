@@ -89,10 +89,10 @@ public:
 			audioProcessorValueTreeState,
 			"Chorus",
 			std::vector<PedalComponent::ParameterSetting>{
-				{ apvts::chorusFractionOfBeatId, "Time", " / beat"},
+				{ apvts::chorusDelayId, "Delay", ""},
 				{ apvts::chorusDepthId, "Depth", "" },
-				{ apvts::chorusFeedbackId, "Feedback", "" },
-				{ apvts::chorusCenterDelayFractionOfBeatId, "Delay", " / beat" },
+				{ apvts::chorusFrequencyId, "Frequency", "" },
+				{ apvts::chorusWidthId, "Width", "" },
 		},
 			apvts::chorusOnId));
 
@@ -100,12 +100,24 @@ public:
 			audioProcessorValueTreeState,
 			"Phaser",
 			std::vector<PedalComponent::ParameterSetting>{
-				{ apvts::phaserRateFractionOfBeatId, "Time", " / beat"},
 				{ apvts::phaserDepthId, "Depth", "" },
-				{ apvts::phaserCenterFrequencyId, "Center", "" },
-				{ apvts::phaserFeedbackId, "Feedback", ""},
+				{ apvts::phaserWidthId, "Width", ""},
+				{ apvts::phaserFeedbackId, "Feedback", "" },
+				{ apvts::phaserFrequencyId, "Frequency", "" },
 		},
-			apvts::phaserOnId));
+			apvts::phaserIsOnId));
+
+		mContainerPtr->addAndMakeVisible(new PedalComponent(
+			audioProcessorValueTreeState,
+			"Flanger",
+			std::vector<PedalComponent::ParameterSetting>{
+				{ apvts::flangerDelayId, "Delay", "" },
+				{ apvts::flangerDepthId, "Depth", "" },
+				{ apvts::flangerFeedbackId, "Feedback", "" },
+				{ apvts::flangerFrequencyId, "Frequency", "" },
+				{ apvts::flangerWidthId, "Width", "" },
+		},
+			apvts::flangerOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
 			audioProcessorValueTreeState,

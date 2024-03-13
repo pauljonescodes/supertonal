@@ -182,26 +182,9 @@ namespace apvts
 
 	// EQ
 
-	static const std::string highPassEqualizationComponentId = "high-pass";
-	static const std::string midPeakEqualizationComponentId = "mid-peak";
-	static const std::string highShelfEqualizationComponentId = "high-shelf";
-	static const std::string lowPassEqualizationComponentId = "low-pass";
-
-	static constexpr float lowShelfFrequencyDefaultValue = 20.0f;
-	static constexpr float midPeakFrequencyDefaultValue = 1000.0f;
-	static constexpr float highShelfFrequencyDefaultValue = 15000.0f;
-	static constexpr float lowPassFrequencyDefaultValue = 20000.0f;
-
-	static const std::map<std::string, float> equalizationTypeIdToDefaultFrequencyMap = {
-		{highPassEqualizationComponentId,lowShelfFrequencyDefaultValue},
-		{midPeakEqualizationComponentId,midPeakFrequencyDefaultValue},
-		{highShelfEqualizationComponentId,highShelfFrequencyDefaultValue},
-		{lowPassEqualizationComponentId,lowPassFrequencyDefaultValue},
-	};
-
-	static constexpr float qualityOffDefaultValue = 0.001f;
+	static constexpr float qualityOffDefaultValue = 0.10f;
 	static constexpr float qualityOnDefaultValue = 1.00f;
-	static constexpr float qualityMinimumValue = 0.001f;
+	static constexpr float qualityMinimumValue = 0.01f;
 	static constexpr float qualityMaximumValue = 10.f;
 	static const juce::NormalisableRange<float> qualityNormalisableRange = makeLogarithmicRange(
 		qualityMinimumValue,
@@ -229,53 +212,6 @@ namespace apvts
 		delayTimeMsMinimumValue,
 		delayTimeMsMaximumValue,
 		defaultIntervalValue);
-
-	// PHASER
-
-	static constexpr float phaserCenterFrequencyDefaultValue = 1000.0f;
-
-	// Bitcrusher
-
-	static constexpr float bitCrusherSampleRateMinimumValue = 1000.0f;
-	static constexpr float bitCrusherSampleRateMaximumValue = 48000.0f;
-	static constexpr float bitCrusherSampleRateIntervalValue = 1000.0f;
-	static constexpr float bitCrusherSampleRateDefaultValue = 8000.0f;
-	static const juce::NormalisableRange<float> bitCrusherSampleRateNormalizableRange =
-		juce::NormalisableRange<float>(
-			bitCrusherSampleRateMinimumValue,
-			bitCrusherSampleRateMaximumValue,
-			bitCrusherSampleRateIntervalValue);
-
-	static constexpr float bitCrusherBitDepthMinimumValue = 1.0f;
-	static constexpr float bitCrusherBitDepthMaximumValue = 12.0f;
-	static constexpr float bitCrusherBitDepthIntervalValue = 1.0f;
-	static constexpr float bitCrusherBitDepthDefaultValue = 12.0f;
-	static const juce::NormalisableRange<float> bitCrusherBitDepthNormalizableRange =
-		juce::NormalisableRange<float>(
-			bitCrusherBitDepthMinimumValue,
-			bitCrusherBitDepthMaximumValue,
-			bitCrusherBitDepthIntervalValue);
-
-	// Tube screamer
-
-	static constexpr float tubeScreamerDiodeTypeMinimumValue = 0.0f;
-	static constexpr float tubeScreamerDiodeTypeMaximumValue = 2.0f;
-	static constexpr float tubeScreamerDiodeTypeInterval = 1.0;
-	static constexpr float tubeScreamerDiodeTypeDefaultValue = 0.0f;
-	static const juce::NormalisableRange<float> tubeScreamerDiodeTypeNormalizableRange = juce::NormalisableRange<float>(
-		tubeScreamerDiodeTypeMinimumValue,
-		tubeScreamerDiodeTypeMaximumValue,
-		tubeScreamerDiodeTypeInterval);
-
-	static constexpr float tubeScreamerDiodeCountMinimumValue = 1.0f;
-	static constexpr float tubeScreamerDiodeCountMaximumValue = 3.0f;
-	static constexpr float tubeScreamerDiodeCountInterval = 1.0;
-	static constexpr float tubeScreamerDiodeCountDefaultValue = 2.0f;
-	static const juce::NormalisableRange<float> tubeScreamerDiodeCountNormalizableRange = juce::NormalisableRange<float>(
-		tubeScreamerDiodeCountMinimumValue,
-		tubeScreamerDiodeCountMaximumValue,
-		tubeScreamerDiodeCountInterval);
-
 
 	namespace Ctagdrc
 	{
@@ -401,18 +337,23 @@ namespace apvts
 		DELAY_DRY_WET,
 
 		CHORUS_ON,
-		CHORUS_FRACTION_OF_BEAT,
 		CHORUS_DEPTH,
-		CHORUS_CENTER_DELAY_FRACTION_OF_BEAT,
-		CHORUS_FEEDBACK,
-		CHORUS_MIX,
+		CHORUS_DELAY,
+		CHORUS_WIDTH,
+		CHORUS_FREQUENCY,
 
-		PHASER_ON,
-		PHASER_RATE_FRACTION_OF_BEAT,
+		PHASER_IS_ON,
 		PHASER_DEPTH,
-		PHASER_CENTER_FREQUENCY,
 		PHASER_FEEDBACK,
-		PHASER_MIX,
+		PHASER_FREQUENCY,
+		PHASER_WIDTH,
+
+		FLANGER_ON,
+		FLANGER_DELAY,
+		FLANGER_WIDTH,
+		FLANGER_DEPTH,
+		FLANGER_FEEDBACK,
+		FLANGER_FREQUENCY,
 
 		BIT_CRUSHER_ON,
 		BIT_CRUSHER_SAMPLE_RATE,
@@ -562,18 +503,23 @@ namespace apvts
 	static const std::string delayDryWetId = "delay_mix";
 
 	static const std::string chorusOnId = "chorus_on";
-	static const std::string chorusFractionOfBeatId = "chorus_per_beat";
+	static const std::string chorusDelayId = "chorus_delay";
 	static const std::string chorusDepthId = "chorus_depth";
-	static const std::string chorusCenterDelayFractionOfBeatId = "chorus_delay_per_beat";
-	static const std::string chorusFeedbackId = "chorus_feedback";
-	static const std::string chorusMixId = "chorus_mix";
+	static const std::string chorusWidthId = "chorus_width";
+	static const std::string chorusFrequencyId = "chorus_feedback";
 
-	static const std::string phaserOnId = "phaser_on";
-	static const std::string phaserRateFractionOfBeatId = "phaser_per_beat";
+	static const std::string phaserIsOnId = "phaser_on";
 	static const std::string phaserDepthId = "phaser_depth";
-	static const std::string phaserCenterFrequencyId = "phaser_center_freq";
+	static const std::string phaserWidthId = "phaser_width";
+	static const std::string phaserFrequencyId = "phaser_frequency";
 	static const std::string phaserFeedbackId = "phaser_feedback";
-	static const std::string phaserMixId = "phaser_mix";
+
+	static const std::string flangerOnId = "flanger_on";
+	static const std::string flangerDelayId = "flanger_delay";
+	static const std::string flangerWidthId = "flanger_width";
+	static const std::string flangerDepthId = "flanger_depth";
+	static const std::string flangerFeedbackId = "flanger_feedback";
+	static const std::string flangerFrequencyId = "flanger_frequency";
 
 	static const std::string bitCrusherOnId = "bit_crusher_on";
 	static const std::string bitCrusherSampleRateId = "bit_crusher_sample_rate";
@@ -730,18 +676,23 @@ namespace apvts
 		{delayDryWetId, ParameterEnum::DELAY_DRY_WET},
 
 		{chorusOnId, ParameterEnum::CHORUS_ON},
-		{chorusFractionOfBeatId, ParameterEnum::CHORUS_FRACTION_OF_BEAT},
 		{chorusDepthId, ParameterEnum::CHORUS_DEPTH},
-		{chorusCenterDelayFractionOfBeatId, ParameterEnum::CHORUS_CENTER_DELAY_FRACTION_OF_BEAT},
-		{chorusFeedbackId, ParameterEnum::CHORUS_FEEDBACK},
-		{chorusMixId, ParameterEnum::CHORUS_MIX},
+		{chorusWidthId, ParameterEnum::CHORUS_WIDTH},
+		{chorusFrequencyId, ParameterEnum::CHORUS_FREQUENCY},
+		{chorusDelayId, ParameterEnum::CHORUS_DELAY},
 
-		{phaserOnId, ParameterEnum::PHASER_ON},
-		{phaserRateFractionOfBeatId, ParameterEnum::PHASER_RATE_FRACTION_OF_BEAT},
+		{flangerOnId, ParameterEnum::FLANGER_ON},
+		{flangerDelayId, ParameterEnum::FLANGER_DELAY},
+		{flangerWidthId, ParameterEnum::FLANGER_WIDTH},
+		{flangerDepthId, ParameterEnum::FLANGER_DEPTH},
+		{flangerFeedbackId, ParameterEnum::FLANGER_FEEDBACK},
+		{flangerFrequencyId, ParameterEnum::FLANGER_FREQUENCY},
+
+		{phaserIsOnId, ParameterEnum::PHASER_IS_ON},
 		{phaserDepthId, ParameterEnum::PHASER_DEPTH},
-		{phaserCenterFrequencyId, ParameterEnum::PHASER_CENTER_FREQUENCY},
+		{phaserFrequencyId, ParameterEnum::PHASER_FREQUENCY},
+		{phaserWidthId, ParameterEnum::PHASER_WIDTH},
 		{phaserFeedbackId, ParameterEnum::PHASER_FEEDBACK},
-		{phaserMixId, ParameterEnum::PHASER_MIX},
 
 		{bitCrusherOnId, ParameterEnum::BIT_CRUSHER_ON},
 		{bitCrusherSampleRateId, ParameterEnum::BIT_CRUSHER_SAMPLE_RATE},

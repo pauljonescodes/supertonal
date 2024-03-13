@@ -71,20 +71,20 @@ private:
 		sLowPassFrequencyDefaultValue
 	};
 	std::array<float, 6> mDecibelGains = {
-	0.0f,
-	0.0f,
-	0.0f,
-	0.0f,
-	0.0f,
-	0.0f
+		0.0f,
+		0.0f,
+		0.0f,
+		0.0f,
+		0.0f,
+		0.0f
 	};
 	std::array<float, 6> mQualities = {
-0.001L,
-0.001L,
-0.001L,
-0.001L,
-0.001L,
-0.001L
+		0.001L,
+		0.001L,
+		0.001L,
+		0.001L,
+		0.001L,
+		0.001L
 	};
 	std::array<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>, 6> mFilters;
 

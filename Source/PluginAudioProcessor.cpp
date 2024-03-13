@@ -72,9 +72,10 @@ PluginAudioProcessor::PluginAudioProcessor()
 		juce::dsp::IIR::Coefficients<float>::makeLowPass(apvts::sampleRateAssumption, InstrumentEqualiser::sLowPassFrequencyNormalisableRange.start)
 		)),
 
-	//mChorusPtr(std::make_unique<juce::dsp::Chorus<float>>()),
-	//mPhaserPtr(std::make_unique<juce::dsp::Phaser<float>>()),
-	mBitCrusher(std::make_unique<BitCrusher>()),
+	mChorusPtr(std::make_unique<Chorus>()),
+	mPhaserPtr(std::make_unique<Phaser>()),
+	mFlangerPtr(std::make_unique<Flanger>()),
+	mBitCrusher(std::make_unique<Bitcrusher>()),
 
 	mConvolutionMessageQueuePtr(std::make_unique<juce::dsp::ConvolutionMessageQueue>()),
 	mCabinetImpulseResponseConvolutionPtr(std::make_unique<juce::dsp::Convolution>(juce::dsp::Convolution::NonUniform{ 128 }, * mConvolutionMessageQueuePtr.get())),
@@ -135,7 +136,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::REVERB_ON:
 		case apvts::ParameterEnum::PRE_COMPRESSOR_IS_ON:
 		case apvts::ParameterEnum::DELAY_ON:
-		case apvts::ParameterEnum::PHASER_ON:
+		case apvts::ParameterEnum::PHASER_IS_ON:
 		case apvts::ParameterEnum::CHORUS_ON:
 		case apvts::ParameterEnum::PRE_EQUALISER_ON:
 		case apvts::ParameterEnum::DELAY_IS_SYNCED:
@@ -147,16 +148,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_AUTO_RELEASE_ON:
 		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_LOOKAHEAD_ON:
 		case apvts::ParameterEnum::BIT_CRUSHER_ON:
+		case apvts::ParameterEnum::FLANGER_ON:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
 				false
 				));
 			break;
-		case apvts::ParameterEnum::CHORUS_DEPTH:
-		case apvts::ParameterEnum::PHASER_DEPTH:
-		case apvts::ParameterEnum::CHORUS_FEEDBACK:
-		case apvts::ParameterEnum::PHASER_FEEDBACK:
 		case apvts::ParameterEnum::DELAY_FEEDBACK:
 		case apvts::ParameterEnum::REVERB_MIX:
 		case apvts::ParameterEnum::REVERB_SIZE:
@@ -237,31 +235,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::gainDeciblesDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				PluginUtils::toTitleCase(parameterId),
-				apvts::gainDecibelsNegativeNormalisableRange,
-				MouseDrive::sVolumeDefaultValue
-				));
-			break;
-		case apvts::ParameterEnum::TUBE_SCREAMER_LEVEL:
-			layout.add(std::make_unique<juce::AudioParameterFloat>(
-				juce::ParameterID{ parameterId, apvts::version },
-				PluginUtils::toTitleCase(parameterId),
-				apvts::gainDecibelsNegativeNormalisableRange,
-				TubeScreamer::sLevelDefaultValue
-				));
-			break;
-		case apvts::ParameterEnum::CHORUS_MIX:
-		case apvts::ParameterEnum::PHASER_MIX:
 		case apvts::ParameterEnum::STAGE1_DRY_WET_MIX:
 		case apvts::ParameterEnum::STAGE2_DRY_WET_MIX:
 		case apvts::ParameterEnum::STAGE3_DRY_WET_MIX:
 		case apvts::ParameterEnum::STAGE4_DRY_WET_MIX:
 		case apvts::ParameterEnum::PRE_COMPRESSOR_DRY_WET_MIX:
-		case apvts::ParameterEnum::TUBE_SCREAMER_TONE:
-		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
 		case apvts::ParameterEnum::REVERB_WIDTH:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -392,7 +370,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				parameterId,
 				true));
 			break;
-		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
 		case apvts::ParameterEnum::DELAY_DRY_WET:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
@@ -469,28 +446,37 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				100.0f
 				));
 			break;
-		case apvts::ParameterEnum::MOUSE_DRIVE_FILTER:
+
+		case apvts::ParameterEnum::CHORUS_FREQUENCY:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::frequencyNormalisableRange,
-				apvts::lowPassFrequencyDefaultValue
+				Chorus::lfoFrequencyNormalisableRange,
+				Chorus::frequencyDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::CHORUS_FRACTION_OF_BEAT:
+		case apvts::ParameterEnum::CHORUS_DEPTH:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::fractionalTimeNormalizableRange,
-				apvts::fractionalTimeDefaultValue
+				Chorus::depthNormalisableRange,
+				Chorus::depthDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::PHASER_RATE_FRACTION_OF_BEAT:
+		case apvts::ParameterEnum::CHORUS_WIDTH:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::fractionalTimeNormalizableRange,
-				apvts::fractionalTimeDefaultValue
+				Chorus::widthNormalisableRange,
+				Chorus::widthDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::CHORUS_DELAY:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Chorus::delayNormalisableRange,
+				Chorus::delayDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::LIMITER_RELEASE:
@@ -501,20 +487,36 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				apvts::limiterReleaseDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::CHORUS_CENTER_DELAY_FRACTION_OF_BEAT:
+		case apvts::ParameterEnum::PHASER_FREQUENCY:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::fractionalTimeNormalizableRange,
-				apvts::fractionalTimeDefaultValue
+				Phaser::frequencyNormalisableRange,
+				Phaser::frequencyDefaultValue
 				));
 			break;
-		case apvts::ParameterEnum::PHASER_CENTER_FREQUENCY:
+		case apvts::ParameterEnum::PHASER_WIDTH:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::frequencyNormalisableRange,
-				apvts::phaserCenterFrequencyDefaultValue
+				Phaser::widthNormalisableRange,
+				Phaser::widthDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::PHASER_DEPTH:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Phaser::depthNormalisableRange,
+				Phaser::depthDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::PHASER_FEEDBACK:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Phaser::feedbackNormalisableRange,
+				Phaser::feedbackDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::DELAY_RIGHT_MS:
@@ -535,20 +537,44 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				2.0f
 				));
 			break;
+		case apvts::ParameterEnum::TUBE_SCREAMER_LEVEL:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				TubeScreamer::levelNormalisableRange,
+				TubeScreamer::levelDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::TUBE_SCREAMER_TONE:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				TubeScreamer::toneNormalisableRange,
+				TubeScreamer::toneDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::TUBE_SCREAMER_DRIVE:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				TubeScreamer::driveNormalisableRange,
+				TubeScreamer::driveDefaultValue
+				));
+			break;
 		case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_TYPE:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::tubeScreamerDiodeTypeNormalizableRange,
-				apvts::tubeScreamerDiodeTypeDefaultValue
+				TubeScreamer::diodeTypeNormalisableRange,
+				TubeScreamer::diodeTypeDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::TUBE_SCREAMER_DIODE_COUNT:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::tubeScreamerDiodeCountNormalizableRange,
-				apvts::tubeScreamerDiodeCountDefaultValue
+				TubeScreamer::diodeCountNormalisableRange,
+				TubeScreamer::diodeCountDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::INSTRUMENT_COMPRESSOR_INPUT_GAIN:
@@ -682,16 +708,80 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::bitCrusherSampleRateNormalizableRange,
-				apvts::bitCrusherSampleRateDefaultValue
+				Bitcrusher::sampleRateNormalisableRange,
+				Bitcrusher::sampleRateDefaultValue
 				));
 			break;
 		case apvts::ParameterEnum::BIT_CRUSHER_BIT_DEPTH:
 			layout.add(std::make_unique<juce::AudioParameterFloat>(
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
-				apvts::bitCrusherBitDepthNormalizableRange,
-				apvts::bitCrusherBitDepthDefaultValue
+				Bitcrusher::bitDepthNormalisableRange,
+				Bitcrusher::bitDepthDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::MOUSE_DRIVE_DISTORTION:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				MouseDrive::distortionNormalisableRange,
+				MouseDrive::distortionDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				MouseDrive::volumeNormalisableRange,
+				MouseDrive::volumeDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::MOUSE_DRIVE_FILTER:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				MouseDrive::filterNormalisableRange,
+				MouseDrive::filterDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::FLANGER_DELAY:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Flanger::delayNormalisableRange,
+				Flanger::delayDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::FLANGER_WIDTH:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Flanger::widthNormalisableRange,
+				Flanger::widthDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::FLANGER_DEPTH:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Flanger::depthNormalisableRange,
+				Flanger::depthDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::FLANGER_FEEDBACK:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Flanger::feedbackNormalisableRange,
+				Flanger::feedbackDefaultValue
+				));
+			break;
+		case apvts::ParameterEnum::FLANGER_FREQUENCY:
+			layout.add(std::make_unique<juce::AudioParameterFloat>(
+				juce::ParameterID{ parameterId, apvts::version },
+				PluginUtils::toTitleCase(parameterId),
+				Flanger::frequencyNormalisableRange,
+				Flanger::frequencyDefaultValue
 				));
 			break;
 		default:
@@ -762,8 +852,9 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	mDelayLowPassFilterPtr->prepare(spec);
 	mDelayHighPassFilterPtr->prepare(spec);
 
-	//mChorusPtr->prepare(spec);
-	//mPhaserPtr->prepare(spec);
+	mChorusPtr->prepare(spec);
+	mPhaserPtr->prepare(spec);
+	mFlangerPtr->prepare(spec);
 	mBitCrusher->prepare(spec);
 
 	mCabinetImpulseResponseConvolutionPtr->prepare(spec);
@@ -837,8 +928,9 @@ void PluginAudioProcessor::reset()
 	mDelayLowPassFilterPtr->reset();
 	mDelayHighPassFilterPtr->reset();
 
-	//mChorusPtr->reset();
-	//mPhaserPtr->reset();
+	mChorusPtr->reset();
+	mPhaserPtr->reset();
+	mFlangerPtr->reset();
 	mBitCrusher->reset();
 
 	mCabinetImpulseResponseConvolutionPtr->reset();
@@ -959,11 +1051,6 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mStage4DryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
-	if ((!mIsStage1On && !mIsStage2On && !mIsStage3On && !mIsStage4On))
-	{
-		audioBlock.clear();
-	}
-
 	mAmplifierEqualiser->processBlock(buffer);
 	mBiasPtr->process(processContext);
 
@@ -1008,17 +1095,10 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		mDelayLineDryWetMixerPtr->mixWetSamples(audioBlock);
 	}
 
-	if (mIsChorusOn)
-	{
-		
-	}
-
-	if (mIsPhaserOn)
-	{
-		
-	}
-
-	mBitCrusher->processAudio(buffer);
+	mChorusPtr->process(buffer);
+	mPhaserPtr->process(buffer);
+	mFlangerPtr->process(buffer);
+	mBitCrusher->process(buffer);
 
 	if (mIsReverbOn)
 	{
@@ -1227,35 +1307,29 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::LIMITER_THRESHOLD:
 		mLimiter->setThreshold(newValue);
 		break;
-	case apvts::ParameterEnum::CHORUS_FRACTION_OF_BEAT:
-//		mChorusPtr->setRate(apvts::clampedValueForFractionOfBeat(beatsPerMinute, newValue));
-		break;
 	case apvts::ParameterEnum::CHORUS_DEPTH:
-//		mChorusPtr->setDepth(newValue);
+		mChorusPtr->setDepth(newValue);
 		break;
-	case apvts::ParameterEnum::CHORUS_CENTER_DELAY_FRACTION_OF_BEAT:
-//		mChorusPtr->setCentreDelay(apvts::clampedValueForFractionOfBeat(beatsPerMinute, newValue));
+	case apvts::ParameterEnum::CHORUS_DELAY:
+		mChorusPtr->setDelay(newValue);
 		break;
-	case apvts::ParameterEnum::CHORUS_FEEDBACK:
-//		mChorusPtr->setFeedback(newValue);
+	case apvts::ParameterEnum::CHORUS_WIDTH:
+		mChorusPtr->setWidth(newValue);
 		break;
-	case apvts::ParameterEnum::CHORUS_MIX:
-//		mChorusPtr->setMix(newValue);
-		break;
-	case apvts::ParameterEnum::PHASER_RATE_FRACTION_OF_BEAT:
-//		mPhaserPtr->setRate(apvts::clampedValueForFractionOfBeat(beatsPerMinute, newValue));
+	case apvts::ParameterEnum::CHORUS_FREQUENCY:
+		mChorusPtr->setFrequency(newValue);
 		break;
 	case apvts::ParameterEnum::PHASER_DEPTH:
-//		mPhaserPtr->setDepth(newValue);
+		mPhaserPtr->setDepth(newValue);
 		break;
-	case apvts::ParameterEnum::PHASER_CENTER_FREQUENCY:
-//		mPhaserPtr->setCentreFrequency(newValue);
+	case apvts::ParameterEnum::PHASER_FREQUENCY:
+		mPhaserPtr->setFrequency(newValue);
 		break;
 	case apvts::ParameterEnum::PHASER_FEEDBACK:
-//		mPhaserPtr->setFeedback(newValue);
+		mPhaserPtr->setFeedback(newValue);
 		break;
-	case apvts::ParameterEnum::PHASER_MIX:
-//		mPhaserPtr->setMix(newValue);
+	case apvts::ParameterEnum::PHASER_WIDTH:
+		mPhaserPtr->setWidth(newValue);
 		break;
 	case apvts::ParameterEnum::REVERB_SIZE:
 	{
@@ -1338,7 +1412,7 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		mMouseDrivePtr->setDistortion(newValue);
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_FILTER:
-		mMouseDrivePtr->setLowPassFrequency(newValue);
+		mMouseDrivePtr->setFilter(newValue);
 		break;
 	case apvts::ParameterEnum::MOUSE_DRIVE_VOLUME:
 		mMouseDrivePtr->setVolume(newValue);
@@ -1370,11 +1444,11 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::DELAY_ON:
 		mIsDelayOn = static_cast<bool>(newValue);
 		break;
-	case apvts::ParameterEnum::PHASER_ON:
-		mIsPhaserOn = static_cast<bool>(newValue);
+	case apvts::ParameterEnum::PHASER_IS_ON:
+		mPhaserPtr->setBypassed(!static_cast<bool>(newValue));
 		break;
 	case apvts::ParameterEnum::CHORUS_ON:
-		mIsChorusOn = static_cast<bool>(newValue);
+		mChorusPtr->setBypassed(!static_cast<bool>(newValue));
 		break;
 	case apvts::ParameterEnum::INSTRUMENT_EQUALISER_HIGH_PASS_ON:
 		mInstrumentEqualiser->setOnAtIndex(static_cast<bool>(newValue), 0);
@@ -1550,6 +1624,24 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 		break;
 	case apvts::ParameterEnum::BIT_CRUSHER_BIT_DEPTH:
 		mBitCrusher->setBitDepth(newValue);
+		break;
+	case apvts::ParameterEnum::FLANGER_ON:
+		mFlangerPtr->setBypassed(!static_cast<bool>(newValue));
+		break;
+	case apvts::ParameterEnum::FLANGER_DELAY:
+		mFlangerPtr->setDelay(newValue);
+		break;
+	case apvts::ParameterEnum::FLANGER_WIDTH:
+		mFlangerPtr->setWidth(newValue);
+		break;
+	case apvts::ParameterEnum::FLANGER_DEPTH:
+		mFlangerPtr->setDepth(newValue);
+		break;
+	case apvts::ParameterEnum::FLANGER_FEEDBACK:
+		mFlangerPtr->setFeedback(newValue);
+		break;
+	case apvts::ParameterEnum::FLANGER_FREQUENCY:
+		mFlangerPtr->setFrequency(newValue);
 		break;
 	default:
 		assert(false);

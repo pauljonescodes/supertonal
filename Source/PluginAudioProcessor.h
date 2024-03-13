@@ -11,7 +11,10 @@
 #include "Processors/Equilisers/AmplifierEqualiser.h"
 #include "Processors/Equilisers/InstrumentEqualiser.h"
 #include "Processors/CTAGDRC/dsp/include/Compressor.h"
-#include "Processors/Other/BitCrusher.h"
+#include "Processors/Other/Bitcrusher.h"
+#include "Processors/Modulators/Phaser.h"
+#include "Processors/Modulators/Chorus.h"
+#include "Processors/Modulators/Flanger.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -121,13 +124,10 @@ private:
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> mDelayHighPassFilterPtr;
     std::unique_ptr<juce::dsp::DryWetMixer<float>> mDelayLineDryWetMixerPtr;
 
-    bool mIsChorusOn = false;
-    //std::unique_ptr<juce::dsp::Chorus<float>> mChorusPtr;
-
-    bool mIsPhaserOn = false;
-    //std::unique_ptr<juce::dsp::Phaser<float>> mPhaserPtr;
-
-    std::unique_ptr<BitCrusher> mBitCrusher;
+    std::unique_ptr<Chorus> mChorusPtr;
+    std::unique_ptr<Phaser> mPhaserPtr;
+    std::unique_ptr<Flanger> mFlangerPtr;
+    std::unique_ptr<Bitcrusher> mBitCrusher;
 
     bool mIsCabImpulseResponseConvolutionOn = true;
     std::unique_ptr<juce::dsp::ConvolutionMessageQueue> mConvolutionMessageQueuePtr;

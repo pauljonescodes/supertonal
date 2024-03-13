@@ -24,7 +24,7 @@
 #include "MouseDrive.h"
 
 MouseDrive::MouseDrive() :
-    mDirectCurrentBlockerHighPassFilter(juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>())
+    mDCBlockerHPF(juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>())
 {
     mNetlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
     mNetlistCircuitQuantities->addResistor(
@@ -149,7 +149,7 @@ void MouseDrive::setVolume(float targetValue)
     mVolumeSmoothedValue.setTargetValue(targetValue);
 };
 
-void MouseDrive::setLowPassFrequency(float newValue)
+void MouseDrive::setFilter(float newValue)
 {
     if (newValue != 0)
     {
@@ -174,9 +174,9 @@ void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
     mGain.prepare(spec);
     mGain.setRampDurationSeconds(0.05);
 
-    mDirectCurrentBlockerHighPassFilter.prepare(spec);
+    mDCBlockerHPF.prepare(spec);
 
-    *mDirectCurrentBlockerHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
+    *mDCBlockerHPF.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
         spec.sampleRate,
         15.0f,
         0.70710678118654752440f);
@@ -200,7 +200,7 @@ void MouseDrive::prepare(juce::dsp::ProcessSpec& spec)
 void MouseDrive::reset()
 {
     mGain.reset();
-    mDirectCurrentBlockerHighPassFilter.reset();
+    mDCBlockerHPF.reset();
 }
 
 void MouseDrive::processBlock(juce::AudioBuffer<float>& buffer)
@@ -231,5 +231,5 @@ void MouseDrive::processBlock(juce::AudioBuffer<float>& buffer)
 
     mLowPassFilter.process(processContext);
 
-    mDirectCurrentBlockerHighPassFilter.process(processContext);
+    mDCBlockerHPF.process(processContext);
 }

@@ -28,15 +28,57 @@
 
 #include <JuceHeader.h>
 #include "TubeScreamerWDF.h"
-#include "../../Utilities/CircuitQuantityHelper.h"
 #include "TubeScreamerTone.h"
+#include "../../Utilities/CircuitQuantityHelper.h"
 
 class TubeScreamer
 {
 public:
-    explicit TubeScreamer ();
+    inline static const float levelDefaultValue = -10.0f;
+    static inline const juce::NormalisableRange<float> levelNormalisableRange = {
+        -64.0f,
+        0.0f,
+        [=](float min, float max, float normalised) // convertFrom0to1
+        {
+            return normalised * (max - min) + min;
+        },
+        [=](float min, float max, float unnormalised) // convertTo0to1
+        {
+            return (unnormalised - min) / (max - min);
+        }
+    };
 
-    inline static const float sLevelDefaultValue = -10.0f;
+    static constexpr float toneDefaultValue = 1.0f;
+    static inline const juce::NormalisableRange<float> toneNormalisableRange = juce::NormalisableRange<float>(
+        0.0f,
+        1.0f,
+        0.01f);
+
+    static constexpr float driveDefaultValue = 0.5f;
+    static inline const juce::NormalisableRange<float> driveNormalisableRange = juce::NormalisableRange<float>(
+        0.0f,
+        1.0f,
+        0.01f);
+
+    static constexpr float diodeTypeMinimumValue = 0.0f;
+    static constexpr float diodeTypeMaximumValue = 2.0f;
+    static constexpr float diodeTypeInterval = 1.0;
+    static constexpr float diodeTypeDefaultValue = 0.0f;
+    static inline const juce::NormalisableRange<float> diodeTypeNormalisableRange = juce::NormalisableRange<float>(
+        diodeTypeMinimumValue,
+        diodeTypeMaximumValue,
+        diodeTypeInterval);
+
+    static constexpr float diodeCountMinimumValue = 1.0f;
+    static constexpr float diodeCountMaximumValue = 3.0f;
+    static constexpr float diodeCountInterval = 1.0;
+    static constexpr float diodeCountDefaultValue = 2.0f;
+    static inline const juce::NormalisableRange<float> diodeCountNormalisableRange = juce::NormalisableRange<float>(
+        diodeCountMinimumValue,
+        diodeCountMaximumValue,
+        diodeCountInterval);
+
+    explicit TubeScreamer ();
 
     void prepare(juce::dsp::ProcessSpec& spec);
     void processBlock(juce::AudioBuffer<float>& buffer);
@@ -44,9 +86,9 @@ public:
 
     void setDrive(float newGain);
     void setLevel(float newLevel);
+    void setTone(float tone);
     void setDiodeType(int newDiodeType); // 0, 1, or 2
     void setDiodeCount(int newDiodeCount);
-	void setTone(float tone);
 
 private:
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> mDriveGainSmoothedValue;
@@ -59,7 +101,7 @@ private:
 
     TubeScreamerWDF mWdf[2];
 	TubeScreamerTone mTone[2];
-    juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> mDirectCurrentBlockerHighPassFilter;
+    juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> mDCBlockerHPF;
 
     float getDiodeIs(int diodeType);
 

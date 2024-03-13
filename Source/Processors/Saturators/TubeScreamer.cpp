@@ -24,7 +24,7 @@
 #include "TubeScreamer.h"
 
 TubeScreamer::TubeScreamer () :
-    mDirectCurrentBlockerHighPassFilter(juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>())
+    mDCBlockerHPF(juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>())
 {
     mNetlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
     mNetlistCircuitQuantities->addResistor (
@@ -87,8 +87,8 @@ void TubeScreamer::prepare (juce::dsp::ProcessSpec& spec)
         wdfProc.setParameters (gainParamSkew, getDiodeIs(mDiodeType), mDiodeCount, true);
     }
 
-    mDirectCurrentBlockerHighPassFilter.prepare (spec);
-    *mDirectCurrentBlockerHighPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
+    mDCBlockerHPF.prepare (spec);
+    *mDCBlockerHPF.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
         spec.sampleRate,
         15.0f,
         0.70710678118654752440f);
@@ -123,14 +123,14 @@ void TubeScreamer::processBlock(juce::AudioBuffer<float>& buffer)
     auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
     auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
 
-    mDirectCurrentBlockerHighPassFilter.process (processContext);
+    mDCBlockerHPF.process (processContext);
 
     buffer.applyGain (juce::Decibels::decibelsToGain (levelGainValue));
 }
 
 void TubeScreamer::reset()
 {
-    mDirectCurrentBlockerHighPassFilter.reset();
+    mDCBlockerHPF.reset();
 }
 
 float TubeScreamer::getDiodeIs(int diodeType)
