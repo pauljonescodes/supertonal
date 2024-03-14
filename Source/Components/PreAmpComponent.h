@@ -7,13 +7,14 @@
 #include "PedalComponent.h"
 #include "EquiliserComponent.h"
 #include "DelayComponent.h"
+#include "TunerComponent.h"
 
 class PreAmpComponent : public juce::Component
 {
 public:
 	PreAmpComponent(
-		juce::AudioProcessorValueTreeState& audioProcessorValueTreeState) :
-		mAudioProcessorValueTreeState(audioProcessorValueTreeState)
+		PluginAudioProcessor& audioProcessor) :
+		mAudioProcessor(audioProcessor)
 	{
 		mViewportPtr = std::make_unique<juce::Viewport>();
 		mContainerPtr = std::make_unique<juce::Component>();
@@ -21,8 +22,12 @@ public:
 		addAndMakeVisible(mViewportPtr.get());
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
 
+		mContainerPtr->addAndMakeVisible(new TunerPedalComponent(
+			mAudioProcessor,
+			apvts::tunerOnId));
+
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Compressor",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::preCompressorThresholdId, "Threshold", "dB"},
@@ -36,7 +41,7 @@ public:
 					apvts::preCompressorAutoMakeUpOnId));
 
 		mContainerPtr->addAndMakeVisible(new EqualiserComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Equaliser",
 			std::vector<EqualiserComponent::ParameterSetting>{
 				{ apvts::preEqualiser100GainId, "100hz", "dB"},
@@ -51,7 +56,7 @@ public:
 			apvts::preEqualiserOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Screamer",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::tubeScreamerDriveId, "Drive", ""},
@@ -61,17 +66,17 @@ public:
 			apvts::tubeScreamerOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Driver",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::mouseDriveDistortionId, "Distortion", ""},
-				{ apvts::mouseDriveFilterId, "Filter", ""},
+				{ apvts::mouseDriveFilterId, "Filter", "" },
 				{ apvts::mouseDriveVolumeId, "Volume", "" }
 		},
 			apvts::mouseDriveOnId));
 
 		mContainerPtr->addAndMakeVisible(new DelayComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Delay",
 			apvts::delayLeftPerBeatId,
 			apvts::delayRightPerBeatId,
@@ -83,10 +88,10 @@ public:
 			apvts::delayDryWetId,
 			apvts::delayIsSyncedId,
 			apvts::delayLinkedId,
-			apvts::delayOnId ));
+			apvts::delayOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Chorus",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::chorusDelayId, "Delay", ""},
@@ -97,18 +102,18 @@ public:
 			apvts::chorusOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Phaser",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::phaserDepthId, "Depth", "" },
-				{ apvts::phaserWidthId, "Width", ""},
+				{ apvts::phaserWidthId, "Width", "" },
 				{ apvts::phaserFeedbackId, "Feedback", "" },
 				{ apvts::phaserFrequencyId, "Frequency", "" },
 		},
 			apvts::phaserIsOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Flanger",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::flangerDelayId, "Delay", "" },
@@ -120,7 +125,7 @@ public:
 			apvts::flangerOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Bit Crusher",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::bitCrusherSampleRateId, "Sample rate", " hz"},
@@ -129,7 +134,7 @@ public:
 			apvts::bitCrusherOnId));
 
 		mContainerPtr->addAndMakeVisible(new PedalComponent(
-			audioProcessorValueTreeState,
+			mAudioProcessor.getAudioProcessorValueTreeState(),
 			"Reverb",
 			std::vector<PedalComponent::ParameterSetting>{
 				{ apvts::roomSizeId, "Size", ""},
@@ -160,7 +165,7 @@ public:
 		int xPosition = 0; 
 		int index = 0;
 		for (auto* comp : mContainerPtr->getChildren()) {
-			if (index == 1)
+			if (index == 2)
 			{
 				comp->setBounds(xPosition, 10, 560, localBounds.getHeight() - 20);
 			}
@@ -176,7 +181,7 @@ public:
 	}
 
 private:
-	juce::AudioProcessorValueTreeState& mAudioProcessorValueTreeState;
+	PluginAudioProcessor& mAudioProcessor;
 
 	std::unique_ptr <juce::Viewport> mViewportPtr;
 	std::unique_ptr <juce::Component> mContainerPtr;

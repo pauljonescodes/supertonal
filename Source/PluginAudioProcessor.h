@@ -16,6 +16,7 @@
 #include "Processors/Modulators/Phaser.h"
 #include "Processors/Modulators/Chorus.h"
 #include "Processors/Modulators/Flanger.h"
+#include "Utilities/GinAudioFifo.h"
 
 class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
 {
@@ -79,12 +80,23 @@ public:
         return *mUndoManager;
     }
 
+    float getPitch()
+    {
+        return (float)mPitchAtom;
+    }
+
 private:
     std::unique_ptr <juce::UndoManager> mUndoManager;
     std::unique_ptr<juce::AudioProcessorValueTreeState> mAudioProcessorValueTreeStatePtr;
     std::unique_ptr<PluginPresetManager> mPresetManagerPtr;
     std::unique_ptr<juce::AudioFormatManager> mAudioFormatManagerPtr;
     juce::SmoothedValue<double, juce::ValueSmoothingTypes::Linear> mBpmSmoothedValue;
+
+    float mTunerOn = false;
+    std::atomic<float> mPitchAtom = 0;
+    std::unique_ptr <adamski::PitchMPM> mPitchMPM;
+    std::unique_ptr <AudioFifo> mAudioFifo;
+    std::unique_ptr<juce::AudioBuffer<float>> mAudioBuffer;
 
     std::unique_ptr <foleys::LevelMeterSource> mInputLevelMeterSourcePtr;
     std::unique_ptr <foleys::LevelMeterSource> mOutputLevelMeterSourcePtr;
@@ -176,8 +188,6 @@ private:
 
     bool mIsInstrumentCompressorPreEqualiser;
     std::unique_ptr<Compressor> mInstrumentCompressorPtr;
-    //LevelEnvelopeFollower inLevelFollower;
-    //LevelEnvelopeFollower outLevelFollower;
 
     bool mIsLimiterOn = true;
     std::unique_ptr<juce::dsp::Limiter<float>> mLimiterPtr;

@@ -32,6 +32,7 @@
               file="Source/Utilities/CircuitQuantityHelper.cpp"/>
         <FILE id="quTl9D" name="CircuitQuantityHelper.h" compile="0" resource="0"
               file="Source/Utilities/CircuitQuantityHelper.h"/>
+        <FILE id="zrNgdk" name="GinAudioFifo.h" compile="0" resource="0" file="Source/Utilities/GinAudioFifo.h"/>
         <FILE id="ClkX0h" name="OmegaProvider.h" compile="0" resource="0" file="Source/Utilities/OmegaProvider.h"/>
       </GROUP>
       <GROUP id="{4158DADA-03E3-DF91-81E4-7F16E37B44DD}" name="Components">
@@ -51,6 +52,8 @@
         <FILE id="g3k9OM" name="PresetComponent.h" compile="0" resource="0"
               file="Source/Components/PresetComponent.h"/>
         <FILE id="JJ02wX" name="TopComponent.h" compile="0" resource="0" file="Source/Components/TopComponent.h"/>
+        <FILE id="V354Iz" name="TunerComponent.h" compile="0" resource="0"
+              file="Source/Components/TunerComponent.h"/>
       </GROUP>
       <GROUP id="{DEDDA15C-1DE5-7D7A-FDED-908468144E16}" name="Processors">
         <GROUP id="{5B869611-B206-28D5-C958-2731ED1ECBE4}" name="Modulators">
@@ -150,6 +153,7 @@
     </GROUP>
   </MAINGROUP>
   <MODULES>
+    <MODULE id="audio_fft" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="ff_meters" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -165,6 +169,7 @@
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="pitch_detector" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
@@ -188,6 +193,8 @@
         <MODULEPATH id="juce_gui_extra" path="../../../modules"/>
         <MODULEPATH id="juce_dsp" path="../../modules"/>
         <MODULEPATH id="ff_meters" path="Modules"/>
+        <MODULEPATH id="pitch_detector" path="Modules"/>
+        <MODULEPATH id="audio_fft" path="Modules"/>
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX" hardenedRuntime="1" iosDevelopmentTeamID="24TXZ384X3"
@@ -211,6 +218,8 @@
         <MODULEPATH id="juce_gui_extra" path="../../../modules"/>
         <MODULEPATH id="juce_dsp" path="../../modules"/>
         <MODULEPATH id="ff_meters" path="Modules"/>
+        <MODULEPATH id="pitch_detector" path="Modules"/>
+        <MODULEPATH id="audio_fft" path="Modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>

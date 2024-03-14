@@ -45,4 +45,23 @@ public:
         float frequencyHz = 1.0f / noteDurationSeconds;
         return std::clamp(frequencyHz, minimumValue, maximumValue);
     }
+
+    static inline std::tuple<std::string, float> getNoteNameAndCentsFromFrequency(double frequency) {
+        static const char* noteNames[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+        const float referenceA4 = 440.0;
+
+        float n = 12.0 * log2(frequency / referenceA4);
+        int nRounded = int(round(n));
+
+        int noteIndex = (nRounded + 9) % 12;
+        if (noteIndex < 0) noteIndex += 12;
+
+        int octave = 4 + (nRounded + 9) / 12;
+
+        float nearestNoteFrequency = referenceA4 * pow(2.0, nRounded / 12.0);
+
+        float cents = 1200 * log2(frequency / nearestNoteFrequency);
+
+        return { noteNames[noteIndex], cents };
+    }
 };

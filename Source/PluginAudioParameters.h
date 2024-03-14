@@ -266,6 +266,8 @@ namespace apvts
 		NOISE_GATE_RATIO,
 		NOISE_GATE_RELEASE,
 
+		TUNER_ON,
+
 		PRE_COMPRESSOR_IS_ON,
 		PRE_COMPRESSOR_THRESHOLD,
 		PRE_COMPRESSOR_ATTACK,
@@ -437,6 +439,8 @@ namespace apvts
 	static const std::string noiseGateReleaseId = "noise_gate_release";
 	static const std::string noiseGateGainId = "noise_gate_gain";
 
+	static const std::string tunerOnId = "tuner_on";
+
 	static const std::string preCompressorOnId = "pre_compressor_on";
 	static const std::string preCompressorThresholdId = "pre_comp_thresh";
 	static const std::string preCompressorAttackId = "pre_comp_attack";
@@ -602,6 +606,8 @@ namespace apvts
 		{noiseGateAttackId, ParameterEnum::NOISE_GATE_ATTACK},
 		{noiseGateRatioId, ParameterEnum::NOISE_GATE_RATIO},
 		{noiseGateReleaseId, ParameterEnum::NOISE_GATE_RELEASE},
+
+		{tunerOnId, ParameterEnum::TUNER_ON},
 
 		{preCompressorOnId, ParameterEnum::PRE_COMPRESSOR_IS_ON},
 		{preCompressorThresholdId, ParameterEnum::PRE_COMPRESSOR_THRESHOLD},

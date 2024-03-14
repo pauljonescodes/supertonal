@@ -10,3 +10,9 @@
 [submodule "Modules/ff_meters"]
 	path = Modules/ff_meters
 	url = git@github.com:ffAudio/ff_meters.git
+[submodule "Modules/pitch_detector"]
+	path = Modules/pitch_detector
+	url = git@github.com:adamski/pitch_detector.git
+[submodule "Modules/audio_fft"]
+	path = Modules/audio_fft
+	url = git@github.com:adamski/audio_fft.git

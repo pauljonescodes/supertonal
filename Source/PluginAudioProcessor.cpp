@@ -23,6 +23,9 @@ PluginAudioProcessor::PluginAudioProcessor()
 		createParameterLayout())),
 	mPresetManagerPtr(std::make_unique<PluginPresetManager>(*mAudioProcessorValueTreeStatePtr.get())),
 	mAudioFormatManagerPtr(std::make_unique<juce::AudioFormatManager>()),
+	mPitchMPM(std::make_unique<adamski::PitchMPM>(44100, 1024)),
+	mAudioFifo(std::make_unique<AudioFifo>()),
+	mAudioBuffer(std::make_unique<juce::AudioBuffer<float>>()),
 	mInputLevelMeterSourcePtr(std::make_unique<foleys::LevelMeterSource>()),
 	mOutputLevelMeterSourcePtr(std::make_unique<foleys::LevelMeterSource>()),
 
@@ -154,6 +157,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 		case apvts::ParameterEnum::BIT_CRUSHER_ON:
 		case apvts::ParameterEnum::FLANGER_ON:
 		case apvts::ParameterEnum::IS_LOFI:
+		case apvts::ParameterEnum::TUNER_ON:
 			layout.add(std::make_unique<juce::AudioParameterBool>(
 				juce::ParameterID{ parameterId, apvts::version },
 				parameterId,
@@ -288,7 +292,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::create
 				juce::ParameterID{ parameterId, apvts::version },
 				PluginUtils::toTitleCase(parameterId),
 				apvts::qualityNormalisableRange,
-				apvts::qualityOffDefaultValue
+				apvts::qualityOnDefaultValue
 				));
 		}
 		break;
@@ -816,6 +820,12 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 	spec.maximumBlockSize = samplesPerBlock;
 	spec.numChannels = numChannels;
 
+	mAudioFifo->setSize(numChannels, samplesPerBlock * 4.0f);
+	mAudioBuffer->setSize(numChannels, samplesPerBlock * 2.0f);
+
+	mPitchMPM->setBufferSize(1024);
+	mPitchMPM->setSampleRate(sampleRate);
+
 	mInputLevelMeterSourcePtr->resize(getTotalNumOutputChannels(), sampleRate * 0.1 / samplesPerBlock);
 	mOutputLevelMeterSourcePtr->resize(getTotalNumOutputChannels(), sampleRate * 0.1 / samplesPerBlock);
 
@@ -990,18 +1000,25 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	auto audioBlock = juce::dsp::AudioBlock<float>(buffer);
 	auto processContext = juce::dsp::ProcessContextReplacing<float>(audioBlock);
 
+	if (mTunerOn)
+	{
+		mAudioFifo->write(buffer);
+		mAudioFifo->read(*mAudioBuffer);
+		mPitchAtom = mPitchMPM->getPitch(mAudioBuffer->getReadPointer(0));
+	}
+
 	mNoiseGate->process(processContext);
 	mInputGainPtr->process(processContext);
 
 	if (mIsPreCompressorOn)
 	{
 		mPreCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
-		float preCompressorInputRms = mIsPreCompressorAutoMakeup ? PluginUtils::calculateRMS(buffer, totalNumInputChannels, numSamples) : 0;
+		float preCompressorInputRms = mIsPreCompressorAutoMakeup ? buffer.getRMSLevel(0, 0, numSamples) : 0;
 		mPreCompressorPtr->process(processContext);
 
 		if (mIsPreCompressorAutoMakeup)
 		{
-			float preCompressorOutputRms = PluginUtils::calculateRMS(buffer, totalNumInputChannels, numSamples);
+			float preCompressorOutputRms = buffer.getRMSLevel(0, 0, numSamples);
 			mPreCompressorGainSmoothedValue.setTargetValue(std::min(preCompressorInputRms / preCompressorOutputRms, 12.0f));
 
 			for (int sample = 0; sample < numSamples; ++sample)
@@ -1676,6 +1693,9 @@ void PluginAudioProcessor::parameterChanged(const juce::String& parameterIdJuceS
 	case apvts::ParameterEnum::CABINET_IMPULSE_RESPONSE_INDEX:
 		mCabinetImpulseResponseIndex = newValue;
 		loadImpulseResponseFromState();
+		break;
+	case apvts::ParameterEnum::TUNER_ON:
+		mTunerOn = static_cast<bool>(newValue);
 		break;
 	default:
 		assert(false);
