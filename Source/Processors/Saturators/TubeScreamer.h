@@ -38,11 +38,11 @@ public:
     static inline const juce::NormalisableRange<float> levelNormalisableRange = {
         -64.0f,
         0.0f,
-        [=](float min, float max, float normalised) // convertFrom0to1
+        [](float min, float max, float normalised) // convertFrom0to1
         {
             return normalised * (max - min) + min;
         },
-        [=](float min, float max, float unnormalised) // convertTo0to1
+        [](float min, float max, float unnormalised) // convertTo0to1
         {
             return (unnormalised - min) / (max - min);
         }

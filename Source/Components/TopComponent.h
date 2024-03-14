@@ -120,7 +120,6 @@ public:
 		mViewportPtr->setBounds(localBounds);
 
 		const int levelMeterWidth = 30; // Arbitrary width for the level meters
-		const int levelMeterSpacing = 10; // Space between the meters and the main content
 
 		// Place the input level meter on the very left, spanning the full height.
 		mInputLevelMeter.setBounds(0, 0, levelMeterWidth, localBounds.getHeight());

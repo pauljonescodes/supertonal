@@ -980,10 +980,8 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	const auto totalNumInputChannels = getTotalNumInputChannels();
 	const auto totalNumOutputChannels = getTotalNumOutputChannels();
 	const auto numSamples = buffer.getNumSamples();
-	const auto samplesPerSecond = getSampleRate();
 	const double rawBeatsPerMinute = getPlayHead()->getPosition()->getBpm().orFallback(120);
 	mBpmSmoothedValue.setTargetValue(rawBeatsPerMinute);
-	const auto smoothedBeatsPerMinute = mBpmSmoothedValue.skip(numSamples);
 
 	if (mIsBypassOn)
 	{

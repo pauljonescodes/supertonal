@@ -41,11 +41,11 @@ public:
 	static inline const juce::NormalisableRange<float> filterNormalisableRange = {
 			20.0f,
 			20000.0f,
-			[=](float start, float end, float normalised)
+			[](float start, float end, float normalised)
 			{
 				return start + (std::exp2(normalised * 6.0f) - 1) * (end - start) / (std::exp2(6.0f) - 1);
 			},
-			[=](float start, float end, float unnormalised)
+			[](float start, float end, float unnormalised)
 			{
 				return std::log2(((unnormalised - start) / (end - start) * (std::exp2(6.0f) - 1)) + 1) / 6.0f;
 			}
@@ -55,11 +55,11 @@ public:
 	static inline const juce::NormalisableRange<float> volumeNormalisableRange = {
 			-64.0f,
 			0.0f,
-			[=](float min, float max, float normalised) // convertFrom0to1
+			[](float min, float max, float normalised) // convertFrom0to1
 			{
 				return normalised * (max - min) + min;
 			},
-			[=](float min, float max, float unnormalised) // convertTo0to1
+			[](float min, float max, float unnormalised) // convertTo0to1
 			{
 				return (unnormalised - min) / (max - min);
 			}

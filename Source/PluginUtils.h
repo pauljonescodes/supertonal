@@ -56,7 +56,7 @@ public:
         int noteIndex = (nRounded + 9) % 12;
         if (noteIndex < 0) noteIndex += 12;
 
-        int octave = 4 + (nRounded + 9) / 12;
+        //int octave = 4 + (nRounded + 9) / 12;
 
         float nearestNoteFrequency = referenceA4 * pow(2.0, nRounded / 12.0);
 

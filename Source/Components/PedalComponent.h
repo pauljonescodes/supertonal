@@ -99,7 +99,7 @@ public:
 
 			row1Count++;
 
-			if (mSliderPtrs.size() == 4 && row1Count == 2 || mSliderPtrs.size() > 4 && row1Count >= 3)
+			if ((mSliderPtrs.size() == 4 && row1Count == 2) || (mSliderPtrs.size() > 4 && row1Count >= 3))
 			{
 				break;
 			}

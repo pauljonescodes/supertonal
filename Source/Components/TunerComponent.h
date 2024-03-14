@@ -96,7 +96,7 @@ private:
 
 	float mLastPitch;
 
-	void timerCallback()
+	void timerCallback() override
 	{
 		const auto newPitch = mAudioProcessorRef.getPitch();
 		if (newPitch != mLastPitch)
