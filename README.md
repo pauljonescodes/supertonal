@@ -2,7 +2,11 @@
 
 ![Alt text](Screenshots/wide.JPG "Supertonal")
 
-Supertonal is a work-in-progress guitar multi-effects processor featuring, in rough order:
+Supertonal is a work-in-progress guitar multi-effects processor.
+
+Take a listen to a [sample](https://github.com/pauljonescodes/supertonal/tree/master/Sounds).
+
+It's capabilities, in a rough order:
 
 - A tuner
 - Gain staging
