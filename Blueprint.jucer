@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="gKYDzO" name="Blueprint Cory Bergeron2" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
-              jucerFormatVersion="1" version="0.2.1" companyName="Supertonal DSP"
+              jucerFormatVersion="1" version="0.2.2" companyName="Supertonal DSP"
               companyCopyright="2024" pluginFormats="buildAAX,buildAU,buildStandalone,buildVST3"
               pluginAAXCategory="8192" headerPath="../../Modules/math_approx/include&#10;../../Modules/chowdsp_wdf/include/chowdsp_wdf"
               cppLanguageStandard="20">
