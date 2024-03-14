@@ -1,6 +1,6 @@
-# Supertonal
-
 ![Alt text](Screenshots/wide.JPG "Supertonal")
+
+# Supertonal
 
 Supertonal is a work-in-progress guitar multi-effects processor.
 
