@@ -140,7 +140,11 @@ void Compressor::process(AudioBuffer<float>& buffer)
 
         // Get max l/r amplitude values and fill sidechain signal
         FloatVectorOperations::abs(rawSidechainSignal, buffer.getReadPointer(0), numSamples);
-        FloatVectorOperations::max(rawSidechainSignal, rawSidechainSignal, buffer.getReadPointer(1), numSamples);
+        FloatVectorOperations::abs(rawSidechainSignal, buffer.getReadPointer(0), numSamples);
+        if (buffer.getNumChannels() > 1)
+        {
+            FloatVectorOperations::max(rawSidechainSignal, rawSidechainSignal, buffer.getReadPointer(1), numSamples);
+        }
 
         // Calculate crest factor on max. amplitude values of input buffer
         ballistics.processCrestFactor(rawSidechainSignal, numSamples);
