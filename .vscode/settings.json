@@ -95,5 +95,6 @@
         "xlocnum": "cpp",
         "xloctime": "cpp",
         "xtree": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "C:/JUCE/projects/Blueprint/Modules/chowdsp_wdf/bench"
 }

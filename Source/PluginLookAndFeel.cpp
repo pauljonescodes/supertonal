@@ -1,17 +1,25 @@
 /*
-  ==============================================================================
+    This code is part of the Supertonal guitar effects multi-processor.
+    Copyright (C) 2023-2024  Paul Jones
 
-    PluginLookAndFeel.cpp
-    Created: 9 Jan 2024 10:30:59pm
-    Author:  paulm
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
-*/
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>
+ */
 
 #include "PluginLookAndFeel.h"
 
-void PluginLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
-    const float rotaryStartAngle, const float rotaryEndAngle, juce::Slider& slider)
+void PluginLookAndFeel::drawRotarySlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos,
+                                         const float rotaryStartAngle, const float rotaryEndAngle, juce::Slider &slider)
 {
     const auto outline = slider.findColour(juce::Slider::rotarySliderOutlineColourId);
     const auto fill = slider.findColour(juce::Slider::rotarySliderFillColourId);
@@ -64,13 +72,13 @@ void PluginLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
 
     juce::Path backgroundArc;
     backgroundArc.addCentredArc(bounds.getCentreX(),
-        bounds.getCentreY(),
-        arcRadius,
-        arcRadius,
-        0.0f,
-        rotaryStartAngle,
-        rotaryEndAngle,
-        true);
+                                bounds.getCentreY(),
+                                arcRadius,
+                                arcRadius,
+                                0.0f,
+                                rotaryStartAngle,
+                                rotaryEndAngle,
+                                true);
 
     g.setColour(outline);
     g.strokePath(backgroundArc, juce::PathStrokeType(lineW, juce::PathStrokeType::curved, juce::PathStrokeType::butt));
@@ -94,13 +102,13 @@ void PluginLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
     {
         juce::Path valueArc;
         valueArc.addCentredArc(bounds.getCentreX(),
-            bounds.getCentreY(),
-            arcRadius,
-            arcRadius,
-            0.0f,
-            rotaryStartAngle,
-            toAngle,
-            true);
+                               bounds.getCentreY(),
+                               arcRadius,
+                               arcRadius,
+                               0.0f,
+                               rotaryStartAngle,
+                               toAngle,
+                               true);
 
         g.setColour(fill);
         g.strokePath(valueArc, juce::PathStrokeType(lineW, juce::PathStrokeType::curved, juce::PathStrokeType::butt));
@@ -112,12 +120,12 @@ void PluginLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
     g.strokePath(p, juce::PathStrokeType(lineW, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 }
 
-void PluginLookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& button,
-    const juce::Colour& backgroundColour,
-    bool isMouseOverButton, bool isButtonDown)
+void PluginLookAndFeel::drawButtonBackground(juce::Graphics &g, juce::Button &button,
+                                             const juce::Colour &backgroundColour,
+                                             bool isMouseOverButton, bool isButtonDown)
 {
     const auto baseColour = backgroundColour
-        .withMultipliedAlpha(button.isEnabled() ? 0.75f : 0.3f);
+                                .withMultipliedAlpha(button.isEnabled() ? 0.75f : 0.3f);
 
     const auto width = float(button.getWidth());
     const auto height = float(button.getHeight());
@@ -128,8 +136,8 @@ void PluginLookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& bu
 
         juce::Path outline;
         outline.addRoundedRectangle(0.f, 0.f,
-            width, height, cornerSize, cornerSize,
-            true, true, true, true);
+                                    width, height, cornerSize, cornerSize,
+                                    true, true, true, true);
 
         g.setGradientFill(juce::ColourGradient(
             baseColour.darker(0.1f), 0.f, height / 2 - 2,
@@ -150,7 +158,7 @@ void PluginLookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& bu
 
         g.setColour(juce::Colours::black.withAlpha(outlineAlpha));
         g.strokePath(outline, juce::PathStrokeType(1.f),
-            juce::AffineTransform::translation(0.f, 1.f).scaled(1.f, (height + 2.f) / height));
+                     juce::AffineTransform::translation(0.f, 1.f).scaled(1.f, (height + 2.f) / height));
     }
 }
 
@@ -159,7 +167,7 @@ int PluginLookAndFeel::getDefaultScrollbarWidth()
     return 8;
 }
 
-void PluginLookAndFeel::drawCornerResizer(juce::Graphics& g, int w, int h, bool /*isMouseOver*/, bool /*isMouseDragging*/)
+void PluginLookAndFeel::drawCornerResizer(juce::Graphics &g, int w, int h, bool /*isMouseOver*/, bool /*isMouseDragging*/)
 {
     using namespace juce;
 
@@ -172,22 +180,22 @@ void PluginLookAndFeel::drawCornerResizer(juce::Graphics& g, int w, int h, bool 
         g.setColour(col1);
 
         g.drawLine(w * i,
-            h + 1.0f,
-            w + 1.0f,
-            h * i,
-            lineThickness);
+                   h + 1.0f,
+                   w + 1.0f,
+                   h * i,
+                   lineThickness);
 
         g.setColour(col2);
 
         g.drawLine(w * i + lineThickness,
-            h + 1.0f,
-            w + 1.0f,
-            h * i + lineThickness,
-            lineThickness);
+                   h + 1.0f,
+                   w + 1.0f,
+                   h * i + lineThickness,
+                   lineThickness);
     }
 }
 
-void PluginLookAndFeel::drawComboBox(juce::Graphics& g, int width, int height, bool isButtonDown, int buttonX, int buttonY, int buttonW, int buttonH, juce::ComboBox& comboBox)
+void PluginLookAndFeel::drawComboBox(juce::Graphics &g, int width, int height, bool isButtonDown, int buttonX, int buttonY, int buttonW, int buttonH, juce::ComboBox &comboBox)
 {
     const auto baseColour = g_secondaryColour.withMultipliedAlpha(comboBox.isEnabled() ? 0.75f : 0.3f);
 
@@ -197,8 +205,8 @@ void PluginLookAndFeel::drawComboBox(juce::Graphics& g, int width, int height, b
 
         juce::Path outline;
         outline.addRoundedRectangle(0.f, 0.f,
-            width, height, cornerSize, cornerSize,
-            true, true, true, true);
+                                    width, height, cornerSize, cornerSize,
+                                    true, true, true, true);
 
         g.setGradientFill(juce::ColourGradient(
             baseColour.darker(0.1f), 0.f, height / 2 - 2,
@@ -219,21 +227,21 @@ void PluginLookAndFeel::drawComboBox(juce::Graphics& g, int width, int height, b
 
         g.setColour(juce::Colours::black.withAlpha(outlineAlpha));
         g.strokePath(outline, juce::PathStrokeType(1.f),
-            juce::AffineTransform::translation(0.f, 1.f).scaled(1.f, (height + 2.f) / height));
+                     juce::AffineTransform::translation(0.f, 1.f).scaled(1.f, (height + 2.f) / height));
     }
 }
 
-void PluginLookAndFeel::positionComboBoxText(juce::ComboBox& cb, juce::Label& labelToPosition)
+void PluginLookAndFeel::positionComboBoxText(juce::ComboBox &cb, juce::Label &labelToPosition)
 {
     labelToPosition.setBounds(cb.getLocalBounds().reduced(cb.getHeight() / 2, 0));
 }
 
-void PluginLookAndFeel::drawPopupMenuBackground(juce::Graphics& g, int width, int height)
+void PluginLookAndFeel::drawPopupMenuBackground(juce::Graphics &g, int width, int height)
 {
     g.fillAll(g_secondaryColour);
 }
 
-void PluginLookAndFeel::drawPopupMenuItem(juce::Graphics& g, const juce::Rectangle<int>& area, bool isSeparator, bool isActive, bool isHighlighted, bool isTicked, bool hasSubMenu, const juce::String& text, const juce::String& shortcutKeyText, const juce::Drawable* icon, const juce::Colour* textColour)
+void PluginLookAndFeel::drawPopupMenuItem(juce::Graphics &g, const juce::Rectangle<int> &area, bool isSeparator, bool isActive, bool isHighlighted, bool isTicked, bool hasSubMenu, const juce::String &text, const juce::String &shortcutKeyText, const juce::Drawable *icon, const juce::Colour *textColour)
 {
     using namespace juce;
 
@@ -282,7 +290,7 @@ void PluginLookAndFeel::drawPopupMenuItem(juce::Graphics& g, const juce::Rectang
     }
 }
 
-void PluginLookAndFeel::drawScrollbar(juce::Graphics& g, juce::ScrollBar& scrollbar, int x, int y, int width, int height, bool isScrollbarVertical, int thumbStartPosition, int thumbSize, bool isMouseOver, bool isMouseDown)
+void PluginLookAndFeel::drawScrollbar(juce::Graphics &g, juce::ScrollBar &scrollbar, int x, int y, int width, int height, bool isScrollbarVertical, int thumbStartPosition, int thumbSize, bool isMouseOver, bool isMouseDown)
 {
     using namespace juce;
 
@@ -300,7 +308,7 @@ void PluginLookAndFeel::drawScrollbar(juce::Graphics& g, juce::ScrollBar& scroll
     }
 }
 
-void PluginLookAndFeel::drawTabButton(juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver, bool isMouseDown)
+void PluginLookAndFeel::drawTabButton(juce::TabBarButton &button, juce::Graphics &g, bool isMouseOver, bool isMouseDown)
 {
     using namespace juce;
 
@@ -308,7 +316,7 @@ void PluginLookAndFeel::drawTabButton(juce::TabBarButton& button, juce::Graphics
     const auto buttonIndex = button.getIndex();
 
     const auto selected = currentIndex == buttonIndex;
-    
+
     const auto baseColour = g_secondaryColour.darker(selected ? 0.25 : 0.0);
 
     const auto width = float(button.getWidth());
@@ -320,8 +328,8 @@ void PluginLookAndFeel::drawTabButton(juce::TabBarButton& button, juce::Graphics
 
         juce::Path outline;
         outline.addRoundedRectangle(0.f, 0.f,
-            width, height, cornerSize, cornerSize,
-            true, true, true, true);
+                                    width, height, cornerSize, cornerSize,
+                                    true, true, true, true);
 
         g.setGradientFill(juce::ColourGradient(
             baseColour.darker(0.1f), 0.f, height / 2 - 2,
@@ -342,59 +350,55 @@ void PluginLookAndFeel::drawTabButton(juce::TabBarButton& button, juce::Graphics
 
         g.setColour(juce::Colours::black.withAlpha(outlineAlpha));
         g.strokePath(outline, juce::PathStrokeType(1.f),
-            juce::AffineTransform::translation(0.f, 1.f).scaled(1.f, (height + 2.f) / height));
+                     juce::AffineTransform::translation(0.f, 1.f).scaled(1.f, (height + 2.f) / height));
 
         Font font(g_fontSize);
         g.setFont(font);
         g.setColour(button.findColour(button.getToggleState() ? TextButton::textColourOnId
-            : TextButton::textColourOffId)
-            .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f));
+                                                              : TextButton::textColourOffId)
+                        .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f));
 
         const int yIndent = button.proportionOfHeight(0.1f);
 
-        const int leftIndent = cornerSize / (button.isConnectedOnLeft() ?
-            yIndent * 2 : yIndent);
-        const int rightIndent = cornerSize / (button.isConnectedOnRight() ?
-            yIndent * 2 : yIndent);
+        const int leftIndent = cornerSize / (button.isConnectedOnLeft() ? yIndent * 2 : yIndent);
+        const int rightIndent = cornerSize / (button.isConnectedOnRight() ? yIndent * 2 : yIndent);
         const int textWidth = button.getWidth() - leftIndent - rightIndent;
 
         if (textWidth > 0)
             g.drawFittedText(button.getButtonText(),
-                leftIndent, yIndent, textWidth, button.getHeight() - yIndent * 2,
-                Justification::centred, 2);
+                             leftIndent, yIndent, textWidth, button.getHeight() - yIndent * 2,
+                             Justification::centred, 2);
     }
 }
 
-juce::Font PluginLookAndFeel::getTextButtonFont(juce::TextButton&, int buttonHeight)
+juce::Font PluginLookAndFeel::getTextButtonFont(juce::TextButton &, int buttonHeight)
 {
     return juce::Font(g_fontSize);
 }
 
-juce::Font PluginLookAndFeel::getLabelFont(juce::Label&)
+juce::Font PluginLookAndFeel::getLabelFont(juce::Label &)
 {
     return juce::Font(g_fontSize);
 }
 
-void PluginLookAndFeel::drawButtonText(juce::Graphics& g, juce::TextButton& button, bool /*shouldDrawButtonAsHighlighted*/, bool /*shouldDrawButtonAsDown*/)
+void PluginLookAndFeel::drawButtonText(juce::Graphics &g, juce::TextButton &button, bool /*shouldDrawButtonAsHighlighted*/, bool /*shouldDrawButtonAsDown*/)
 {
     using namespace juce;
     Font font(getTextButtonFont(button, button.getHeight()));
     g.setFont(font);
     g.setColour(button.findColour(button.getToggleState() ? TextButton::textColourOnId
-        : TextButton::textColourOffId)
-        .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f));
+                                                          : TextButton::textColourOffId)
+                    .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f));
 
     const int yIndent = button.proportionOfHeight(0.1f);
     const int cornerSize = jmin(button.getHeight(), button.getWidth()) / 2;
 
-    const int leftIndent = cornerSize / (button.isConnectedOnLeft() ?
-        yIndent * 2 : yIndent);
-    const int rightIndent = cornerSize / (button.isConnectedOnRight() ?
-        yIndent * 2 : yIndent);
+    const int leftIndent = cornerSize / (button.isConnectedOnLeft() ? yIndent * 2 : yIndent);
+    const int rightIndent = cornerSize / (button.isConnectedOnRight() ? yIndent * 2 : yIndent);
     const int textWidth = button.getWidth() - leftIndent - rightIndent;
 
     if (textWidth > 0)
         g.drawFittedText(button.getButtonText(),
-            leftIndent, yIndent, textWidth, button.getHeight() - yIndent * 2,
-            Justification::centred, 2);
+                         leftIndent, yIndent, textWidth, button.getHeight() - yIndent * 2,
+                         Justification::centred, 2);
 }
